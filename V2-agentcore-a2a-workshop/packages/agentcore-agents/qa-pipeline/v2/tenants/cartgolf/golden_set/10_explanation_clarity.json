@@ -1,0 +1,52 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성",
+  "category": "설명력 및 전달력",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 5, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "교환비/영업일/합포장 조건 등 숫자·조건 명시 여부로 판정. 4단계 [10,7,5,0].",
+  "examples": [
+    {
+      "example_id": "GS-10-FULL-01",
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 자사 상품이라 1회 무상 교환 가능하시고요. 회수 기사가 영업일 기준 2에서 3일 이내 방문 예정입니다. 반송장은 기사가 두고 갈 예정이니 교환 완료 시까지 보관 부탁드리겠습니다.",
+      "rationale": "교환비(무상) + 방문 일정(2~3영업일) + 반송장 보관 조건 모두 명확.",
+      "rationale_tags": ["구조 명확", "숫자 명시"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-10-MID-HIGH-01",
+      "score": 7,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 하나는 반품 하나는 교환 하실 경우 한 개 주문번호에 대해서 반품비 5천원 발생하시고, 다른 주문번호는 배송비 조정 처리 가능합니다. 합포장 반송 가능하세요.",
+      "rationale": "핵심 정보 거의 전달되나 반품비/교환비 구분이 다소 복잡하게 표현됨.",
+      "rationale_tags": ["구조 다소 복잡"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-10-MID-01",
+      "score": 5,
+      "score_bucket": "partial",
+      "intent": "상품문의",
+      "segment_text": "상담사: 그 상품은 월 몇천원 정도 하시고 사이즈는 라지 정도 있으세요. 자세한 건 페이지 참고해 주세요.",
+      "rationale": "'정도' 완화어 사용 + 숫자 미명시. 실질 정보 약함.",
+      "rationale_tags": ["정보 부분 명확"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-10-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "결제문의",
+      "segment_text": "상담사: 음 그거는 저도 잘 모르겠네요. 그냥 알아서 홈페이지 보세요.",
+      "rationale": "설명 전무 + 업무회피.",
+      "rationale_tags": ["설명 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

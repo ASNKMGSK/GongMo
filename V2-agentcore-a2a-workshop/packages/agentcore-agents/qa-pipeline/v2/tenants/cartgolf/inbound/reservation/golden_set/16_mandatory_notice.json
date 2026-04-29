@@ -1,0 +1,43 @@
+{
+  "item_number": 16,
+  "item_name": "필수 안내사항 이행 (예약)",
+  "category": "업무 정확도",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["예약신청", "예약변경", "예약취소"],
+  "dialog_stages": ["main", "outro"],
+  "version": "cartgolf_inbound_reservation_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "intent_script_crosscheck",
+    "details": "예약 확정 전 반드시 취소 수수료 + 날씨 취소 정책 고지 필수 (PDF §7.4)",
+    "script_registry": "../mandatory_scripts/intent_to_script.yaml"
+  },
+  "examples": [
+    {
+      "example_id": "GS-16-RES-FULL-001",
+      "item_number": 16,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "예약신청",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 네 고객님 예약 확정 전에 안내드리면요 취소는 라운드 일 기준 칠 일 전까지 무료 취소 가능하시고 그 이후에는 단계별 수수료 적용되십니다 그리고 당일 우천이나 악천후로 라운드 진행이 어려울 경우에는 홀 수에 따라 환불 기준이 적용되니 그 점 참고 부탁드립니다 네 이 부분 안내 드렸고 예약 진행 도와드려도 될까요",
+      "rationale": "[필수 안내사항] 취소 수수료 정책 + 날씨 취소 정책 2요소 모두 이행 + 진행 동의 확인 → 만점",
+      "rationale_tags": ["item_16", "full_compliance", "cancellation_policy", "weather_policy", "consent", "reservation"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 14}],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_021","variant":"full_disclosure","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-16-RES-ZERO-001",
+      "item_number": 16,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "예약신청",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 네 예약 완료되었습니다 고객님\n고객: 네 감사해요\n상담사: 네 그럼 좋은 라운드 되세요",
+      "rationale": "[필수 안내사항] 취소 수수료 · 날씨 정책 둘 다 미고지 → 0점\n - 예약 확정만 전달\n - 수수료 기준 없음 → 추후 취소 시 분쟁 소지\n - 날씨 환불 기준 없음",
+      "rationale_tags": ["item_16", "missing_cancellation_notice", "missing_weather_notice", "reservation"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 14}],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_022","variant":"no_disclosure","human_score_verified":false}
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "item_number": 8,
+  "item_name": "문의 파악 및 재확인(복창)",
+  "category": "니즈 파악",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["예약신청", "예약변경", "예약취소", "가용문의"],
+  "dialog_stages": ["main"],
+  "version": "cartgolf_inbound_reservation_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "keyword_trigger_window",
+    "details": "예약 관련 트리거 (\"티오프\", \"몇시\", \"인원\", \"카트\", \"라운드\") 근처 3발화 윈도우",
+    "trigger_keywords": ["티오프", "몇 시", "인원", "카트", "라운드", "예약"],
+    "window_size_turns": 3
+  },
+  "examples": [
+    {
+      "example_id": "GS-08-RES-FULL-001",
+      "item_number": 8,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "예약신청",
+      "dialog_stage": "main",
+      "segment_text": "고객: 다음 주 토요일에 라운드 예약하고 싶어요\n상담사: 네 고객님 다음 주 토요일 삼월 이십구 일 말씀이시죠 혹시 티오프 시간대는 오전 오후 중 어느 쪽 선호하세요\n고객: 오전이요\n상담사: 네 오전 티오프로 확인드릴게요 동반자 인원은 몇 분이시고 카트 이용 여부는 어떻게 할까요",
+      "rationale": "[니즈 파악] 날짜 복창 + 시간대 옵션 재질의 + 인원·카트 확인까지 3단 재확인 완결 → 만점\n - 날짜 재확인: \"삼월 이십구 일 말씀이시죠\"\n - 시간 옵션 제시\n - 인원 + 부대 옵션(카트) 모두 질의",
+      "rationale_tags": ["item_8", "full_compliance", "date_confirm", "option_branching", "reservation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_001","variant":"full_confirm","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-08-RES-PARTIAL-001",
+      "item_number": 8,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "예약변경",
+      "dialog_stage": "main",
+      "segment_text": "고객: 저 예약 날짜 바꿀 수 있나요\n상담사: 네 어떤 예약이시고 언제로 바꾸시려고요\n고객: 다음 주 토요일 거였는데 일요일로요\n상담사: 네 확인해 볼게요",
+      "rationale": "[니즈 파악] 기본 질의는 했으나 인원·시간대 유지 여부·카트 여부 재확인 누락 → 3점\n - 날짜만 변경 복창\n - 원 예약의 다른 옵션(시간대·인원·카트) 유지/변경 여부 미확인\n - 변경 가용 여부도 즉시 대신 \"확인해 볼게요\" 로 대기",
+      "rationale_tags": ["item_8", "partial_compliance", "incomplete_option_check", "reservation"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_002","variant":"partial_confirm","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-08-RES-ZERO-001",
+      "item_number": 8,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "가용문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이번 주말에 자리 있나요\n상담사: 글쎄요 보통 주말은 꽉 차요\n고객: 그러면 빈 시간대 있는지 확인해 주시면 안 될까요\n상담사: 그건 좀 어려워요",
+      "rationale": "[니즈 파악] 예약 시스템 조회 시도 없음 + 재질의 전무 → 0점\n - 실제 가용 시간 확인 미수행\n - 대체 일자/시간 제안 전무\n - \"글쎄요\" / \"어려워요\" 방어적 응대만",
+      "rationale_tags": ["item_8", "no_effort", "no_system_check", "reservation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_003","variant":"no_check","human_score_verified":false}
+    }
+  ]
+}

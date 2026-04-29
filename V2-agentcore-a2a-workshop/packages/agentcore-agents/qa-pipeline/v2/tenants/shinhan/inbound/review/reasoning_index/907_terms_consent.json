@@ -1,0 +1,37 @@
+{
+  "item_number": 907,
+  "item_name": "약관 설명 및 동의 절차",
+  "version": "shinhan_review_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_907_synthetic_rev_021",
+      "score": 5,
+      "rationale": "[약관/동의 · 만점] 약관규제법 준수: 신용정보 조회 동의(KCB/NICE 명시) / 개인정보 처리(목적 4종 + 선택 동의 분리) / 부가서비스 자동가입 여부 / 약관 송부 + 청약철회 4요소 모두 명확.\n - 상담사#2: \"신용정보 조회 동의 절차로 KCB / NICE 두 신용평가사에 본인의 신용정보 조회 동의가 필요합니다 동의하시겠어요\"\n - 상담사#4: \"마케팅 활용은 선택 동의이십니다 마케팅 동의는 어떻게 하시겠어요\"\n - 상담사#8: \"가입 후 칠 일 이내 청약철회도 가능하십니다\"",
+      "quote_example": "상담사: 신용정보 조회 동의 절차로 KCB / NICE 두 신용평가사에 본인의 신용정보 조회 동의가 필요합니다 동의하시겠어요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_907", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_021"
+    },
+    {
+      "record_id": "r_907_synthetic_rev_022",
+      "score": 3,
+      "rationale": "[약관/동의 · 부분점수 3점] 신용정보 조회 동의는 진행. 그러나 마케팅 동의를 \"일단 동의로 진행\"하며 사실상 강제 — 선택 동의 자유 침해 우려. 부가서비스 자동가입 안내 누락. 청약철회 미고지.\n - 상담사#2: \"신용정보 조회 동의 부탁드릴게요\"\n - 상담사#6: \"일반적인 절차이시고요 추후 변경 가능하시니까 일단 동의로 진행 도와드릴게요\"\n - 상담사#8: \"약관은 카드 발급되시면 동봉되어서 같이 받으실 거예요\"",
+      "quote_example": "상담사: 일반적인 절차이시고요 추후 변경 가능하시니까 일단 동의로 진행 도와드릴게요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_907", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_022"
+    },
+    {
+      "record_id": "r_907_synthetic_rev_023",
+      "score": 0,
+      "rationale": "[약관/동의 · 0점] critical_violation 트리거. 신용정보 조회 동의 절차 무시 (\"자동으로 처리\"), 약관 사전 고지 의무 위반, 부가서비스 자동가입 여부 모호 안내. 약관규제법 위반 가능.\n - 상담사#4: \"그건 신청 시점에 자동으로 처리되니까 따로 안 받아도 됩니다\"\n - 상담사#6: \"그건 발급되시면 카드랑 같이 책자로 받으실 텐데 거기에 다 있어요\"\n - 상담사#8: \"그건 가입되면서 같이 알아서 처리되는 거고 별도 비용은 거의 안 들어요\"",
+      "quote_example": "상담사: 그건 신청 시점에 자동으로 처리되니까 따로 안 받아도 됩니다",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_907", "zero_compliance", "critical_violation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_023"
+    }
+  ]
+}

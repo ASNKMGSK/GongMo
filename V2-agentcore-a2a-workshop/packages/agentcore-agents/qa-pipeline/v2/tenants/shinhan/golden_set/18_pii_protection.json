@@ -1,0 +1,83 @@
+{
+  "item_number": 18,
+  "item_name": "정보 보호 준수",
+  "category": "개인정보 보호",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "본인확인",
+    "한도조정",
+    "결제일변경",
+    "분실신고",
+    "청구문의",
+    "카드발급",
+    "민원"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-18-FULL-shinhan-001",
+      "item_number": 18,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "한도조정",
+      "segment_text": "상담사: 본인확인 위해 성함과 카드번호 뒤 사 자리만 부탁드리겠습니다\n고객: 박지훈 ***이에요\n상담사: 박지훈 고객님 카드번호 뒤 ****자리 확인되었습니다 본인 맞으십니까\n고객: 네 맞아요\n상담사: 네 한도 조회 도와드리겠습니다 등록 휴대폰 번호 끝 사 자리만 추가 확인드릴게요\n고객: ***요\n상담사: 네 확인되었습니다 잠시만 기다려 주세요",
+      "rationale": "[정보 보호] 카드번호는 뒤 4자리만 / 휴대폰은 끝 4자리만 마스킹 일관성 유지 + 상담사 선발화 없음 → 만점\n - 상담사#1: \"카드번호 뒤 사 자리만 부탁드리겠습니다\" — 마스킹 정책 준수\n - 상담사#3: \"카드번호 뒤 ****자리 확인되었습니다\" — 마스킹 복창\n - 상담사#5: \"등록 휴대폰 번호 끝 사 자리만 추가 확인드릴게요\" — 마스킹 일관",
+      "rationale_tags": ["item_18", "full_compliance", "masked_pii"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 1},
+        {"speaker": "상담사", "turn_id": 3},
+        {"speaker": "상담사", "turn_id": 5}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-18-PARTIAL-shinhan-002",
+      "item_number": 18,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "청구문의",
+      "segment_text": "상담사: 본인확인 도와드릴게요 성함과 등록 휴대폰 번호 부탁드릴게요\n고객: 이서연 공일공 ***이에요\n상담사: 네 등록 휴대폰 공일공 *** 확인되었구요 추가로 카드번호 좀 알려주세요\n고객: ***이요\n상담사: 카드번호 뒤 사 자리 확인되었습니다",
+      "rationale": "[정보 보호] 휴대폰 번호 전체 / 카드번호 안내 요청 시 '카드번호' 단독 표현 → 부분점수 (마스킹 일관성 미흡)\n - 상담사#1: \"등록 휴대폰 번호 부탁드릴게요\" — 휴대폰 번호 전체 안내 유도 (뒤 4자리 한정 명시 없음)\n - 상담사#3: \"카드번호 좀 알려주세요\" — '뒤 4자리' 한정 누락",
+      "rationale_tags": ["item_18", "partial_compliance", "incomplete_masking"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 1},
+        {"speaker": "상담사", "turn_id": 3}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-18-ZERO-shinhan-003",
+      "item_number": 18,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "민원",
+      "segment_text": "상담사: 고객님 카드번호가 ****-****-****-****이시구요 주민번호는 ******-*******로 등록되어 있으세요\n고객: 네\n상담사: 등록 주소도 서울시 강남구 *** 로 확인됩니다 본인 맞으십니까\n고객: 네 맞아요\n상담사: 네 그럼 진행하겠습니다",
+      "rationale": "[정보 보호] 상담사가 카드번호 / 주민번호 / 주소를 선발화 + 마스킹 없이 풀 노출 → 0점 (critical_violations: privacy_leak)\n - 상담사#1: \"고객님 카드번호가 ****-****-****-****이시구요 주민번호는 ******-*******로 등록되어 있으세요\" — 카드번호 / 주민번호 상담사 선발화\n - 상담사#3: \"등록 주소도 서울시 강남구 *** 로 확인됩니다\" — 주소 선발화",
+      "rationale_tags": ["item_18", "non_compliance", "pii_leak"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 1},
+        {"speaker": "상담사", "turn_id": 3}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

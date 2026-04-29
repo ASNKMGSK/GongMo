@@ -1,0 +1,208 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — Multi-tenant Configuration: `shinhan` (site-level)
+#
+# Phase: shinhan pilot, Created: 2026-04-28
+#
+# 신한카드 — 인바운드(컬렉션관리부 / 심사발급부 / 소비자보호부) +
+# 아웃바운드(CRM부 / 텔레마케팅 / 준법관리부) 통합 site-level 테넌트.
+# 본 파일은 신한 site 직하 공통 정책 (공통 13항목 + 사이트 PII 정책 등) 만 정의하며,
+# 부서별 specialization 은 inbound/<dept>/tenant_config.yaml,
+# outbound/<dept>/tenant_config.yaml 에서 override 한다.
+
+tenant_id: shinhan
+tenant_name: "신한카드 (Shinhan Card)"
+domain: financial_services
+description: >
+  신한카드 인바운드(컬렉션 / 심사발급 / 소비자보호) + 아웃바운드(CRM / TM /
+  준법관리) 통합 평가. 공통 13항목 (#1, #2, #4~#10, #12, #14, #17, #18) 만
+  본 site-level 에서 평가하며, 신한 평가표에 없는 #11/#13/#15/#16 은 제외한다.
+  부서특화 (예: 901 채권추심법 준수 / 905 약관고지 / 909 녹취동의 / 913 민원분류
+  / 919 부당권유 금지 등 901-922 시리즈) 는 부서 폴더 직하 tenant_config 에서
+  override 한다.
+
+version:
+  schema: "v2.0.0"                  # tenant_config 스키마 버전 (generic / kolon 과 동일)
+  rubric: "shinhan_v1"              # shinhan pilot 최초 확정 (2026-04-28)
+  golden_set: "shinhan_v1"          # shinhan pilot seed (시니어 합의 전 pilot 예시 수록)
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# PII 엄격도 정책 (#17/#18 평가 노드 주입용)
+# ---------------------------------------------------------------------------
+# 카드사 표준 — 주민번호/카드번호/계좌번호 마스킹 강제
+pii_policy:
+  strictness: strict        # strict | standard | relaxed
+  masking_required: true    # 전사에 주민번호/카드번호/계좌번호 노출 시 즉시 감점
+  third_party_disclosure:
+    allowed_scope: ["일반 카드 상품 개요", "절차 안내", "공시 사항"]
+    blocked_scope:
+      - "특정 계약 정보"
+      - "금융거래 세부"
+      - "주소/연락처 제공"
+      - "주민등록번호"
+      - "카드번호 전체"
+      - "계좌번호 전체"
+      - "고객 주소"
+      - "고객 연락처"
+  prohibited_terms_file: "prohibited_terms.txt"
+
+# ---------------------------------------------------------------------------
+# 감점 정책 (ALLOWED_STEPS — 신한 평가표 정합)
+# ---------------------------------------------------------------------------
+# 신한카드 평가표 기준 — #11, #13, #15, #16 은 항목 자체가 없음 → 정의 라인 제외.
+# 부서특화 (901-922) 노드는 부서 tenant_config 에서 별도 정의.
+scoring_policy:
+  max_total: 100
+  allowed_steps:
+    "1":  [5, 3, 0]        # 첫인사
+    "2":  [5, 3, 0]        # 끝인사
+    # "3" 경청/말겹침/말자름 — STT 한계로 평가 제외
+    "4":  [5, 3, 0]        # 호응 및 공감
+    "5":  [5, 3, 0]        # 대기 멘트
+    "6":  [5, 3, 0]        # 정중한 표현
+    "7":  [5, 3, 0]        # 쿠션어 활용
+    "8":  [5, 3, 0]        # 문의 파악 / 재확인
+    "9":  [5, 3, 0]        # 고객 정보 확인 (force_t3)
+    "10": [10, 7, 5, 0]    # 설명 명확성 (4단계)
+    # "11" 두괄식 — 신한 미적용
+    "12": [5, 3, 0]        # 문제 해결 의지
+    # "13" 부연 설명 — 신한 미적용
+    "14": [5, 3, 0]        # 사후 안내
+    # "15" 정확한 안내 — 신한 미적용 (부서특화 *_accuracy 로 대체)
+    # "16" 필수 안내 이행 — 신한 미적용 (부서특화 *_accuracy 로 통합)
+    "17": [5, 3, 0]        # 정보 확인 절차 (force_t3)
+    "18": [5, 3, 0]        # 정보 보호 준수 (force_t3)
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목
+  force_t3_items: [9, 17, 18]
+
+  # 즉시 0점 트리거 (카테고리 전체 영향) — 카드사 맥락
+  critical_violations:
+    - id: privacy_leak
+      triggers:
+        - "주민번호 유출"
+        - "카드번호 전체 유출"
+        - "계좌번호 전체 유출"
+        - "주소 유출"
+        - "제3자 민감정보 제공"
+      impact: ["17", "18"]
+    - id: unkind_treatment
+      triggers: ["반말", "비하", "욕설", "업무회피", "협박성 발언"]
+      impact: total_zero           # 총점 0점
+    - id: misinformation_uncorrected
+      triggers: ["허위 안내 미정정", "이자율 오안내 미정정", "수수료 오안내 미정정"]
+      impact: dept_accuracy        # 부서특화 *_accuracy 노드 적용
+  # 인프라 폴백 무효화 정책 (V1 reconciler.reconcile_evaluation 연동)
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Intent 분류 (Layer 1 전처리 → Sub Agent RAG retrieval key 일부)
+# ---------------------------------------------------------------------------
+# Layer 1 (Dev1) 이 transcript 에서 이 목록 중 하나로 intent 를 분류.
+# 신한 카드 도메인 한국어 라벨 체계.
+supported_intents:
+  - 연체상담
+  - 카드발급
+  - 카드심사
+  - 청구문의
+  - 결제일변경
+  - 분실신고
+  - 한도조정
+  - 부가서비스
+  - 본인확인
+  - 일반문의
+  - 민원
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 — 설계서 7.4 매핑
+# ---------------------------------------------------------------------------
+# Sub Agent 가 RAG 호출 시 어떤 발화 구간을 segment_text 로 전달할지 정책.
+# kolon 동일 — 단 #11, #13, #15, #16 라인은 제외.
+segment_strategy:
+  "1":  first_utterances_3_5      # 첫인사: 시작 3~5 발화
+  "2":  last_utterances_3_5       # 끝인사: 종료 3~5 발화
+  # "3" 말겹침 — STT 한계로 평가 제외
+  "4":  emotion_windows           # 공감: 감정 표현/사과 근처 윈도우
+  "5":  hold_windows              # 대기: 대기 마커/사전·사후 안내 근처
+  "6":  full_agent_utterances     # 정중한 표현: 전 에이전트 발화
+  "7":  refusal_windows           # 쿠션어: 거절/불가/양해 발화 근처
+  "8":  agent_long_blocks         # 니즈 파악: 에이전트 장문 발화
+  "9":  identity_verification_window  # 고객 정보 확인: PII 질의응답 근처
+  "10": agent_long_blocks         # 설명 명확성: 에이전트 장문 발화(50자+)
+  # "11" 두괄식 — 신한 미적용
+  "12": problem_solving_windows   # 적극성 문제해결
+  # "13" 부연 설명 — 신한 미적용
+  "14": closing_windows           # 사후 안내
+  # "15" 정확한 안내 — 신한 미적용 (부서특화 *_accuracy 로 대체)
+  # "16" 필수 안내 이행 — 신한 미적용 (부서특화 *_accuracy 로 통합)
+  "17": pii_query_window          # 개인정보 확인: PII 토큰 근처 N 발화
+  "18": pii_leak_scan             # 개인정보 보호: PII 유출 스캔 전체
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — Dev4 RAG 3종과 연결
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    # 신한 site-level 에서는 #15 가 미적용이므로 공통 필수 항목 없음.
+    # 부서별 *_accuracy 노드가 부서 폴더의 business_knowledge/ 를 우선 조회한다.
+    required_items: []
+    fallback_mode: "unevaluable"  # RAG 부재 시 unevaluable
+
+# ---------------------------------------------------------------------------
+# 필수 안내 스크립트 (#16) — 신한은 #16 미적용
+# ---------------------------------------------------------------------------
+# 신한은 #16 자체가 평가 대상이 아니므로 site-level 매핑 없음.
+# 부서특화 *_accuracy 노드가 자체 mandatory_scripts 를 보유한다.
+mandatory_scripts:
+  source_file: null
+
+# ---------------------------------------------------------------------------
+# Routing (Layer 4 Tier calibration)
+# ---------------------------------------------------------------------------
+routing:
+  initial_t0_cap: 0.30
+  t1_sample_rate: 0.05
+  t1_sample_rate_max: 0.10
+  grade_boundary_margin: 3
+
+# ---------------------------------------------------------------------------
+# Confidence (Layer 4 신호 calibration)
+# ---------------------------------------------------------------------------
+confidence:
+  rag_min_sample_size: 3
+  rag_small_sample_weight: 0.5
+
+  # 공통 13항목만 — 신한 미적용 (#11, #13, #15, #16) 라인은 제외
+  item_weights:
+    "1":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    "2":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    "4":  { llm_self: 0.35, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.20 }
+    "5":  { llm_self: 0.25, rule_llm_agreement: 0.35, rag_stdev: 0.15, evidence_quality: 0.25 }
+    "6":  { llm_self: 0.30, rule_llm_agreement: 0.30, rag_stdev: 0.15, evidence_quality: 0.25 }
+    "7":  { llm_self: 0.40, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.15 }
+    "8":  { llm_self: 0.30, rule_llm_agreement: 0.20, rag_stdev: 0.20, evidence_quality: 0.30 }
+    "9":  { llm_self: 0.15, rule_llm_agreement: 0.45, rag_stdev: 0.10, evidence_quality: 0.30 }
+    "10": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "12": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "14": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "17": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+    "18": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+
+# ---------------------------------------------------------------------------
+# 언어 / UI 설정
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

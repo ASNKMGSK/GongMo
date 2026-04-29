@@ -1,0 +1,113 @@
+{
+  "item_number": 912,
+  "item_name": "청약철회권 안내 및 가입의사 확인",
+  "category": "shinhan_crm_tm_compliance",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "TM상품권유",
+    "카드추가발급",
+    "부가서비스가입"
+  ],
+  "version": "shinhan_crm_v1",
+  "examples": [
+    {
+      "example_id": "GS-912-FULL-shinhan-crm-001",
+      "item_number": 912,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 그럼 가입 진행 전 마지막 안내드리겠습니다 본 카드 가입은 방문판매 등에 관한 법률 및 여신전문금융업법에 따라 14일 이내 별도 사유 없이 청약철회권 행사가 가능하시며 철회 시 위약금이나 손해배상금이 청구되지 않습니다 철회 방법은 1577 신한카드 고객센터 또는 홈페이지 마이페이지에서 가능합니다 안내드린 내용을 이해하셨고 디오 신용카드 가입에 동의하시는지 다시 한번 의사를 확인 부탁드립니다\n고객: 네 이해했고 가입에 동의합니다\n상담사: 감사합니다 가입 처리 진행하겠습니다",
+      "rationale": "[청약철회권·가입의사 확인] 4요소 (법적 근거 / 14일 기간 / 철회 방법 / 명시적 가입의사 재확인) 모두 이행 → 만점\n - 상담사: \"방문판매 등에 관한 법률 및 여신전문금융업법에 따라 14일 이내 별도 사유 없이 청약철회권 행사가 가능\" (법적 근거 + 기간)\n - 상담사: \"철회 시 위약금이나 손해배상금이 청구되지 않습니다\" (불이익 없음 안내)\n - 상담사: \"1577 신한카드 고객센터 또는 홈페이지 마이페이지에서 가능합니다\" (구체 철회 방법)\n - 상담사: \"안내드린 내용을 이해하셨고 디오 신용카드 가입에 동의하시는지 다시 한번 의사를 확인 부탁드립니다\" (이해 + 가입의사 재확인)\n - 고객: \"네 이해했고 가입에 동의합니다\" (명시적 동의 획득)",
+      "rationale_tags": [
+        "item_912",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 2
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_010",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-912-PARTIAL-shinhan-crm-002",
+      "item_number": 912,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 가입은 14일 이내 청약철회 가능하세요 가입 진행할까요\n고객: 네 진행해주세요\n상담사: 네 발급 처리하겠습니다",
+      "rationale": "[청약철회권·가입의사 확인] 14일 기간은 짧게 언급하나 법적 근거/철회 방법 누락 + 가입의사 확인이 매우 약식 → 부분 감점\n - 상담사: \"14일 이내 청약철회 가능하세요\" (기간만 언급, 법적 근거/구체 철회 방법 미고지)\n - 상담사: \"가입 진행할까요\" (가입의사 확인은 짧음 - 이해도 확인 절차 부재)\n - 고객의 \"네 진행해주세요\" 만으로 명시적 동의 획득은 인정",
+      "rationale_tags": [
+        "item_912",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 2
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_011",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-912-ZERO-shinhan-crm-003",
+      "item_number": 912,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 그럼 일단 가입 처리 진행하겠습니다 카드 도착하시면 사용해보세요\n고객: 네 알겠어요\n상담사: 추후 마음에 안 드시면 그냥 안 쓰셔도 됩니다 신청해 두는 거니까요",
+      "rationale": "[청약철회권·가입의사 확인] 청약철회권 안내 전무 + 가입의사 명시적 재확인 절차 부재 → 0점\n - 상담사: \"일단 가입 처리 진행하겠습니다\" (가입의사 재확인 누락 — 일방 통보)\n - 청약철회권 14일 기간 / 법적 근거 / 철회 방법 모두 발화 부재\n - 상담사: \"마음에 안 드시면 그냥 안 쓰셔도 됩니다\" (청약철회권을 단순 미사용으로 오도, 법적 의무 회피)",
+      "rationale_tags": [
+        "item_912",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_012",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

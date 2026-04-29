@@ -1,0 +1,52 @@
+{
+  "item_number": 1,
+  "item_name": "첫인사",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "인사말 + 코오롱 고객센터 소속 + 상담사명 3요소 모두 포함하여 만점 부여",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 상담사 김OO 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "senior_a",
+      "tags": ["full_compliance", "opening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "정식 인사말 + 코오롱몰 고객센터 + 상담사 성명 완전 충족, 용건 질문까지 포함",
+      "quote_example": "상담사: 안녕하십니까 코오롱몰 고객센터 상담사 박OO 입니다 어떻게 도와드릴까요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_compliance", "polite_opening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "인사말 + 소속 포함되었으나 상담사명 누락으로 1요소 미충족 3점",
+      "quote_example": "상담사: 안녕하세요 코오롱 고객센터입니다 무엇을 도와드릴까요",
+      "evaluator_id": "senior_c",
+      "tags": ["missing_name", "opening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "인사말 + 상담사명 있으나 '코오롱 고객센터' 소속 언급 누락 3점",
+      "quote_example": "상담사: 안녕하세요 상담사 이OO 입니다",
+      "evaluator_id": "senior_a",
+      "tags": ["missing_affiliation", "opening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "인사말/소속/상담사명 3요소 모두 누락, 첫인사 절차 미이행",
+      "quote_example": "상담사: 네 말씀하세요",
+      "evaluator_id": "senior_b",
+      "tags": ["no_opening", "missing_all"],
+      "stub_seed": true
+    }
+  ]
+}

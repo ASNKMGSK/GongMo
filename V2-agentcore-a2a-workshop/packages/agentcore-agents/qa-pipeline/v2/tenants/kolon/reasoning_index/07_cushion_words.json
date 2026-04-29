@@ -1,0 +1,203 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어 활용",
+  "version": "kolon_v4_fixed",
+  "reasoning_records": [
+    {
+      "record_id": "r_07_668437",
+      "score": 0,
+      "rationale": "[쿠션어] 거절/불가 통보에 쿠션어 전무 → 0점\n - 고객#122: \"예 예\"\n - 상담사#123: \"배송받고 나서 어떻게 바로 그 배송받자마자 어떻게 바로 다시 보내는 건 좀 어렵구요\"\n - 고객#124: \"네\"",
+      "quote_example": "고객: 예 예",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "zero_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668437"
+    },
+    {
+      "record_id": "r_07_668451",
+      "score": 3,
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 1회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"안녕하세요\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668451"
+    },
+    {
+      "record_id": "r_07_668464",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 고객#46: \"네\"\n - 상담사#47: \"그렇다 보니까는 케이스 제공 여부 가능 불가능은요 지금은 알 수가 없어서요 입점사 확인해보고 다시 한번 연락을 드려도 괜찮으시겠습니까\"\n - 고객#48: \"네 아니 뭐 이 이렇게 그냥 그것도 비닐봉투리요 어 이게 찍히이 붙어있잖아요 끝부분에\"\n - 고객#53: \"그러고 왔어요 이걸 어떻게 선물을 박스에다 쳐 선물을 해요\"",
+      "quote_example": "고객: 네",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668464"
+    },
+    {
+      "record_id": "r_07_668481",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 고객#35: \"여보세요 똑같은 말 지금 몇 번 들어 제가 제가 할 금만 할 때마다 얘기하잖아요 다른 데는 되는데 왜 이거는 안 되냐고\"\n - 상담사#36: \"죄송합니다 저희가 바로 개선이 좀 어려워요 고객님 그 부분은 시스템적으로 개선이 어렵다고 합니다 일단은 불편하신 내용은\"\n - 고객#37: \"왜 시스템부터 이렇게 어디가 어려워요 근데 왜 다른 데는 그게 다 돼요 그 참된 거잖아요 다른 데는 된다는 그거 내 다시 있는데 안 한다는 거잖아요\"\n - 상담사#38: \"그렇진 않습니다 고객님 저희도 개선할려고 여러 번 건의를 했구요 본사에서도 검토를 했지만 저희가 현재 가지고 있는 시스템만으로는 개선이 어렵다고 합니다\"",
+      "quote_example": "고객: 여보세요 똑같은 말 지금 몇 번 들어 제가 제가 할 금만 할 때마다 얘기하잖아요 다른 데는 되는데 왜 이거는 안 되냐고",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668481"
+    },
+    {
+      "record_id": "r_07_668488",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 안녕하세요 네 고객님\"",
+      "quote_example": "상담사: 습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668488"
+    },
+    {
+      "record_id": "r_07_668507",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 고객#91: \"네네네 네\"\n - 상담사#92: \"현재로서는 이게 출고가 될 수 있다 말씀드리기가 어렵거든요\"\n - 고객#93: \"그렇죠 예\"",
+      "quote_example": "고객: 네네네 네",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668507"
+    },
+    {
+      "record_id": "r_07_668526",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요\"\n - 상담사#3: \"아 방문 방법이요 네 고객님 성함이랑 연락처번호 어떻게 되실까요\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668526"
+    },
+    {
+      "record_id": "r_07_668542",
+      "score": 3,
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 고객님 전화 연결되었습니다\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668542"
+    },
+    {
+      "record_id": "r_07_668605",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네네 예예\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668605"
+    },
+    {
+      "record_id": "r_07_668610",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네네\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668610"
+    },
+    {
+      "record_id": "r_07_668675",
+      "score": 3,
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 고객님 예\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668675"
+    },
+    {
+      "record_id": "r_07_668697",
+      "score": 5,
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\"\n - 상담사#3: \"네\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668697"
+    },
+    {
+      "record_id": "r_07_668736",
+      "score": 3,
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 고객#78: \"예 예 예\"\n - 상담사#79: \"거기에도 약간 주글거리게 보이시거든요 고객님 이게 약간 평평하게 표지는 스타일은 아니신 거 같아요 약간 울 불가한 면이 있으세요\"\n - 고객#80: \"근데 뒷면은 또 괜찮하거든요\"\n - 고객#82: \"뒷면은 청청한데 앞면이 죽을거려 그래서\"",
+      "quote_example": "고객: 예 예 예",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668736"
+    },
+    {
+      "record_id": "r_07_668771",
+      "score": 3,
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\"\n - 상담사#3: \"반품 신청하셨어요 고객님\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668771"
+    }
+  ]
+}

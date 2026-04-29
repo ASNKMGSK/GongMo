@@ -1,0 +1,82 @@
+{
+  "item_number": 12,
+  "item_name": "문제 해결 의지",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "연체상담",
+    "한도조정",
+    "민원",
+    "카드심사",
+    "분실신고",
+    "청구문의"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-12-FULL-shinhan-001",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "연체상담",
+      "segment_text": "고객: 이번 달 결제가 어려울 것 같은데 어떻게 해야 되나요\n상담사: 아 네 고객님 결제 어려운 상황 안내드리면요 첫째 일부 결제만 진행 후 잔여 분할납부 신청하시는 방법이 있구요 둘째 결제일 변경으로 시기 조정 가능하시구요 셋째 단기 지급유예 신청도 검토 가능하시거든요 어떤 방법이 가장 적합하실까요\n고객: 분할납부가 좋을 것 같은데\n상담사: 네 그럼 분할납부 신청 도와드리겠습니다 십이 개월 / 이십사 개월 / 삼십육 개월 중 가능하시구요 만약 지금 결정 어려우시면 일단 분할 시뮬레이션 안내드리고 다시 상담 요청하셔도 됩니다",
+      "rationale": "[문제해결] 거절 없이 3가지 대안 (일부결제 / 결제일변경 / 지급유예) 선제 제시 + 추가 옵션 (시뮬레이션 / 콜백) → 만점\n - 상담사#2: \"첫째 일부 결제만 진행 후 잔여 분할납부 신청하시는 방법이 있구요 둘째 결제일 변경으로 시기 조정 가능하시구요 셋째 단기 지급유예 신청도 검토 가능하시거든요\"\n - 상담사#4: \"만약 지금 결정 어려우시면 일단 분할 시뮬레이션 안내드리고 다시 상담 요청하셔도 됩니다\"",
+      "rationale_tags": ["item_12", "full_compliance", "multiple_alternatives"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-shinhan-002",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "한도조정",
+      "segment_text": "고객: 한도가 부족한데 어떻게 해야 돼요\n상담사: 네 임시증액 신청 가능하시구요 신청 후에 심사 후 안내드릴게요\n고객: 다른 방법은 없나요\n상담사: 음 그건 한번 알아봐야 될 것 같아요\n고객: 알겠어요",
+      "rationale": "[문제해결] 임시증액 1가지 대안만 제시 + 추가 대안 모색 의지 미흡 → 부분점수\n - 상담사#2: \"네 임시증액 신청 가능하시구요\" — 1대안 단독\n - 상담사#4: \"음 그건 한번 알아봐야 될 것 같아요\" — 모호한 후속 약속",
+      "rationale_tags": ["item_12", "partial_compliance", "single_alternative"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-ZERO-shinhan-003",
+      "item_number": 12,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "민원",
+      "segment_text": "고객: 청구가 잘못된 것 같은데 좀 봐주세요\n상담사: 그건 저희 부서가 아니에요 다른 부서 문의하세요\n고객: 어디로요\n상담사: 그건 잘 모르겠어요\n고객: 좀 안내해주세요\n상담사: 본사 홈페이지 보세요",
+      "rationale": "[문제해결] 책임 전가 + 대안 제시 부재 + 안내 회피 → 0점\n - 상담사#2: \"그건 저희 부서가 아니에요 다른 부서 문의하세요\" — 책임 회피\n - 상담사#4: \"그건 잘 모르겠어요\"\n - 상담사#6: \"본사 홈페이지 보세요\" — 안내 회피",
+      "rationale_tags": ["item_12", "non_compliance", "shifting_blame"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

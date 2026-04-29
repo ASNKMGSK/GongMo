@@ -1,0 +1,8387 @@
+{
+  "batch_dir": "C:\\Users\\META M\\Desktop\\프롬프트 튜닝\\batch_20260419_160641_iter03_clean",
+  "aggregate": {
+    "total_samples": 9,
+    "total_items": 162,
+    "items_with_confidence_mismatch": 162,
+    "items_missing_v2_required": 162,
+    "evidence_missing_timestamp": 138,
+    "evidence_missing_turn_id_name": 18,
+    "items_with_dropped_details": 121
+  },
+  "samples": {
+    "668437": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 124,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 124,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 124,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668451": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 50,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 50,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 50,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668464": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668481": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "customer_ended_first",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 13,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 51,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 51,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 51,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668488": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "customer_ended_first",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 25,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 59,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 59,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 59,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668507": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "customer_ended_first",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 5,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 33,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668526": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "customer_ended_first",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 5,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 17,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 17,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668542": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 2,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 27,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 27,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 62,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 62,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 62,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ],
+    "668605": [
+      {
+        "item_number": 1,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 2,
+        "v1_fields_present": [
+          "confidence",
+          "customer_ended_first",
+          "deductions",
+          "details",
+          "elements_detected",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 3,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 4,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 5,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "summary"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "summary",
+            "v2": "judgment"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details",
+          "evidence[].relevance"
+        ],
+        "evidence_count": 3,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 6,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 7,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 17,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "iv_items_asked",
+          "iv_procedure_performed",
+          "max_score",
+          "preemptive_disclosures",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 17,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 18,
+        "v1_fields_present": [
+          "authority_verified",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "privacy_violations",
+          "score",
+          "third_party_context"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 17,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 8,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 0,
+        "evidence_missing_v2_fields": [],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 9,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "infra_fallback_recovered_points",
+          "infra_fallback_skipped",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "speaker",
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 10,
+        "v1_fields_present": [
+          "clarity_assessment",
+          "confidence",
+          "customer_reasks",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "jargon_found",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 11,
+        "v1_fields_present": [
+          "conclusion_first_patterns",
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score",
+          "structure_assessment"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 15,
+        "v1_fields_present": [
+          "confidence",
+          "contradictions",
+          "corrections_made",
+          "deductions",
+          "details",
+          "evidence",
+          "incorrect_guidance",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 16,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "details",
+          "evidence",
+          "item_name",
+          "item_number",
+          "mandatory_items_completed",
+          "mandatory_items_missing",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [
+          "details"
+        ],
+        "evidence_count": 1,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 12,
+        "v1_fields_present": [
+          "alternatives_offered",
+          "avoidance_detected",
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 79,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 13,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "item_name",
+          "item_number",
+          "max_score",
+          "proactive_guidance",
+          "reinquiry_detected",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 79,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      },
+      {
+        "item_number": 14,
+        "v1_fields_present": [
+          "confidence",
+          "deductions",
+          "evidence",
+          "followup_items",
+          "immediate_resolution",
+          "item_name",
+          "item_number",
+          "max_score",
+          "score"
+        ],
+        "mapped_to_v2": [
+          {
+            "v1": "item_number",
+            "v2": "item_number"
+          },
+          {
+            "v1": "max_score",
+            "v2": "max_score"
+          },
+          {
+            "v1": "score",
+            "v2": "score"
+          },
+          {
+            "v1": "deductions",
+            "v2": "deductions"
+          },
+          {
+            "v1": "item_name",
+            "v2": "item"
+          },
+          {
+            "v1": "confidence",
+            "v2": "confidence.final"
+          }
+        ],
+        "missing_v2_required": [
+          "evaluation_mode"
+        ],
+        "v1_dropped_fields": [],
+        "evidence_count": 79,
+        "evidence_missing_v2_fields": [
+          "timestamp"
+        ],
+        "confidence_scale_mismatch": true
+      }
+    ]
+  },
+  "migration_notes": [
+    "[필수] V1 confidence float(0~1) → V2 int(1~5) 스케일 변환 필요 (162/162 항목, 100.0%). 변환 규칙 예: round(v1 * 5) with clamp [1,5].",
+    "[필수] V2 evaluation_mode 필드 V1 전체 누락 (162/162 항목). 기본값 'full' 부여 후 #9/#17/#18 은 'structural_only'/'compliance_based' 로 재지정.",
+    "[권장] V2 evidence.timestamp 필드 V1 에 없음 (138/162 항목). V1 샘플에는 STT timestamp 미포함 — timestamp='' 빈문자열로 폴백.",
+    "[정보] V1 details {'backend', 'llm_based'} V2 drop — QAOutputV2.diagnostics 로 이관 가능."
+  ]
+}

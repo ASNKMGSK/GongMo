@@ -1,0 +1,37 @@
+{
+  "item_number": 906,
+  "item_name": "필수 안내 이행",
+  "version": "shinhan_review_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_906_synthetic_rev_011",
+      "score": 5,
+      "rationale": "[필수 안내 · 만점] 연회비 / 결제일(선택지+선택값) / 이용한도(300만 + 조정 가능성) / 심사절차(영업일/내용) / 배송일정(영업일/방법/본인수령) 5요소 모두 명확 안내.\n - 상담사#2: \"연회비는 국내전용 일만 오천 원 / 해외겸용 이만 원\"\n - 상담사#4: \"결제일은 매월 일 일 / 오 일 / 십 일 / 십오 일 / 이십 일 / 이십오 일 중 선택 가능\"\n - 상담사#10: \"배송일정은 발급 결정 후 영업일 기준 이 일에서 삼 일 이내 등기우편으로 발송되시고요\"",
+      "quote_example": "상담사: 결제일은 매월 일 일 / 오 일 / 십 일 / 십오 일 / 이십 일 / 이십오 일 중 선택 가능하시고",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_906", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_011"
+    },
+    {
+      "record_id": "r_906_synthetic_rev_012",
+      "score": 3,
+      "rationale": "[필수 안내 · 부분점수 3점] 연회비 / 결제일 / 이용한도 3요소는 안내. 그러나 심사절차 모호(\"보통 며칠 안에\"), 배송일정 미고지(\"발급되시면 알려드릴게요\").\n - 상담사#2: \"연회비 일만 오천 원이시고요 결제일은 십오 일이세요\"\n - 상담사#6: \"심사는 보통 며칠 안에 결과 나오고요\"\n - 상담사#8: \"그건 발급되시면 알려드릴게요\"",
+      "quote_example": "상담사: 심사는 보통 며칠 안에 결과 나오고요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_906", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_012"
+    },
+    {
+      "record_id": "r_906_synthetic_rev_013",
+      "score": 0,
+      "rationale": "[필수 안내 · 0점] 5요소 전부 누락. 연회비/결제일/이용한도/심사절차/배송일정 모두 자가확인(약관/배송업체) 안내로 회피. 상담사 자체 안내 의무 미이행.\n - 상담사#2: \"네 그냥 신청 정보 입력하시면 자동으로 처리됩니다\"\n - 상담사#4: \"그건 카드 받으시면 같이 동봉되는 약관에 다 있어요\"\n - 상담사#8: \"배송업체에서 별도로 연락 갈 겁니다\"",
+      "quote_example": "상담사: 그건 카드 받으시면 같이 동봉되는 약관에 다 있어요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_906", "zero_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_013"
+    }
+  ]
+}

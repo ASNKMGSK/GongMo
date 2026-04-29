@@ -1,0 +1,472 @@
+{
+  "item_number": 5,
+  "item_name": "대기 멘트",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "상품문의",
+    "환불취소"
+  ],
+  "version": "kolon_v4_fixed",
+  "examples": [
+    {
+      "example_id": "GS-05-FULL-668437",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네\n상담사: 그러면 잠시만요 지금\n고객: 그대로 있어요 텍 같은 건\n...\n고객: 네 맞아요\n상담사: 잠깐만요\n고객: 이 이 주가 이 주\n...\n고객: 아 내가 반품 교환건이 있든가 그\n상담사: 교환건이요 고객님 그 지금 어차피 교환 교환 측은 아 잠깐만요\n고객: 네",
+      "rationale": "[대기] 대기 양해 발화 확인 (일부) → 만점 (즉시 해결 인정)\n - 상담사#31: \"그러면 잠시만요 지금\"\n - 상담사#71: \"잠깐만요\"\n - 상담사#103: \"교환건이요 고객님 그 지금 어차피 교환 교환 측은 아 잠깐만요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 31
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 71
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 103
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668437",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-PARTIAL-668451",
+      "item_number": 5,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 할려고 그러는데 고게 지금 안 되더라고요 하나만\n상담사: 아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\n고객: 네\n상담사: 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드릴게요\n고객: 네 * * * * * * * * * * *",
+      "rationale": "[대기] 사전/사후 1가지 누락 (사전✗/사후✗) → 3점\n - 상담사#17: \"아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\"\n - 상담사#19: \"정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드릴게요\"",
+      "rationale_tags": [
+        "item_5",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 19
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668451",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668464",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 박스 셔츠에서 주문한 거요\n상담사: 네 확인해보겠습니다\n상담사: 네 기다려서 감사합니다 지금 확인해보니까는 스카프 베이지 확인되고 있고요 박스 셔츠 확인되고 있는데 맞으실까요\n고객: 네 네네네",
+      "rationale": "[대기] 대기 전 양해 + 대기 후 감사 확인 → 만점\n - 상담사#14: \"네 확인해보겠습니다\"\n - 상담사#15: \"네 기다려서 감사합니다 지금 확인해보니까는 스카프 베이지 확인되고 있고요 박스 셔츠 확인되고 있는데 맞으실까요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 14
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668464",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668481",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아니 그 바지를 시켰는데 그게 또 없습니까\n상담사: 아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 아 무심터이다",
+      "rationale": "[대기] 대기 상황 미발생 또는 마커 부재 → 조건부 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668481",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668488",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 근데 이제 제가 다른 제품은 온 온다고 표현을 해야 되나 이게 쪼금 쪼글주글해야 돼서요 목 밴드가\n상담사: 잠시만 기다려 주세요 고객님\n고객: 네\n상담사: 뭐 부분 어 네 기다려 주셔서 감사합니다 혹시 지금 판매페이지 저도 지금 보고는 있는데요\n고객: 네네",
+      "rationale": "[대기] 대기 전 양해 + 대기 후 감사 확인 → 만점\n - 상담사#29: \"잠시만 기다려 주세요 고객님\"\n - 상담사#31: \"뭐 부분 어 네 기다려 주셔서 감사합니다 혹시 지금 판매페이지 저도 지금 보고는 있는데요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 29
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 31
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668488",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668507",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네네네\n상담사: 소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\n고객: 네 네 네\n...\n고객: 네 네네네\n상담사: 어 근데 잠시만요\n고객: \n고객: 어 여기에는 품절로 떠 있던데요\n상담사: 잠시만 기다려 주시겠습니까\n고객: 네",
+      "rationale": "[대기] 전/후 양해 (사전✓/사후✓) → 만점\n - 상담사#25: \"소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\"\n - 상담사#61: \"어 근데 잠시만요\"\n - 상담사#65: \"잠시만 기다려 주시겠습니까\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 61
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 65
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668507",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-PARTIAL-668526",
+      "item_number": 5,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 네\n상담사: 네 잠시만요\n고객: 어\n...\n고객: 그리고 하나는 그 스 스리가 트 트리 뭐 와이드 팬트요\n상담사: 아 잠시만요 아 네 와이드 팬츠 그 네이비 색상 십 일만 이천 사백 원 구매했던 제품 말씀이실까요\n고객: 잠깐만요\n...\n고객: 네 없어요\n상담사: 네 잠시만요 네 고객님 저희 부분 반품 이천 오백 원이 발생되시는데요 반품비 저희 환불금액에서 차감해도 될까요 고객님\n고객: 근데 이거",
+      "rationale": "[대기] 사전/사후 1가지 누락 (사전✓/사후✗) → 3점\n - 상담사#13: \"네 잠시만요\"\n - 상담사#25: \"아 잠시만요 아 네 와이드 팬츠 그 네이비 색상 십 일만 이천 사백 원 구매했던 제품 말씀이실까요\"\n - 상담사#39: \"네 잠시만요 네 고객님 저희 부분 반품 이천 오백 원이 발생되시는데요 반품비 저희 환불금액에서 차감해도 될까요 고객님\"",
+      "rationale_tags": [
+        "item_5",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 39
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668526",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-ZERO-668542",
+      "item_number": 5,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "고객: 예예예 그대로\n상담사: 네 잠시만 기다리시겠습니까\n고객: 자 자켓 백 오 사이즈 다크 그레이 그거는",
+      "rationale": "[대기] 양해 멘트 없이 대기 발생 → 0점\n - 상담사#82: \"네 잠시만 기다리시겠습니까\"",
+      "rationale_tags": [
+        "item_5",
+        "zero_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 82
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668542",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668605",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 예 고구를 저기 라지 사이즈로 교환을 하면 저기 예 교환을 좀 할까 하는데요\n상담사: 잠시만요 며칠 날 주문하신 어떤 제품에 대해서 문의하시는 건가요\n고객: 리키는 뭐 있구요 브랜드가 와입니다\n상담사: 잠시만요\n고객: 잠깐만요 어 예 그\n...\n고객: 저기 한꺼번에 두 개를 주문을 했는데\n상담사: 잠시만요 네 고객님 왁 제품 어떤 제품에 대해서 교환 문의하시는 건가요 지금 두 개 확인되시거든요\n고객: 아 두 개 다를요 사이즈를 변경을 한다구요",
+      "rationale": "[대기] 전/후 양해 (사전✓/사후✓) → 만점\n - 상담사#11: \"잠시만요 며칠 날 주문하신 어떤 제품에 대해서 문의하시는 건가요\"\n - 상담사#13: \"잠시만요\"\n - 상담사#26: \"잠시만요 네 고객님 왁 제품 어떤 제품에 대해서 교환 문의하시는 건가요 지금 두 개 확인되시거든요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 26
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668605",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668610",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\n고객: 네\n상담사: 아 네 기다려 감사합니다 지금 주문서 확인해보니깐 사 월 팔 일 주문 건으로 저희 입점사 빠니깔레 상품으로 셔츠 엠 사이즈 보여주고 있는데 맞으실까요\n고객: 네",
+      "rationale": "[대기] 대기 전 양해 + 대기 후 감사 확인 → 만점\n - 상담사#11: \"네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\"\n - 상담사#13: \"아 네 기다려 감사합니다 지금 주문서 확인해보니깐 사 월 팔 일 주문 건으로 저희 입점사 빠니깔레 상품으로 셔츠 엠 사이즈 보여주고 있는데 맞으실까요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668610",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668675",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "고객: 어 여기 코롱몰에서 그냥 왔다고 되어있어서 그냥 제가 여쪽에 거기서는 한 거거든요 여기 그 배송 보내는 분\n상담사: 아 그러면 지금 잠시만요 고객님께서 직접 구매하신 게 아닌 걸까요\n고객: 어 제가 구매하긴 했는데\n...\n고객: 네네\n상담사: * * * * 칠 구 삼 팔 칠 에 공 삼 삼 이요 한번 확인해볼게요 고객님 잠시만요\n고객: 네",
+      "rationale": "[대기] 대기 양해 발화 확인 (일부) → 만점 (즉시 해결 인정)\n - 상담사#27: \"아 그러면 지금 잠시만요 고객님께서 직접 구매하신 게 아닌 걸까요\"\n - 상담사#40: \"* * * * 칠 구 삼 팔 칠 에 공 삼 삼 이요 한번 확인해볼게요 고객님 잠시만요\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 27
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 40
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668675",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668697",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네 네네 아 네\n상담사: 어 잠시만요\n고객: 네\n...\n고객: 그 옆에 줄 같은 거는 따로 구입 구 구입을 구입을 해야 되는 거냐 그랬더니 아니 원래 같이 달려있는 거라고 얘기를 하더라고요\n상담사: 어 그러세요 잠시만요 고객님\n고객: 네\n...\n고객: 아 그래요\n상담사: 저희가 교환 잠시만요 착용을 하신 거예요 고객님\n고객: 아니 착용을 하진 않았는데 그 끈을 끈을 여기서 다 달았는데 그까 포장 비닐이면 이런 건 다 벗겨죠",
+      "rationale": "[대기] 대기 양해 발화 확인 (일부) → 만점 (즉시 해결 인정)\n - 상담사#23: \"어 잠시만요\"\n - 상담사#35: \"어 그러세요 잠시만요 고객님\"\n - 상담사#45: \"저희가 교환 잠시만요 착용을 하신 거예요 고객님\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 23
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 35
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 45
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668697",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-FULL-668736",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 아 이거 그러잖아요\n상담사: 잠시만 기다려 주십시오 고객님\n고객: 예 안면이 안쪽을 버리는 걸로\n상담사: 아 네 잠시만 기다려 주십시오\n고객: 원래 약간 다 이런 거",
+      "rationale": "[대기] 대기 양해 발화 확인 (일부) → 만점 (즉시 해결 인정)\n - 상담사#59: \"잠시만 기다려 주십시오 고객님\"\n - 상담사#61: \"아 네 잠시만 기다려 주십시오\"",
+      "rationale_tags": [
+        "item_5",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 59
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 61
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668736",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-PARTIAL-668771",
+      "item_number": 5,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 네 네 네 맞아요\n상담사: 아 맞으세요 잠시만요 고객님 엔지니어드 에어리 도트 팬츠 말씀하시는 거죠\n고객: 네\n고객: 네네네\n상담사: 아 네 잠시만 기다려주세요\n고객: 네\n상담사: 어 네네 반품비 배송 어 네 어 네\n상담사: 아 네 고객님 기다려서 감사합니다 지금 저희 한 번\n상담사: 제품 확인해보니까 저희 사 월 사 일 날 제품이 입고된 걸로 확인되시는데요",
+      "rationale": "[대기] 사전/사후 1가지 누락 (사전✓/사후✗) → 3점\n - 상담사#13: \"아 맞으세요 잠시만요 고객님 엔지니어드 에어리 도트 팬츠 말씀하시는 거죠\"\n - 상담사#17: \"아 네 잠시만 기다려주세요\"\n - 상담사#21: \"아 네 고객님 기다려서 감사합니다 지금 저희 한 번\"",
+      "rationale_tags": [
+        "item_5",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 21
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668771",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

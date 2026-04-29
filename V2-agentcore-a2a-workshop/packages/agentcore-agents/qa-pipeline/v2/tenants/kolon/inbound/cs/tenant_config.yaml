@@ -1,0 +1,36 @@
+# kolon 인바운드 CS 부서 — tenant_config override 샘플
+#
+# 이 파일은 3단계 멀티테넌트 가장 구체 레이어 (site × channel × department) 에서만 적용되는
+# 파라미터 override 예시입니다. load_tenant_policy(site_id, channel, department) 는
+# resolve_tenant_path fallback 체인에서 첫 번째로 발견되는 tenant_config.yaml 만 읽습니다.
+#
+# 즉 이 파일이 존재하면 kolon/inbound/cs 요청은 이 값들을 우선 사용하고,
+# 없는 키는 코드 기본값으로 떨어집니다 (섹션 merge 는 현재 미지원).
+#
+# 생성일: 2026-04-24 (3단계 구조 도입 샘플)
+
+tenant_id: kolon-inbound-cs
+
+routing:
+  # CS 팀은 인입량이 많아 T1 스팟체크 비율 상향 (default 0.05 → 0.07)
+  initial_t0_cap: 0.30
+  t1_sample_rate: 0.07
+  t1_sample_rate_max: 0.10
+  grade_boundary_margin: 2
+
+confidence:
+  rag_min_sample_size: 3
+  rag_small_sample_weight: 0.5
+  item_weights:
+    # #1 첫인사 — CS 팀은 인사 스크립트 고정이라 rule_llm_agreement 비중 상향
+    "1":
+      llm_self: 0.25
+      rule_llm_agreement: 0.45
+      rag_stdev: 0.15
+      evidence_quality: 0.15
+    # #16 필수 안내 — CS 팀은 결제/환불 고지 의무가 커서 rule 비중 더 상향
+    "16":
+      llm_self: 0.20
+      rule_llm_agreement: 0.50
+      rag_stdev: 0.15
+      evidence_quality: 0.15

@@ -1,0 +1,42 @@
+{
+  "item_number": 2,
+  "item_name": "끝인사",
+  "category": "인사 예절",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "iter03_clean: 2-요소 완화 적용 (추가 문의 확인 + 인사말 또는 상담사명 중 1개만 있어도 3점 가능).",
+  "examples": [
+    {
+      "example_id": "GS-02-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 더 궁금하신 점은 없으실까요? 네, 감사합니다. 홍길동이었습니다. 좋은 하루 보내세요.",
+      "rationale": "추가 문의 확인 + 인사말 + 상담사명 3 요소 모두 포함.",
+      "rationale_tags": ["3요소 충족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-02-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 네, 감사합니다. 좋은 하루 보내세요.",
+      "rationale": "인사말만 있고 추가 문의 확인/상담사명 누락. 1 요소만 있어 iter03_clean 완화 기준으로 3점.",
+      "rationale_tags": ["추가 문의 누락", "상담사명 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-02-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 네, 끊습니다.",
+      "rationale": "끝인사 미진행에 해당. 모든 요소 누락.",
+      "rationale_tags": ["끝인사 미진행"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

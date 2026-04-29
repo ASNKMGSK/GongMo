@@ -1,0 +1,52 @@
+{
+  "item_number": 9,
+  "item_name": "고객 정보 확인",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "연락처 + 성함 요청 → 고객 답변 → 본인확인 완료 멘트까지 3단계 완전 충족 만점 (force_t3)",
+      "quote_example": "상담사: 성함과 휴대폰 번호 부탁드릴게요 / 본인 맞으십니까 / 소중한 정보 확인 감사드립니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_iv", "force_t3"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "왁 상품 반품 접수 전 성함/연락처 확인 + 본인확인 + 감사 멘트 완전",
+      "quote_example": "상담사: OOO 고객님 본인 맞으십니까 네 소중한 정보 확인 감사합니다",
+      "evaluator_id": "senior_b",
+      "tags": ["full_iv", "order_processing"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "연락처/성함 확인은 있으나 본인확인 멘트 없음 3점",
+      "quote_example": "상담사: 성함 연락처 확인했습니다 (본인확인 완료 통지 누락)",
+      "evaluator_id": "senior_c",
+      "tags": ["missing_confirmation", "partial_iv"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "성함만 확인, 연락처 재확인 절차 누락 3점",
+      "quote_example": "상담사: 성함만 확인할게요 (연락처 미확인)",
+      "evaluator_id": "senior_a",
+      "tags": ["missing_phone", "partial_iv"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "고객정보 확인 절차 전무 — 교환 접수 즉시 진행 0점",
+      "quote_example": "상담사: 바로 교환 접수해드릴게요 (정보 확인 생략)",
+      "evaluator_id": "senior_b",
+      "tags": ["no_iv", "skip_verification"],
+      "stub_seed": true
+    }
+  ]
+}

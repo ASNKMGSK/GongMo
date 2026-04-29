@@ -1,0 +1,107 @@
+{
+  "item_number": 1,
+  "item_name": "첫인사",
+  "category": "인사 예절",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["상품문의", "환불취소", "배송문의", "클레임", "일반문의"],
+  "dialog_stages": ["intro"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "examples": [
+    {
+      "example_id": "GS-01-CS-FULL-001",
+      "item_number": 1,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "일반문의",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 안녕하세요 코오롱 고객센터 상담사 김지원입니다 무엇을 도와드릴까요\n고객: 네 안녕하세요 문의 좀 드리려고요",
+      "rationale": "[첫인사] 3요소 완전 충족 → 만점\n - 인사말: \"안녕하세요\"\n - 회사명: \"코오롱 고객센터\"\n - 상담사명: \"김지원\"",
+      "rationale_tags": ["item_1", "full_compliance", "intro_full", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_001",
+        "variant": "standard_full",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-01-CS-FULL-002",
+      "item_number": 1,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 안녕하십니까 코오롱 고객센터 이수민입니다 네 반갑습니다 고객님 어떤 문의로 전화 주셨어요\n고객: 아 네 그 주문한 거 취소하려고요",
+      "rationale": "[첫인사] 격식체 인사 + 회사명 + 상담사명 모두 충족 → 만점\n - 인사말: \"안녕하십니까\" (격식)\n - 회사명: \"코오롱 고객센터\"\n - 상담사명: \"이수민\"\n - 후속 응대어 \"반갑습니다\" 까지 이어져 부드러운 개시",
+      "rationale_tags": ["item_1", "full_compliance", "formal", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_002",
+        "variant": "formal_full",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-01-CS-ZERO-001",
+      "item_number": 1,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "클레임",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 여보세요\n고객: 여보세요 저 문의가 있는데요\n상담사: 네 말씀하세요",
+      "rationale": "[첫인사] 회사명·상담사명 누락 + 비격식 응대 → 0점\n - 회사명 없음\n - 상담사명 없음\n - \"여보세요\" 로 응대 (인사말 역할 미흡)",
+      "rationale_tags": ["item_1", "missing_company", "missing_name", "informal", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}, {"speaker": "상담사", "turn_id": 3}],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_003",
+        "variant": "fully_missing",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-01-CS-ZERO-002",
+      "item_number": 1,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "배송문의",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 네 코오롱입니다\n고객: 아 저기 배송 관련해서 문의 좀\n상담사: 네 어떤 거요",
+      "rationale": "[첫인사] 인사말 누락 + 상담사명 누락 → 0점\n - 인사말 \"안녕하세요\" 없음 (\"네\" 로 바로 진입)\n - 상담사명 없음\n - 회사명만 단축형 \"코오롱\" 으로 언급",
+      "rationale_tags": ["item_1", "missing_greeting", "missing_name", "abbreviated_company", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_004",
+        "variant": "partial_missing",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-01-CS-FULL-003",
+      "item_number": 1,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 네 안녕하세요 코오롱 스포츠 고객센터 박민지 상담사입니다 어떻게 도와드릴까요\n고객: 네 안녕하세요 제가 이제 그 상품을 하나 문의드리고 싶어서요",
+      "rationale": "[첫인사] 브랜드명 포함 + 상담사 직함 명시 → 만점\n - 인사말: \"안녕하세요\"\n - 회사/브랜드명: \"코오롱 스포츠 고객센터\" (구체 브랜드 포함)\n - 상담사명+직함: \"박민지 상담사\"",
+      "rationale_tags": ["item_1", "full_compliance", "brand_specific", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_005",
+        "variant": "brand_full",
+        "human_score_verified": false
+      }
+    }
+  ]
+}

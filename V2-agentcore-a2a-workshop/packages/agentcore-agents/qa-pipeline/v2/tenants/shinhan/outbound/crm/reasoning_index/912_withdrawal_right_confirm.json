@@ -1,0 +1,50 @@
+{
+  "item_number": 912,
+  "item_name": "청약철회권 안내 및 가입의사 확인",
+  "version": "shinhan_crm_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_912_synthetic_010",
+      "score": 5,
+      "rationale": "[청약철회권·가입의사 확인] 4요소 (법적 근거 / 14일 기간 / 철회 방법 / 명시적 가입의사 재확인) 모두 이행 → 만점\n - 상담사: \"방문판매 등에 관한 법률 및 여신전문금융업법에 따라 14일 이내\" (법적 근거+기간)\n - 상담사: \"위약금이나 손해배상금이 청구되지 않습니다\" (불이익 없음 안내)\n - 상담사: \"1577 신한카드 고객센터 또는 홈페이지 마이페이지에서 가능합니다\" (구체 철회 방법)\n - 상담사: \"이해하셨고 가입에 동의하시는지 다시 한번 의사를 확인 부탁드립니다\" (명시적 동의 재확인)",
+      "quote_example": "상담사: 방문판매 등에 관한 법률 및 여신전문금융업법에 따라 14일 이내 별도 사유 없이 청약철회권 행사가 가능",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_912",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_010"
+    },
+    {
+      "record_id": "r_912_synthetic_011",
+      "score": 3,
+      "rationale": "[청약철회권·가입의사 확인] 14일 기간만 짧게 언급 / 법적 근거·구체 철회 방법 누락 + 가입의사 확인 매우 약식 → 부분 감점\n - 상담사: \"14일 이내 청약철회 가능하세요\" (기간만 언급)\n - 상담사: \"가입 진행할까요\" (이해도 확인 절차 부재)",
+      "quote_example": "상담사: 14일 이내 청약철회 가능하세요 가입 진행할까요",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_912",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_011"
+    },
+    {
+      "record_id": "r_912_synthetic_012",
+      "score": 0,
+      "rationale": "[청약철회권·가입의사 확인] 청약철회권 안내 전무 + 가입의사 명시적 재확인 절차 부재 + 철회권을 단순 미사용으로 오도 → 0점\n - 상담사: \"일단 가입 처리 진행하겠습니다\" (의사 재확인 누락 / 일방 통보)\n - 상담사: \"마음에 안 드시면 그냥 안 쓰셔도 됩니다\" (법적 청약철회권 회피)",
+      "quote_example": "상담사: 그럼 일단 가입 처리 진행하겠습니다 카드 도착하시면 사용해보세요",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_912",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_012"
+    }
+  ]
+}

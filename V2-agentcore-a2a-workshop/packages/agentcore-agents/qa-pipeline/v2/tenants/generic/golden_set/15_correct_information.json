@@ -1,0 +1,56 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내",
+  "category": "업무 정확도",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "업무지식 RAG 필수. RAG 부재 시 partial_with_review → unevaluable 반환. 실제 안내 사실과 RAG 내 공식 정보 간 일치도로 평가.",
+  "examples": [
+    {
+      "example_id": "GS-15-FULL-01",
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "billing",
+      "segment_text": "상담사: 결제는 신용카드, 체크카드, 계좌 자동이체 3가지 방법 모두 가능합니다. 자동이체 신청은 본인확인 후 3 영업일 내 등록됩니다.",
+      "rationale": "manual.md BK-GEN-002 chunk 와 사실 일치.",
+      "rationale_tags": ["RAG 일치", "사실 정확"],
+      "evidence_refs": ["BK-GEN-002"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-15-PARTIAL-01",
+      "score": 7,
+      "score_bucket": "partial",
+      "intent": "billing",
+      "segment_text": "상담사: 결제는 카드로만 가능해요.",
+      "rationale": "사실과 일부 불일치 (계좌 자동이체 누락). 완전 오안내는 아니지만 불완전.",
+      "rationale_tags": ["부분 오안내"],
+      "evidence_refs": ["BK-GEN-002"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-15-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "cancellation",
+      "segment_text": "상담사: 해지하시면 100% 환불됩니다. 일주일 내에 하시면 돼요.",
+      "rationale": "manual.md BK-GEN-003 — 7일 이내 전액 환불 맞으나 고객이 40일 가입자인 상황에서 잘못 적용. 허위 안내 미정정 시 0점.",
+      "rationale_tags": ["허위 안내"],
+      "evidence_refs": ["BK-GEN-003"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-15-UNEVAL-01",
+      "score": null,
+      "score_bucket": "unevaluable",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 저희 신상품 A는 월 5천원이고 데이터 무제한입니다.",
+      "rationale": "manual.md 에 해당 상품 chunk 없음 — 업무지식 RAG 부재. unevaluable 분기.",
+      "rationale_tags": ["RAG 부재"],
+      "evidence_refs": [],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

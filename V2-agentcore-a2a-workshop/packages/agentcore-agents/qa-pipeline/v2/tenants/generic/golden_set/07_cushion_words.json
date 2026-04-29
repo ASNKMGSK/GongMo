@@ -1,0 +1,42 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어 활용",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "iter03_clean: refusal-gated — 거절/불가/양해 상황이 전제되지 않은 발화에는 쿠션어 부재를 감점하지 않음.",
+  "examples": [
+    {
+      "example_id": "GS-07-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "cancellation",
+      "segment_text": "상담사: 번거로우시겠지만 본인확인을 위해 생년월일을 한 번 더 말씀해 주실 수 있을까요?",
+      "rationale": "거절/요청 상황에서 쿠션어('번거로우시겠지만') 사용.",
+      "rationale_tags": ["쿠션어 적절"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "cancellation",
+      "segment_text": "고객: 환불 바로 해주세요. 상담사: 그거는 안 됩니다. 규정상 3일 걸려요.",
+      "rationale": "거절 상황인데 쿠션어 전무. 단 내용은 정확하여 3점.",
+      "rationale_tags": ["거절 상황 쿠션어 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-07-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "고객: 당장 변경 해주세요. 상담사: 안 되는데요. 그건 그냥 안 돼요.",
+      "rationale": "거절 반복 + 쿠션어/양해 전무 + 건조한 응대 톤.",
+      "rationale_tags": ["거절 반복 쿠션어 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

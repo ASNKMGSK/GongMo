@@ -1,0 +1,42 @@
+{
+  "item_number": 3,
+  "item_name": "경청 / 말겹침 / 말자름",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "STT 겹침 구간 미표기 시 기본 만점 처리.",
+  "examples": [
+    {
+      "example_id": "GS-03-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "general_inquiry",
+      "segment_text": "고객: 그래서 제가 지난달에 결제한 금액이 중복된 것 같아서요. 상담사: 네, 확인해 드리겠습니다.",
+      "rationale": "고객 발언 완료 후 상담사 응답. 말겹침/말자름 없음.",
+      "rationale_tags": ["경청 정상"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-03-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "complaint",
+      "segment_text": "고객: 그게 아니라 제가 말씀드리는 건 [동시] 상담사: [동시] 네 고객님 그 부분은.",
+      "rationale": "말겹침 1회 발생 — 중간 개입. 말자름 없음.",
+      "rationale_tags": ["말겹침 1회"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-03-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "고객: 제가 처음부터 말씀드렸 [말자름] 상담사: 아니 고객님 그 부분은 이미 말씀드렸잖아요.",
+      "rationale": "말자름 1회 + 반말 뉘앙스. 즉시 0점 처리.",
+      "rationale_tags": ["말자름 1회"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "item_number": 913,
+  "item_name": "민원 유형 분류 및 원인 파악 ★",
+  "version": "shinhan_consumer_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_913_synthetic_cons_001",
+      "score": 15,
+      "rationale": "[VOC 분류 · 만점] 민원 카테고리 정확 매핑(\"이중청구·중복승인\" + \"환불 처리 지연\" 복수 분류) + 원인 파악을 위한 4가지 정보 요청 + 가설(중복 승인/매입 미취소) 명시 + SLA(영업일 1일) 안내.\n - 상담사#4: \"결제 / 청구 카테고리 중 \\\"이중청구·중복승인\\\" 유형이시고요 환불 지연이 함께 발생하고 있어서 \\\"환불 처리 지연\\\" 유형도 같이 등록하겠습니다\"\n - 상담사#6: \"결제 일시 / 결제 가맹점 / 결제 금액 / 결제 방식(승인/매입) 4가지 정보 부탁드릴게요\"\n - 상담사#8: \"가맹점 단말기 중복 승인 / 매입 미취소 가능성으로 보이고요\"",
+      "quote_example": "상담사: 결제 / 청구 카테고리 중 \"이중청구·중복승인\" 유형이시고요 환불 지연이 함께 발생하고 있어서 \"환불 처리 지연\" 유형도 같이 등록하겠습니다",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_913", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_001"
+    },
+    {
+      "record_id": "r_913_synthetic_cons_002",
+      "score": 5,
+      "rationale": "[VOC 분류 · 부분점수 5점] \"결제 관련\" 광범위 분류만 진행 — 세부 카테고리(이중청구 / 환불지연) 미식별. 원인 파악 정보 요청 누락. SLA 시점 모호 (\"좀 다양해서\").\n - 상담사#2: \"결제 관련 문제로 보이시네요\"\n - 상담사#4: \"확인해 보고 처리해 드리겠습니다\"\n - 상담사#8: \"그건 처리 시간이 좀 다양해서 정확히 말씀드리긴 어렵고요\"",
+      "quote_example": "상담사: 결제 관련 문제로 보이시네요",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_913", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_002"
+    },
+    {
+      "record_id": "r_913_synthetic_cons_003",
+      "score": 0,
+      "rationale": "[VOC 분류 · 0점] critical_violation 트리거. 민원 카테고리 분류 거부 (\"따로 분류 안 해도\"), 원인 파악 회피, 책임 가맹점 전가. 사실상 단순문의로 처리.\n - 상담사#2: \"그건 자주 있는 일이고요 좀 기다려 보세요\"\n - 상담사#6: \"그건 가맹점 잘못이라서요 저희가 어쩌기 어렵고요\"\n - 상담사#8: \"따로 분류 안 해도 처리는 됩니다\"",
+      "quote_example": "상담사: 따로 분류 안 해도 처리는 됩니다",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_913", "zero_compliance", "critical_violation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_003"
+    }
+  ]
+}

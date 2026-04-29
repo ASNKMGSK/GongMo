@@ -1,0 +1,52 @@
+{
+  "item_number": 12,
+  "item_name": "문제 해결 의지",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "상품 불량 느낌 호소에 교환 + 입고 후 꼼꼼 검수 약속까지 적극 해결 제안 만점",
+      "quote_example": "상담사: 저희 입고 출고 진행 시 이런 부분 내용 전달하고 꼼꼼히 확인할 수 있도록 하겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["proactive", "full_resolution"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "사이즈 불일치 반품 요청에 즉시 접수 + 추가 사이즈 문의까지 친절 응대",
+      "quote_example": "상담사: 반품 접수 바로 진행하고요 사이즈 관련 문의도 상세히 안내드리겠습니다",
+      "evaluator_id": "senior_b",
+      "tags": ["proactive", "extra_help"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "요청 업무는 처리하나 대안/추가 해결 제안 없음 3점",
+      "quote_example": "상담사: 네 반품 접수만 해드릴게요",
+      "evaluator_id": "senior_c",
+      "tags": ["passive", "minimal_effort"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "고객 요청 수행하나 상품 불량 가능성 등 추가 안내 회피 3점",
+      "quote_example": "상담사: 일단 교환부터 해드리고 그 다음은 그때 가서요",
+      "evaluator_id": "senior_a",
+      "tags": ["defer_later", "partial_effort"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "문제 해결 의지 없음 — '저희는 못 해드려요' 업무회피 0점",
+      "quote_example": "상담사: 그런 건 저희는 못 도와드려요 다른 데 알아보세요",
+      "evaluator_id": "senior_b",
+      "tags": ["work_avoidance", "critical"],
+      "stub_seed": true
+    }
+  ]
+}

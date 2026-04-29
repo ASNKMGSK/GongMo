@@ -1,0 +1,36 @@
+# kolon 아웃바운드 텔레세일즈 부서 — tenant_config override 샘플
+#
+# 텔레세일즈는 영업 목적 통화이므로 설명력·적극성·필수 고지 비중이 CS 대비 큼.
+# 생성일: 2026-04-24 (3단계 구조 도입 샘플)
+
+tenant_id: kolon-outbound-telesales
+
+routing:
+  # 텔레세일즈는 계약 리스크가 있어 T0 자동승인 비율 낮춤 (30% → 20%)
+  initial_t0_cap: 0.20
+  t1_sample_rate: 0.10
+  t1_sample_rate_max: 0.15
+  grade_boundary_margin: 2
+
+confidence:
+  rag_min_sample_size: 3
+  rag_small_sample_weight: 0.5
+  item_weights:
+    # #10 설명력 — 텔레세일즈 핵심 역량. evidence_quality 비중 최대화
+    "10":
+      llm_self: 0.25
+      rule_llm_agreement: 0.20
+      rag_stdev: 0.15
+      evidence_quality: 0.40
+    # #14 후속조치 — 계약 유도 핵심
+    "14":
+      llm_self: 0.30
+      rule_llm_agreement: 0.20
+      rag_stdev: 0.20
+      evidence_quality: 0.30
+    # #16 필수 고지 — 영업 목적 통화 고지/녹취 고지 의무. rule 비중 최대
+    "16":
+      llm_self: 0.15
+      rule_llm_agreement: 0.55
+      rag_stdev: 0.15
+      evidence_quality: 0.15

@@ -1,0 +1,52 @@
+{
+  "item_number": 8,
+  "item_name": "문의 파악 및 재확인",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "교환 사유 청취 후 고객 의도 재확인 + 요약 복창 만점",
+      "quote_example": "상담사: 신상이 좀 심하다 보니깐 상품에 문제가 있다라는 느낌이신 거죠",
+      "evaluator_id": "senior_a",
+      "tags": ["full_needs", "summarization"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "사이즈 불일치 반품 사유 파악 + 교환/반품 중 반품 의도 재확인 완료",
+      "quote_example": "상담사: 사이즈하고 색상 타이트하다고 해주셨고요 에그라이트 스테드넥 재킷 반품 진행 맞으실까요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_needs", "clarify_intent"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "고객 발화 파악했으나 재확인/복창 절차 누락 3점",
+      "quote_example": "상담사: 네 알겠습니다 바로 반품 접수하겠습니다",
+      "evaluator_id": "senior_c",
+      "tags": ["missing_readback", "partial_needs"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "교환 요청만 파악, 구체 사유(색상/사이즈/불량) 미확인 3점",
+      "quote_example": "상담사: 교환 접수 도와드릴게요 (사유 질의 생략)",
+      "evaluator_id": "senior_a",
+      "tags": ["missing_reason_probing"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "고객 의도 파악 실패 + 엉뚱한 안내 진행 0점",
+      "quote_example": "상담사: 주문 취소 원하시는 거죠 (고객은 교환 요청)",
+      "evaluator_id": "senior_b",
+      "tags": ["misunderstood", "needs_failure"],
+      "stub_seed": true
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "item_number": 13,
+  "item_name": "부연 설명 및 추가 안내",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "examples": [
+    {
+      "example_id": "GS-13-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 기본 요금은 3만 9천원입니다. 추가로 말씀드리면, 혹시 가족 할인 적용 대상이시면 월 5천원 더 할인 가능하고, 약정 24개월 선택 시 가입비 면제됩니다.",
+      "rationale": "핵심 답변 + 추가 혜택 2종 선제 안내.",
+      "rationale_tags": ["선제 부연 안내"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 기본 요금은 3만 9천원입니다.",
+      "rationale": "핵심 답변만. 부연 설명/추가 안내 없음.",
+      "rationale_tags": ["부연 없음"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-13-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 뭐 그 정도입니다. 더 자세한 건 홈페이지요.",
+      "rationale": "답변 자체가 회피성. 부연 설명 거부.",
+      "rationale_tags": ["설명 거부"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

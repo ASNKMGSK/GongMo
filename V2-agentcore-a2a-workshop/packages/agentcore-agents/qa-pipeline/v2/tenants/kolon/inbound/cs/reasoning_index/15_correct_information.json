@@ -1,0 +1,38 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내",
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 정확한 안내 항목. Business Knowledge 대조 후 사실 일치 여부·분기 고려 여부·리스크 고지 여부가 주된 판정 축.",
+  "reasoning_records": [
+    {
+      "record_id": "r_15_cs_sample_051",
+      "score": 15,
+      "rationale": "결제수단(카드/현금) 분기, 법정/정책 기간, 가변 요인(카드사 정책) 까지 3축이 모두 안내되어 오안내 리스크가 구조적으로 차단됨. 고객 재확인 요청에도 동일한 정보를 일관되게 반복.",
+      "quote_example": "상담사: 카드 결제 건이셔서 취소 요청 주신 후 영업일 기준 삼 일에서 오 일 사이에 카드사에서 취소 처리되시고요 현금 결제 건이셨다면 계좌 확인 후 이 영업일 이내에 환급 처리됩니다",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_15", "full_compliance", "policy_complete", "risk_disclosed", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_051"
+    },
+    {
+      "record_id": "r_15_cs_sample_052",
+      "score": 10,
+      "rationale": "기본 택배 리드타임(2~3일) 은 정확하게 전달했으나 \"금요일쯤\" 같은 추정 표현 + 도서산간/주말/지역별 편차 고지 부재. 정확도는 유지되나 분기 분석이 약해 일부 케이스에서 오안내 리스크 존재.",
+      "quote_example": "상담사: 그러면 금요일쯤에 받으실 수 있으실 거예요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_15", "partial_compliance", "missing_branching", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_052"
+    },
+    {
+      "record_id": "r_15_cs_sample_053",
+      "score": 0,
+      "rationale": "실제 코오롱몰 반품/교환 정책은 단순변심 14일, 하자 30일임에도 \"한 달 정도\" 로 근거 없는 기간을 안내. 고객이 재확인 요청했을 때도 수정하지 않고 같은 오정보를 강화. 단순 누락이 아니라 명확한 사실 오류.",
+      "quote_example": "상담사: 어 한 달 정도까지는 될 거예요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_15", "incorrect_info", "policy_violation", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_053"
+    }
+  ]
+}

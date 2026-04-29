@@ -1,0 +1,61 @@
+{
+  "item_number": 10,
+  "item_name": "설명의 명확성",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 10,
+      "rationale": "회수 일정 + 반송장 보관 + 검수 소요일 구조화 설명 + 수치 명시 만점",
+      "quote_example": "상담사: 회수 기사가 2-3 영업일 내 방문하고 반송장은 교환 완료까지 보관 부탁드리며 입고 후 검수는 2-3 영업일 소요됩니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_clarity", "structured"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 10,
+      "rationale": "자사 상품 1회 무상 교환 조건 명확 + 색상/사이즈 동일 확인 명시 만점",
+      "quote_example": "상담사: 자사 상품이라 1회 무상 교환 가능하시고요 색상과 사이즈는 동일하게 진행 맞으실까요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_clarity", "policy_cited"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 7,
+      "rationale": "핵심 안내는 정확하나 '정도'/'~거 같애요' 완화 표현 섞임 중간 7점",
+      "quote_example": "상담사: 회수는 2-3일 정도 걸릴 거 같애요",
+      "evaluator_id": "senior_c",
+      "tags": ["mitigated_expression", "mid_clarity"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 5,
+      "rationale": "장황한 설명 중 핵심(비용 발생 여부)은 전달되나 조건 불명확 5점",
+      "quote_example": "상담사: 상품 불량이면 무상이고 아니면 비용이 뭐 그럴 수도 있고",
+      "evaluator_id": "senior_a",
+      "tags": ["verbose", "ambiguous_conditions"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "설명 전무, '저도 모르겠어요' 업무회피 0점",
+      "quote_example": "상담사: 그건 저도 잘 모르겠어요",
+      "evaluator_id": "senior_b",
+      "tags": ["work_avoidance", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_006",
+      "score": 7,
+      "rationale": "릴렉스핏/슬림핏/오버핏 설명 정확하나 구체 치수 부재 중간 7점",
+      "quote_example": "상담사: 릴렉스핏 슬림핏 오버핏에 따라 사이즈가 상이할 수 있어요",
+      "evaluator_id": "senior_c",
+      "tags": ["mid_clarity", "missing_numeric"],
+      "stub_seed": true
+    }
+  ]
+}

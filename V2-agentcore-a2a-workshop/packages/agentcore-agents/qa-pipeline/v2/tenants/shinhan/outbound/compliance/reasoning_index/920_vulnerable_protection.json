@@ -1,0 +1,50 @@
+{
+  "item_number": 920,
+  "item_name": "취약계층 식별 및 보호 조치",
+  "version": "shinhan_compliance_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_920_synthetic_104",
+      "score": 5,
+      "rationale": "[취약계층 보호] 65세 이상 식별 후 적합성 원칙 보호 조치 3종 모두 이행 → 만점\n - 상담사: \"고객님 연세 여쭤봐도 될까요\" (식별 시도)\n - 상담사: \"가족 중에 함께 결정하실 분이 계시면 같이 들어주셔도 좋고\" (가족 동참 권유)\n - 상담사: \"충분히 생각하신 후 결정해 주셔도 됩니다\" (검토 시간 보장)\n - 상담사: \"이해가 안 되시면 언제든 다시 여쭤봐 주십시오\" (재설명 보장)",
+      "quote_example": "상담사: 가족 중에 함께 결정하실 분이 계시면 같이 들어주셔도 좋고",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_920",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_104"
+    },
+    {
+      "record_id": "r_920_synthetic_105",
+      "score": 3,
+      "rationale": "[취약계층 보호] 반복 질문 (이해 곤란 패턴) 식별 가능 / 재설명은 정중히 이행하나 가족 동참·검토 시간 보장 누락 → 부분 감점\n - 고객: 동일 정보 3회 반복 질문 (이해 곤란 신호)\n - 상담사: \"아니요 매월이 아니라 1년에 한 번이세요\" (재설명 이행)\n - 상담사: \"그럼 가입 진행할까요\" (검토 시간 부재 / 가족 동참 권유 누락)",
+      "quote_example": "상담사: 아니요 매월이 아니라 1년에 한 번이세요",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_920",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_105"
+    },
+    {
+      "record_id": "r_920_synthetic_106",
+      "score": 0,
+      "rationale": "[취약계층 보호] 명백한 취약 신호 (75세 / 청력 곤란 / 반복 질문 / 상품 개념 모호) 인지 후에도 보호 조치 전무 → 0점\n - 고객: \"잘 안 들리는데 좀 천천히 말씀해 주세요\" (청력 곤란)\n - 고객: \"신용카드요 그게 뭐예요\" (상품 개념 모호 / 명백한 이해 곤란자)\n - 상담사: \"일단 가입 진행할게요\" (의사 재확인 회피, 일방 처리)\n - 상담사: \"필요 없으면 안 쓰시면 돼요\" (#921, #922 동시 위반)",
+      "quote_example": "상담사: 일단 가입 진행할게요 카드 발급되어 도착하면 사용해보시고 필요 없으면 안 쓰시면 돼요",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_920",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_106"
+    }
+  ]
+}

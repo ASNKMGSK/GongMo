@@ -1,0 +1,85 @@
+{
+  "item_number": 2,
+  "item_name": "끝인사",
+  "category": "인사 예절",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "연체상담",
+    "카드발급",
+    "청구문의",
+    "한도조정",
+    "분실신고",
+    "결제일변경",
+    "부가서비스",
+    "본인확인",
+    "일반문의",
+    "민원",
+    "카드심사"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-02-FULL-shinhan-001",
+      "item_number": 2,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "결제일변경",
+      "segment_text": "상담사: 결제일 변경 처리 완료되었습니다 다음 청구분부터 매월 십오 일로 적용되시구요\n고객: 네 알겠습니다\n상담사: 안내 내용 알림톡으로 발송해드렸습니다 다른 문의사항 있으실까요\n고객: 아니요 없어요\n상담사: 네 그럼 이용해 주셔서 감사합니다 신한카드 김민지 상담사였습니다 좋은 하루 되세요",
+      "rationale": "[끝인사] 추가 문의 확인 + 인사말 + 상담사명 재고지 3요소 모두 충족 → 만점\n - 상담사#3: \"안내 내용 알림톡으로 발송해드렸습니다 다른 문의사항 있으실까요\"\n - 상담사#5: \"네 그럼 이용해 주셔서 감사합니다 신한카드 김민지 상담사였습니다 좋은 하루 되세요\"",
+      "rationale_tags": ["item_2", "full_compliance", "three_elements"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 3},
+        {"speaker": "상담사", "turn_id": 5}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-02-PARTIAL-shinhan-002",
+      "item_number": 2,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "청구문의",
+      "segment_text": "상담사: 청구 내역 확인 도와드렸습니다\n고객: 네 알겠습니다\n상담사: 다른 문의사항 있으실까요\n고객: 없어요\n상담사: 네 감사합니다",
+      "rationale": "[끝인사] 추가 문의 확인 + 인사말 2요소 (상담사명 재고지 누락) → 부분점수 (2-요소 완화 정책)\n - 상담사#3: \"다른 문의사항 있으실까요\"\n - 상담사#5: \"네 감사합니다\"",
+      "rationale_tags": ["item_2", "partial_compliance", "two_elements"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 3},
+        {"speaker": "상담사", "turn_id": 5}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-02-ZERO-shinhan-003",
+      "item_number": 2,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "연체상담",
+      "segment_text": "상담사: 어 그럼 그렇게 진행하시면 돼요\n고객: 네\n상담사: 끊을게요",
+      "rationale": "[끝인사] 추가 문의 확인 + 인사말 + 상담사명 3요소 모두 누락 + 일방적 종료 → 0점\n - 상담사#3: \"끊을게요\" — 추가 문의 확인 / 인사말 / 상담사명 모두 부재",
+      "rationale_tags": ["item_2", "non_compliance", "abrupt_ending"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 3}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

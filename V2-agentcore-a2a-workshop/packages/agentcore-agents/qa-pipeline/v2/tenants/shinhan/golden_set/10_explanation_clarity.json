@@ -1,0 +1,87 @@
+{
+  "item_number": 10,
+  "item_name": "설명의 명확성",
+  "category": "설명력 및 전달력",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 5, 0],
+  "intents": [
+    "연체상담",
+    "카드발급",
+    "청구문의",
+    "한도조정",
+    "결제일변경",
+    "분실신고",
+    "부가서비스",
+    "민원",
+    "카드심사"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-10-FULL-shinhan-001",
+      "item_number": 10,
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "연체상담",
+      "segment_text": "고객: 분할납부 어떻게 진행되는 거예요\n상담사: 네 고객님 분할납부 안내드리면요 현재 연체 잔액 백이십삼만원에 대해서 최대 십이 개월 분할 신청 가능하시구요 매월 결제일에 분할 회차분이 자동 출금되는 형태입니다\n고객: 이자도 붙어요\n상담사: 네 분할납부 시 잔액 기준 연 이십이 점 구 프로 약정이자가 적용되시구요 신청일 다음 영업일부터 발생하시고 매월 회차분에 포함되어 청구됩니다 첫 회차 청구일은 신청 후 다음 결제일이세요\n고객: 알겠어요\n상담사: 네 그러면 십이 개월 분할 기준으로 월 십이만이천원 정도 이자 포함 약 십삼만원 예상되시구요 정확한 금액은 신청 완료 후 알림톡으로 발송되십니다",
+      "rationale": "[설명] 장문 3건, 숫자 (잔액 / 이자율 / 회차 / 월 납부액) 명확, 고객 되물음 최소 → 만점\n - 상담사#2: \"분할납부 안내드리면요 현재 연체 잔액 백이십삼만원에 대해서 최대 십이 개월 분할 신청 가능하시구요\"\n - 상담사#4: \"분할납부 시 잔액 기준 연 이십이 점 구 프로 약정이자가 적용되시구요 신청일 다음 영업일부터 발생하시고 매월 회차분에 포함되어 청구됩니다\"\n - 상담사#6: \"십이 개월 분할 기준으로 월 십이만이천원 정도 이자 포함 약 십삼만원 예상되시구요\"",
+      "rationale_tags": ["item_10", "full_compliance", "numeric_clarity"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-10-PARTIAL-shinhan-002",
+      "item_number": 10,
+      "score": 5,
+      "score_bucket": "partial",
+      "intent": "한도조정",
+      "segment_text": "고객: 한도 증액 어떻게 진행되나요\n상담사: 네 한도 증액 신청은 시스템에서 검토 후 결과 안내드리는데요 신청 후에 결과 나오시면 SMS로 알려드릴 거구요\n고객: 얼마나 걸려요\n상담사: 음 보통 좀 시간이 걸리시고요\n고객: 그게 얼마인지요\n상담사: 그건 시스템에 따라 다르세요\n고객: 그래서 며칠 정도\n상담사: 영업일로는 보통 며칠 정도 보시면 될 것 같아요",
+      "rationale": "[설명] 내부용어 / 일방 나열 + 고객 되물음 3회 (얼마 / 며칠) 발생 + 숫자 모호 → 5점\n - 상담사#4: \"음 보통 좀 시간이 걸리시고요\" — 모호\n - 상담사#6: \"그건 시스템에 따라 다르세요\" — 책임 회피\n - 상담사#8: \"영업일로는 보통 며칠 정도 보시면 될 것 같아요\" — 모호",
+      "rationale_tags": ["item_10", "partial_compliance", "vague_numbers"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-10-ZERO-shinhan-003",
+      "item_number": 10,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "청구문의",
+      "segment_text": "고객: 사월 청구가 평소보다 많은데 왜 그래요\n상담사: 그건 그냥 청구돼서 그래요\n고객: 무슨 말씀이세요\n상담사: 그러게요 시스템상 그래요\n고객: 항목 좀 알려주세요\n상담사: 그건 잘 모르겠어요 청구된 대로 보세요\n고객: 진짜요",
+      "rationale": "[설명] 설명 자체 부재 + 고객 되물음 3회 + 책임 회피 → 0점\n - 상담사#2: \"그건 그냥 청구돼서 그래요\"\n - 상담사#4: \"그러게요 시스템상 그래요\"\n - 상담사#6: \"그건 잘 모르겠어요 청구된 대로 보세요\"",
+      "rationale_tags": ["item_10", "non_compliance", "no_explanation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+﻿# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/inbound/compliance 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속
+
+tenant_id: shinhan
+team_id: compliance
+channel: inbound
+department: compliance
+description: >
+  준법관리부 — 설명의무, 취약계층 보호, 부당권유, 청약철회
+
+version:
+  schema: "v2.0.0"
+  last_updated: "2026-04-28"
+
+dept_evaluation:
+  - node_id: comp_unfair_sale_check
+    label: "부당권유 / 설명의무 통합 점검"
+    score: 30
+    items:
+      - "설명의무 이행 (상품 핵심 / 위험 / 제한사항)"
+      - "부당권유 금지 (단정적 판단 / 우월적 지위)"
+      - "취약계층 보호 (고령 / 장애)"
+      - "청약철회 / 분쟁조정 권리 고지"

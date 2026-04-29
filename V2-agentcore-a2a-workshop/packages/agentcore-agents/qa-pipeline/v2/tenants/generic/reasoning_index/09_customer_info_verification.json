@@ -1,0 +1,43 @@
+{
+  "item_number": 9,
+  "item_name": "고객 정보 확인",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "성함/생년월일/연락처 3요소 본인확인, 상담사가 선언급 없음 — 만점",
+      "quote_example": "성함 생년월일 등록 연락처 3가지 확인 부탁드립니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_iv", "three_factor"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "본인확인 수행했으나 2요소만 확인 — 일부 요소 누락 3점",
+      "quote_example": "성함 생년월일 부탁드립니다",
+      "evaluator_id": "senior_b",
+      "tags": ["partial_iv", "two_factor"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "상담사가 이름을 먼저 언급 (preemptive disclosure) 0점",
+      "quote_example": "홍길동 고객님 맞으시죠",
+      "evaluator_id": "senior_c",
+      "tags": ["preemptive_disclosure", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "본인확인 절차 미수행 — 즉시 업무 진행 0점",
+      "quote_example": "바로 처리해드릴게요",
+      "evaluator_id": "senior_a",
+      "tags": ["no_iv", "force_t3"],
+      "stub_seed": true
+    }
+  ]
+}

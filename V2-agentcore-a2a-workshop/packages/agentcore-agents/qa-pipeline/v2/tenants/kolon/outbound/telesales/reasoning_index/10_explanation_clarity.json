@@ -1,0 +1,38 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성 (상품 프로모션)",
+  "version": "kolon_outbound_telesales_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 아웃바운드 텔레세일즈는 상품 설명 blocks 이 중심. 수치·조건·제약 구체성이 핵심 판정 축.",
+  "reasoning_records": [
+    {
+      "record_id": "r_10_ts_sample_011",
+      "score": 10,
+      "rationale": "혜택·조건·제약까지 4축이 수치화 되어 전달됨 (25%·10만원·4월30일). 제약조건(\"중복 쿠폰 불가\") 을 자발 고지하여 결정 후 클레임 리스크를 선제 차단. 구조화된 번호 안내.",
+      "quote_example": "상담사: 첫째 멤버십 고객님 한정으로 전 상품 이십오 퍼센트 할인 적용되시고요 둘째 구매 금액 십만 원 이상이실 경우 사은품으로 골프 장갑 증정 가능하십니다",
+      "evaluator_id": "kolon_telesales_senior_synthetic",
+      "tags": ["item_10", "full_compliance", "structured", "constraints_disclosed", "telesales"],
+      "stub_seed": false,
+      "sample_id": "ts_sample_011"
+    },
+    {
+      "record_id": "r_10_ts_sample_012",
+      "score": 7,
+      "rationale": "혜택의 존재는 전달되나 \"엄청 크게\" 같은 모호 수식어만 사용. 할인율·사은품 품목·기간 수치 모두 미명시. 긴급 압박 표현(\"빨리 결정하시는 게\") 만 강화되어 설득력은 있으나 구체성이 부족.",
+      "quote_example": "상담사: 할인 많이 되시고요 지금 구매하시면 사은품도 드리거든요 기간 얼마 안 남았으니까 빨리 결정하시는 게",
+      "evaluator_id": "kolon_telesales_senior_synthetic",
+      "tags": ["item_10", "partial_compliance", "vague_numbers", "urgency_without_details", "telesales"],
+      "stub_seed": false,
+      "sample_id": "ts_sample_012"
+    },
+    {
+      "record_id": "r_10_ts_sample_013",
+      "score": 0,
+      "rationale": "상품 정보 zero. \"엄청 좋은 거\"·\"사시면 후회 안 하세요\" 등 근거 없는 주관 서술만 반복. 고객 재질의(\"기능이나 소재\") 에 \"사이트 보세요\" 로 회피 — 아웃바운드 영업 목적 자체를 달성하지 못하는 실패 케이스.",
+      "quote_example": "상담사: 엄청 좋은 거예요 저희 자랑 상품이고요 사시면 후회 안 하세요",
+      "evaluator_id": "kolon_telesales_senior_synthetic",
+      "tags": ["item_10", "no_info", "deflection", "telesales"],
+      "stub_seed": false,
+      "sample_id": "ts_sample_013"
+    }
+  ]
+}

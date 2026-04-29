@@ -1,0 +1,37 @@
+{
+  "item_number": 1,
+  "item_name": "첫인사",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_01_shinhan_001",
+      "score": 5,
+      "rationale": "[첫인사] 인사말 + 소속 + 상담사명 3요소 모두 충족 → 만점\n - 상담사#1: \"안녕하세요 신한카드 고객센터 김민지 상담사입니다 무엇을 도와드릴까요\" — '안녕하세요' + '신한카드 고객센터' + '김민지 상담사'",
+      "quote_example": "상담사: 안녕하세요 신한카드 고객센터 김민지 상담사입니다 무엇을 도와드릴까요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_1", "full_compliance", "three_elements"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_01_shinhan_002",
+      "score": 3,
+      "rationale": "[첫인사] 인사말 + 소속 2요소만 충족 (상담사명 누락) → 부분점수\n - 상담사#1: \"안녕하세요 신한카드입니다\" — 상담사명 미포함",
+      "quote_example": "상담사: 안녕하세요 신한카드입니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_1", "partial_compliance", "two_elements"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_01_shinhan_003",
+      "score": 0,
+      "rationale": "[첫인사] 인사말 / 소속 / 상담사명 3요소 모두 누락 → 0점\n - 상담사#1: \"네 말씀하세요\" — 표준 도입 멘트 부재",
+      "quote_example": "상담사: 네 말씀하세요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_1", "non_compliance", "no_elements"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

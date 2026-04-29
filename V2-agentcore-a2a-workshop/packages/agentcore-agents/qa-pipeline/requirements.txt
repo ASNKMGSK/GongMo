@@ -1,0 +1,38 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# QA Pipeline V3 — EC2 배포용 runtime dependencies
+# 로컬 개발은 conda env `py313` 사용. EC2 는 이 파일로 venv 에 설치.
+
+# LangGraph / LangChain
+langgraph>=0.4.0
+langchain-core>=0.3.0
+langchain-aws>=0.2.0
+
+# AWS
+boto3>=1.35.0
+
+# FastAPI server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.0.0
+sse-starlette>=2.0.0
+
+# 멀티파트 (파일 업로드)
+python-multipart>=0.0.9
+
+# PDF 추출 (wiki/tenant upload)
+pymupdf>=1.24.0
+
+# XLSX (GT 정답 로드 — /v2/gt-scores)
+openpyxl>=3.1.0
+
+# AG2 토론 — v2/debate/*
+# `ag2` 는 `autogen` / `pyautogen` 과 동일 PyPI 패키지.
+ag2[anthropic,bedrock]>=0.9.7
+
+# HTTP 클라이언트
+httpx>=0.27.0
+
+# YAML / TOML
+pyyaml>=6.0.1

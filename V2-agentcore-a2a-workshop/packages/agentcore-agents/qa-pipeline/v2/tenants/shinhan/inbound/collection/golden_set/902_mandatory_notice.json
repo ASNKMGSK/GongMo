@@ -1,0 +1,77 @@
+{
+  "item_number": 902,
+  "item_name": "필수 안내 이행",
+  "category": "shinhan_coll_accuracy",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["연체상담", "거래정지문의", "한도확인"],
+  "version": "shinhan_collection_v1",
+  "examples": [
+    {
+      "example_id": "GS-902-FULL-shinhan-coll-001",
+      "item_number": 902,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "연체상담",
+      "segment_text": "고객: 연체되면 카드 못 쓰는 건가요\n상담사: 네 고객님 안내드리면 현재 연체 십팔 일 경과되어 있어서요 일시 거래정지 상태로 전환되어 결제 승인이 제한되고 계십니다\n고객: 아 그래요\n상담사: 그리고 연체일이 삼십 일을 초과하시면 신용정보원 단기 연체 정보로 등재될 수 있고요 이건 흔히 말씀하시는 블랙리스트 등재 가능성이 있다는 의미입니다\n고객: 그러면 한도는 어떻게 되는 건가요\n상담사: 가용한도 부분 안내드리면 현재 등록 한도 오백만 원 중 사용 잔액 사십삼만 원 차감되어서 가용한도는 사백오십칠만 원이신데요 다만 연체 해소 전까지는 가용한도가 있어도 신규 결제 승인은 제한된다는 점 안내 드립니다\n고객: 네 알겠습니다",
+      "rationale": "[필수 안내 · 만점] 거래정지 / 블랙리스트(신용정보원 등재 가능성) / 가용한도 3요소 모두 명확 안내. 가용한도가 있어도 연체 해소 전 신규 승인 제한 사항까지 보충.\n - 상담사#2: \"일시 거래정지 상태로 전환되어 결제 승인이 제한되고 계십니다\"\n - 상담사#4: \"신용정보원 단기 연체 정보로 등재될 수 있고요 이건 흔히 말씀하시는 블랙리스트 등재 가능성이 있다는 의미입니다\"\n - 상담사#6: \"가용한도는 사백오십칠만 원이신데요 다만 연체 해소 전까지는 가용한도가 있어도 신규 결제 승인은 제한된다는 점 안내 드립니다\"",
+      "rationale_tags": ["item_902", "full_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_011",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-902-PARTIAL-shinhan-coll-002",
+      "item_number": 902,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "연체상담",
+      "segment_text": "고객: 지금 카드는 쓸 수 있어요\n상담사: 어 지금은 거래정지 걸려서 결제는 안 되실 거예요\n고객: 다른 영향은 없는 거예요\n상담사: 음 일단 가용한도가 한 사백오십만 원 정도 남아 있긴 한데 지금 연체 상태라서요 결제는 다 막혀 있는 상태예요\n고객: 신용에는 문제 없어요\n상담사: 네 뭐 길어지면 좀 영향이 있을 수 있는데 지금 단계에서는 크게 걱정 안 하셔도 됩니다",
+      "rationale": "[필수 안내 · 부분점수 3점] 거래정지 / 가용한도 2요소는 안내했으나 블랙리스트(신용정보원 등재) 안내가 모호 (\"좀 영향이 있을 수 있는데\"). 등재 시점/기준일(30일) 미언급.\n - 상담사#2: \"지금은 거래정지 걸려서 결제는 안 되실 거예요\"\n - 상담사#4: \"가용한도가 한 사백오십만 원 정도 남아 있긴 한데\"\n - 상담사#6: \"길어지면 좀 영향이 있을 수 있는데 지금 단계에서는 크게 걱정 안 하셔도 됩니다\"",
+      "rationale_tags": ["item_902", "partial_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_012",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-902-ZERO-shinhan-coll-003",
+      "item_number": 902,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "한도확인",
+      "segment_text": "고객: 한도가 얼마 남았어요\n상담사: 그건 앱에서 확인하시면 됩니다\n고객: 카드는 지금 쓸 수 있는 거예요\n상담사: 일단 결제 한 번 해보시고 안 되면 다시 전화 주세요\n고객: 연체되면 신용에 문제 생긴다고 들었는데\n상담사: 그건 뭐 사람마다 다르고요 자세한 건 신용평가사에 문의하셔야 됩니다",
+      "rationale": "[필수 안내 · 0점] 거래정지/블랙리스트/가용한도 3요소 모두 회피 응답. 자체 안내 의무를 고객 자가확인 또는 외부기관으로 떠넘김.\n - 상담사#2: \"그건 앱에서 확인하시면 됩니다\"\n - 상담사#4: \"일단 결제 한 번 해보시고 안 되면 다시 전화 주세요\"\n - 상담사#6: \"그건 뭐 사람마다 다르고요 자세한 건 신용평가사에 문의하셔야 됩니다\"",
+      "rationale_tags": ["item_902", "zero_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_013",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

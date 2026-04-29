@@ -1,0 +1,52 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 10,
+      "rationale": "업무지식 매뉴얼과 사실 완전 일치, 수치/조건 정확 만점",
+      "quote_example": "월 이용료는 29,000원이고 계약 기간은 12개월 맞습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_accuracy", "knowledge_aligned"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 7,
+      "rationale": "핵심 사실은 맞으나 세부 1개 누락 — 중간 7점",
+      "quote_example": "월 이용료 29,000원 맞고요 (기간 조건 누락)",
+      "evaluator_id": "senior_b",
+      "tags": ["missing_minor_detail"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "사실과 부분 불일치 + 불완전 안내 3점",
+      "quote_example": "월 이용료 35,000원 정도 되실 것 같고요",
+      "evaluator_id": "senior_c",
+      "tags": ["partial_mismatch"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "허위 안내 미정정 — 잘못된 사실 전달 0점",
+      "quote_example": "네 무료 이용 가능하십니다 (실제 유료)",
+      "evaluator_id": "senior_a",
+      "tags": ["false_info", "uncorrected", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 7,
+      "rationale": "매뉴얼 일치 + 모호 표현 1회 — 중간 7점",
+      "quote_example": "처리기간은 대략 3-5일 정도이며 변동될 수 있습니다",
+      "evaluator_id": "senior_b",
+      "tags": ["mitigated_but_correct"],
+      "stub_seed": true
+    }
+  ]
+}

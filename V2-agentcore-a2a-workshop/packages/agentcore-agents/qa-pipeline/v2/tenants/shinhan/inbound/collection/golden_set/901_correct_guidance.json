@@ -1,0 +1,80 @@
+{
+  "item_number": 901,
+  "item_name": "정확한 안내 ★",
+  "category": "shinhan_coll_accuracy",
+  "max_score": 15,
+  "allowed_steps": [15, 10, 5, 0],
+  "intents": ["연체상담", "분할납부문의"],
+  "version": "shinhan_collection_v1",
+  "examples": [
+    {
+      "example_id": "GS-901-FULL-shinhan-coll-001",
+      "item_number": 901,
+      "score": 15,
+      "score_bucket": "full",
+      "intent": "연체상담",
+      "segment_text": "고객: 여보세요 제가 카드값이 좀 밀렸다고 문자가 왔는데요\n상담사: 네 고객님 신한카드 컬렉션관리부 *** 입니다 본인 확인 먼저 도와드리겠습니다 성함과 생년월일 말씀해 주시겠어요\n고객: *** 칠십이 사 일오\n상담사: 네 본인 확인되셨습니다 고객님 현재 연체 정보 안내드리겠습니다 사 월 십 일 결제일 기준으로 십팔 일 경과되어 있고요\n고객: 네\n상담사: 원금 사십이만 삼천 원 연체이자 칠천 사백 원 합산해서 총 납부 금액이 사십삼만 사백 원입니다\n고객: 그러면 어떻게 갚으면 되는 거죠\n상담사: 납부기한은 오 월 이 일까지 부탁드리고요 결제계좌는 등록되어 있는 신한은행 *** 계좌로 자동출금 예정입니다 직접 이체하셔도 되시고요\n고객: 네 알겠습니다\n상담사: 네 연체일이 삼십 일을 넘기면 신용평점 영향이 있을 수 있으니 가능하시면 기한 내 납부 부탁드리겠습니다",
+      "rationale": "[정확 안내 · 만점] 연체경과(18일) / 원금(42.3만) / 연체이자(7,400) / 총납부(43.04만) / 납부기한(5/2) / 결제계좌(신한은행) 5요소 전부 명확 안내 + 신용평점 영향 사전 고지.\n - 상담사#4: \"사 월 십 일 결제일 기준으로 십팔 일 경과되어 있고요\"\n - 상담사#6: \"원금 사십이만 삼천 원 연체이자 칠천 사백 원 합산해서 총 납부 금액이 사십삼만 사백 원입니다\"\n - 상담사#8: \"납부기한은 오 월 이 일까지 부탁드리고요 결제계좌는 등록되어 있는 신한은행 *** 계좌로 자동출금 예정입니다\"",
+      "rationale_tags": ["item_901", "full_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6},
+        {"speaker": "상담사", "turn_id": 8},
+        {"speaker": "상담사", "turn_id": 10}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-901-PARTIAL-shinhan-coll-002",
+      "item_number": 901,
+      "score": 5,
+      "score_bucket": "partial",
+      "intent": "연체상담",
+      "segment_text": "고객: 카드 연체된 거 얼마 남았어요\n상담사: 네 본인 확인 먼저 부탁드릴게요 성함과 생년월일\n고객: ***\n상담사: 네 확인되셨고요 지금 연체 금액이 한 사십삼만 원 정도 됩니다\n고객: 정확히 얼마예요 그 안에 이자도 포함이에요\n상담사: 네 어 이자랑 원금 합쳐서 그 정도 되시고요 자세한 건 문자로 보내드릴게요\n고객: 언제까지 내야 돼요\n상담사: 곧 오 월 초 정도까지 납부 부탁드리겠습니다\n고객: 결제는 어떻게 되는데요\n상담사: 그 등록되어 있는 계좌로 자동으로 빠질 거예요",
+      "rationale": "[정확 안내 · 부분점수 5점] 5요소 중 일부 누락 또는 불명확. 원금/이자 분리 안내 누락 (\"한 사십삼만 원 정도\"), 납부기한 모호 (\"오 월 초 정도\"), 결제계좌 은행명 미언급. 고객 재질문 발생.\n - 상담사#4: \"지금 연체 금액이 한 사십삼만 원 정도 됩니다\"\n - 고객#5: \"정확히 얼마예요 그 안에 이자도 포함이에요\"\n - 상담사#8: \"곧 오 월 초 정도까지 납부 부탁드리겠습니다\"",
+      "rationale_tags": ["item_901", "partial_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "고객", "turn_id": 5},
+        {"speaker": "상담사", "turn_id": 8},
+        {"speaker": "상담사", "turn_id": 10}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-901-ZERO-shinhan-coll-003",
+      "item_number": 901,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "연체상담",
+      "segment_text": "고객: 저 카드값 연체됐다고 해서 전화드렸어요\n상담사: 네 그 일단 빨리 입금해 주세요\n고객: 얼마인데요\n상담사: 그건 문자로 보낸 거 보시면 됩니다\n고객: 문자 못 봤는데 지금 알려주세요\n상담사: 한 사십만 원대일 거예요 아마\n고객: 정확한 금액이랑 언제까지인지\n상담사: 그 빨리 내시면 되고요 안 그러면 거래정지될 수도 있어요\n고객: 어디로 입금하면 돼요\n상담사: 그건 등록된 계좌로 알아서 처리됩니다",
+      "rationale": "[정확 안내 · 0점] 5요소 전부 누락 또는 부정확. 연체경과/원금·이자 분리/총납부/납부기한/결제계좌 모두 회피 응답. \"아마 사십만 원대\" 추정 안내 + 위협성 톤.\n - 상담사#2: \"그 일단 빨리 입금해 주세요\"\n - 상담사#6: \"한 사십만 원대일 거예요 아마\"\n - 상담사#8: \"그 빨리 내시면 되고요 안 그러면 거래정지될 수도 있어요\"",
+      "rationale_tags": ["item_901", "zero_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 6},
+        {"speaker": "상담사", "turn_id": 8},
+        {"speaker": "상담사", "turn_id": 10}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_collection_v1",
+        "sample_id": "synthetic_coll_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

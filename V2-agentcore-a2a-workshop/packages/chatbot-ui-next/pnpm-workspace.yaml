@@ -1,0 +1,7 @@
+# 이 파일은 chatbot-ui-next 를 자체 워크스페이스 루트로 만들기 위한 것.
+# 루트 V2-agentcore-a2a-workshop/pnpm-workspace.yaml 가 packages/* 를 잡고 있지만,
+# chatbot-ui-next 는 Next.js standalone 프로젝트로 독립 설치/빌드해야 하므로 분리.
+# next.config.ts 의 turbopack.root 와 함께 동작 (Dev1, 2026-04-23).
+ignoredBuiltDependencies:
+  - sharp
+  - unrs-resolver

@@ -1,0 +1,42 @@
+{
+  "item_number": 17,
+  "item_name": "정보 확인 절차",
+  "category": "개인정보 보호",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["info_change", "cancellation", "claim", "billing"],
+  "version": "0.1.0-stub",
+  "notes": "V1 iter05 회귀 이슈 - ALLOWED_STEPS 를 [5,0] 에서 [5,3,0] 으로 확장 권고 반영. 3점 스냅 허용.",
+  "examples": [
+    {
+      "example_id": "GS-17-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "info_change",
+      "segment_text": "상담사: 정보 변경을 위해 성함과 생년월일, 등록 연락처를 차례로 말씀해 주시겠어요? 고객: (응답). 상담사: 확인되셨습니다. 감사합니다.",
+      "rationale": "3-요소 본인확인 + 확인 완료 멘트.",
+      "rationale_tags": ["3요소 정상 절차"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-17-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "info_change",
+      "segment_text": "상담사: 성함과 생년월일 알려주세요.",
+      "rationale": "2-요소만 확인, 연락처/제3자 인증 등 누락. iter05 권고로 3점 허용.",
+      "rationale_tags": ["일부 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-17-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "info_change",
+      "segment_text": "상담사: 네 바로 변경해 드릴게요. 어떻게 바꿔드릴까요?",
+      "rationale": "본인확인 절차 전무 — 즉시 0점.",
+      "rationale_tags": ["본인확인 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

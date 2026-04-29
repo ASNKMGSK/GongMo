@@ -1,0 +1,35 @@
+# 카트골프 인바운드 예약팀 — tenant_config override 샘플
+#
+# 예약팀은 #15 정확한 안내 (요금/정책) 가 가장 중요 — 오안내 시 직접적 금전 분쟁
+# 생성일: 2026-04-24
+
+tenant_id: cartgolf-inbound-reservation
+
+routing:
+  initial_t0_cap: 0.25          # 예약 오안내 리스크 커서 T0 자동승인 비율 낮춤
+  t1_sample_rate: 0.08
+  t1_sample_rate_max: 0.12
+  grade_boundary_margin: 2
+
+confidence:
+  rag_min_sample_size: 3
+  rag_small_sample_weight: 0.5
+  item_weights:
+    # #15 정확한 안내 — 요금/정책 오안내 리스크 최소화. rag_stdev + evidence_quality 비중 상향
+    "15":
+      llm_self: 0.20
+      rule_llm_agreement: 0.20
+      rag_stdev: 0.30
+      evidence_quality: 0.30
+    # #16 필수 안내 — 취소 수수료 + 날씨 정책 고지. rule 비중 상향
+    "16":
+      llm_self: 0.15
+      rule_llm_agreement: 0.55
+      rag_stdev: 0.15
+      evidence_quality: 0.15
+    # #8 니즈 파악 — 티오프 시간/인원/카트 재확인 중요. llm_self 보존
+    "8":
+      llm_self: 0.30
+      rule_llm_agreement: 0.25
+      rag_stdev: 0.20
+      evidence_quality: 0.25

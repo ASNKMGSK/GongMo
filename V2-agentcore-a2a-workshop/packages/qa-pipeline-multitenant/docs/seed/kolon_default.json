@@ -1,0 +1,23 @@
+{
+  "tenant_id": "kolon_default",
+  "display_name": "Kolon (기본 테넌트)",
+  "industry": "industrial",
+  "qa_items_enabled": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21],
+  "score_overrides": {},
+  "default_models": {
+    "primary": "us.anthropic.claude-sonnet-4-20250514-v1:0",
+    "fast": "us.anthropic.claude-haiku-4-5-20251001-v1:0"
+  },
+  "prompt_overrides_dir": "prompts/tenants/kolon_default/",
+  "branding": {
+    "logo_url": "",
+    "primary_color": "#003a70",
+    "secondary_color": "#f5a623",
+    "accent_color": "#ffffff"
+  },
+  "rate_limit_per_minute": 120,
+  "storage_quota_gb": 50,
+  "created_at": "2026-04-17T00:00:00Z",
+  "updated_at": "2026-04-17T00:00:00Z",
+  "is_active": true
+}

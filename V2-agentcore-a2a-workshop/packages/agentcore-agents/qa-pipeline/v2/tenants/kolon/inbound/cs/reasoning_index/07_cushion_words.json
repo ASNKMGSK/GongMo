@@ -1,0 +1,38 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어",
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 쿠션어 항목. refusal-gated: 거절/불가 상황 없으면 평가 면제. 거절 발생 시 쿠션어 개수·대안 제시 여부가 축.",
+  "reasoning_records": [
+    {
+      "record_id": "r_07_cs_sample_041",
+      "score": 5,
+      "rationale": "거절이 필요한 상황에서 \"정말 죄송스럽게도\" + \"어려우십니다\" 2개 쿠션어 조합 후 즉시 대안(\"교환 쿠폰 발급\") 제시. 거절-완충-대안 3단 구조가 모범적.",
+      "quote_example": "상담사: 정말 죄송스럽게도 단순 변심으로 인한 환불은 구매일로부터 십사 일 이내에만 가능하셔서 이번 건은 환불이 어려우십니다 대신 교환 쿠폰 발급이 가능한지 한번 확인해 봐도 될까요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_7", "full_compliance", "cushion_with_alternative", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_041"
+    },
+    {
+      "record_id": "r_07_cs_sample_042",
+      "score": 3,
+      "rationale": "간접 표현(\"안 될 것 같아요\") 으로 거절 완화는 시도했으나 \"죄송\" / \"양해\" 유형 쿠션어 부재. 대안 제시(\"내일은 받으실 수\") 는 있어 부분 인정.",
+      "quote_example": "상담사: 그건 안 될 것 같아요 이미 다 출고돼서요 내일은 받으실 수 있습니다",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_7", "partial_compliance", "weak_cushion", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_042"
+    },
+    {
+      "record_id": "r_07_cs_sample_043",
+      "score": 0,
+      "rationale": "\"안 됩니다\" 직설 거절 + \"정책상 안 돼요\" 규정 방패. 쿠션어 0개 + 대안 탐색 전무. 정중도는 유지되나 쿠션어 기능 자체가 부재.",
+      "quote_example": "상담사: 안 됩니다 그건 교환 대상이 아니에요 / 상담사: 정책상 안 돼요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_7", "no_cushion", "direct_refusal", "no_alternative", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_043"
+    }
+  ]
+}

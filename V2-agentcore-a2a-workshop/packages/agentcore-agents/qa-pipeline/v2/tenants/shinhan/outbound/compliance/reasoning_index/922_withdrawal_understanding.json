@@ -1,0 +1,50 @@
+{
+  "item_number": 922,
+  "item_name": "청약철회·이해도 확인",
+  "version": "shinhan_compliance_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_922_synthetic_110",
+      "score": 5,
+      "rationale": "[청약철회·이해도 확인] 4요소 (법적 근거 / 14일 기간 / 철회 방법 / 핵심 항목별 이해도 재확인 + 명시적 동의) 모두 이행 → 만점\n - 상담사: \"금융소비자보호법 제46조에 따라 14일 이내\" (법적 근거+기간)\n - 상담사: \"1577 신한카드 고객센터 또는 홈페이지 마이페이지\" (구체 철회 방법)\n - 상담사: \"연회비 / 이자율 / 청약철회 14일 — 이 부분 모두 이해하셨는지\" (핵심 항목별 이해도 재확인)\n - 고객: \"네 모두 이해했습니다\" / \"네 동의합니다\" (명시적 동의)",
+      "quote_example": "상담사: 금융소비자보호법 제46조에 따라 14일 이내 청약철회권 행사가 가능합니다",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_922",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_110"
+    },
+    {
+      "record_id": "r_922_synthetic_111",
+      "score": 3,
+      "rationale": "[청약철회·이해도 확인] 14일 기간/철회 방법 일부 안내 / 법적 근거 미고지 + 항목별 이해도 재확인 누락 → 부분 감점\n - 상담사: \"14일 이내 청약철회 가능하시고요 1577 고객센터로 전화\" (기간+방법 일부)\n - 상담사: \"진행할까요\" (이해도 재확인 절차 부재)\n - 법적 근거 (금소법 제46조) 미고지",
+      "quote_example": "상담사: 14일 이내 청약철회 가능하시고요 1577 고객센터로 전화 주시면 됩니다 진행할까요",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_922",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_111"
+    },
+    {
+      "record_id": "r_922_synthetic_112",
+      "score": 0,
+      "rationale": "[청약철회·이해도 확인] 청약철회권 안내 전무 + 이해도/동의 재확인 모두 부재 + 자동 해지 허위 정보 → 0점\n - 상담사: \"가입 처리 진행할게요\" (의사 재확인 누락)\n - 상담사: \"마음에 안 드시면 그냥 안 쓰시면 돼요 알아서 해지될 거예요\" (청약철회권 오도 + 자동 해지 허위)\n - 14일 기간 / 법적 근거 / 철회 방법 / 이해도 재확인 모두 발화 부재",
+      "quote_example": "상담사: 마음에 안 드시면 그냥 안 쓰시면 돼요 알아서 해지될 거예요",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_922",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_112"
+    }
+  ]
+}

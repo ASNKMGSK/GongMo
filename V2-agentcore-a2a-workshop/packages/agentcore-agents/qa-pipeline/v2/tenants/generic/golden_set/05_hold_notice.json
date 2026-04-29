@@ -1,0 +1,41 @@
+{
+  "item_number": 5,
+  "item_name": "대기 멘트",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "examples": [
+    {
+      "example_id": "GS-05-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 잠시만 확인해 보겠습니다. [대기] 상담사: 오래 기다리셨습니다. 감사합니다.",
+      "rationale": "대기 전 양해 + 대기 후 감사/사과 양쪽 모두 안내.",
+      "rationale_tags": ["사전/사후 모두"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-05-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 잠깐만요. [대기] 상담사: 네 확인되었습니다.",
+      "rationale": "사전 안내는 있으나 사후 감사/사과 없음.",
+      "rationale_tags": ["사후 안내 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-05-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "general_inquiry",
+      "segment_text": "[대기 30초] 상담사: 네 고객님, 확인되었는데요.",
+      "rationale": "대기 상황에서 사전/사후 안내 모두 누락.",
+      "rationale_tags": ["대기 안내 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

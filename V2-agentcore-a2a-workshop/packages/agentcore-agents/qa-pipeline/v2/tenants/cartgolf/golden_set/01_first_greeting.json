@@ -1,0 +1,61 @@
+{
+  "item_number": 1,
+  "item_name": "첫인사",
+  "category": "인사 예절",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "examples": [
+    {
+      "example_id": "GS-01-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다. 코오롱 고객센터 김상담입니다. 무엇을 도와드릴까요?",
+      "rationale": "인사말(반갑습니다) + 소속(코오롱 고객센터) + 상담사명(김상담) 3 요소 모두 포함.",
+      "rationale_tags": ["3요소 충족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-01-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 안녕하세요. 코오롱 고객센터 이수현입니다. 넥스 상품 문의이신가요?",
+      "rationale": "인사말 + 소속 + 상담사명 3 요소 충족. 넥스 브랜드 문의 자연스럽게 이어짐.",
+      "rationale_tags": ["3요소 충족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-01-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "상담사: 네 코오롱 고객센터입니다. 말씀하세요.",
+      "rationale": "소속은 있으나 인사말이 '네' 로 약하고 상담사명 누락. 3 요소 중 1개 누락.",
+      "rationale_tags": ["상담사명 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-01-PARTIAL-02",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 안녕하세요, 박서연입니다. 네 말씀하세요.",
+      "rationale": "인사말 + 상담사명 있으나 소속(코오롱 고객센터) 누락. 3 요소 중 1개 누락.",
+      "rationale_tags": ["소속 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-01-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "일반문의",
+      "segment_text": "상담사: 네, 말씀하세요.",
+      "rationale": "인사말/소속/상담사명 모두 누락. 2개 이상 누락으로 0점.",
+      "rationale_tags": ["3요소 전 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

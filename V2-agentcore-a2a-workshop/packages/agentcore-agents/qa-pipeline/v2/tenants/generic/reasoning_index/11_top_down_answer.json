@@ -1,0 +1,34 @@
+{
+  "item_number": 11,
+  "item_name": "두괄식 답변",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "결론 먼저 + 세부 설명 뒤 두괄식 구조 — 만점",
+      "quote_example": "가능합니다 자세한 절차는 다음과 같습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["top_down"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "세부 먼저 + 결론 맨 뒤 미괄식 — 3점",
+      "quote_example": "절차가 ○○ 이고 ○○ 하면 ○○ 이고 그래서 가능합니다",
+      "evaluator_id": "senior_b",
+      "tags": ["bottom_up"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "결론 없이 불명확 회피성 답변 0점",
+      "quote_example": "그건 좀 복잡한 상황이라서요",
+      "evaluator_id": "senior_c",
+      "tags": ["no_conclusion", "evasive"],
+      "stub_seed": true
+    }
+  ]
+}

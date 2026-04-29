@@ -1,0 +1,74 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["환불취소", "클레임", "배송문의"],
+  "dialog_stages": ["main"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "keyword_trigger_window",
+    "details": "거절/불가/양해 발생 근처 윈도우 — refusal trigger 발생 시에만 평가 (refusal_count=0 이면 refusal-gated 면제) (PDF §7.4)",
+    "trigger_keywords": ["어렵", "불가", "안됩", "못 해", "안 해", "힘듭", "아쉽", "양해"],
+    "window_size_turns": 2,
+    "refusal_gated": true
+  },
+  "examples": [
+    {
+      "example_id": "GS-07-CS-FULL-001",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이거 결제 후 한 달 지났는데 환불 안 될까요\n상담사: 네 고객님 정말 죄송스럽게도 단순 변심으로 인한 환불은 구매일로부터 십사 일 이내에만 가능하셔서 이번 건은 환불이 어려우십니다 대신 교환 쿠폰 발급이 가능한지 한번 확인해 봐도 될까요",
+      "rationale": "[쿠션어] 거절 상황 + 쿠션어 2개 + 대안 제시 → 만점\n - 쿠션어 1: \"정말 죄송스럽게도\"\n - 쿠션어 2: \"이번 건은 환불이 어려우십니다\"\n - 거절 후 대안(\"교환 쿠폰 발급\") 즉시 제시",
+      "rationale_tags": ["item_7", "full_compliance", "cushion_with_alternative", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 8}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_041","variant":"full_cushion_alt","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-07-CS-PARTIAL-001",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "배송문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 오늘 바로 받을 수 있나요\n상담사: 네 그건 안 될 것 같아요 이미 다 출고돼서요 내일은 받으실 수 있습니다",
+      "rationale": "[쿠션어] 거절은 명확하나 쿠션어 1개만 + 완곡화 부족 → 3점\n - \"그건 안 될 것 같아요\" — 간접 표현 수준이나 정중어 수식 부재\n - \"죄송\" 또는 \"양해\" 유형 어휘 없음\n - 대안 제시는 있음 (\"내일은 받으실 수\")",
+      "rationale_tags": ["item_7", "partial_compliance", "weak_cushion", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_042","variant":"weak_cushion","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-07-CS-ZERO-001",
+      "item_number": 7,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "클레임",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이거 교환해 주세요\n상담사: 안 됩니다 그건 교환 대상이 아니에요\n고객: 왜요\n상담사: 정책상 안 돼요",
+      "rationale": "[쿠션어] 쿠션어 전무 + 대안 제시 없음 → 0점\n - \"안 됩니다\" 직설 거절 (쿠션어 0개)\n - \"정책상 안 돼요\" — 규정 방패 사용\n - 대안 탐색/제시 부재",
+      "rationale_tags": ["item_7", "no_cushion", "direct_refusal", "no_alternative", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_043","variant":"flat_refusal","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-07-CS-NA-001",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이 상품 재고 있나요\n상담사: 네 재고 확인해 보니 충분하십니다 바로 구매 진행해 드릴까요",
+      "rationale": "[쿠션어] 거절/불가 상황 미발생 → refusal-gated 면제 규칙 적용 → 만점 (iter03_clean 규칙)",
+      "rationale_tags": ["item_7", "refusal_gated_waived", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 2}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_044","variant":"no_refusal_waived","human_score_verified":false}
+    }
+  ]
+}

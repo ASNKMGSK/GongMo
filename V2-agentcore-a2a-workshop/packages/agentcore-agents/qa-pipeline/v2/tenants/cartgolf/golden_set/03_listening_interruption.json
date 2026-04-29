@@ -1,0 +1,52 @@
+{
+  "item_number": 3,
+  "item_name": "경청 / 말겹침 / 말자름",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "STT 한계로 인해 evaluation_mode=skipped — 만점 5 고정. 참고용 예시.",
+  "examples": [
+    {
+      "example_id": "GS-03-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 넥스 경량 패딩을 교환하고 싶은데요. 상담사: 네, 교환 관련 안내 도와드릴게요.",
+      "rationale": "고객 발언 완료 후 상담사 응답. 말겹침/말자름 없음. STT skipped 만점.",
+      "rationale_tags": ["경청 정상"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-03-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "고객: 왁 셔츠 라지 사이즈 재고가 있을까요. 상담사: 잠시만요, 확인 후 안내드리겠습니다.",
+      "rationale": "고객 문의 → 양해 → 확인 순차 응답. STT skipped 만점.",
+      "rationale_tags": ["경청 정상"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-03-FULL-03",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "주문배송",
+      "segment_text": "고객: 헨리코튼 셔츠 주문이 아직 안 왔어요. 상담사: 네 주문번호 확인 후 안내드리겠습니다.",
+      "rationale": "STT evaluation_mode=skipped — 말겹침 마커 미표기 기본 만점.",
+      "rationale_tags": ["skipped 기본 만점"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-03-FULL-04",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "결제문의",
+      "segment_text": "고객: 교환비 결제 관련해서요. 상담사: 네 고객님, 말씀해 주세요.",
+      "rationale": "STT skipped — 정상 턴 턴 주고받음 가정. 만점 고정.",
+      "rationale_tags": ["skipped 기본 만점"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

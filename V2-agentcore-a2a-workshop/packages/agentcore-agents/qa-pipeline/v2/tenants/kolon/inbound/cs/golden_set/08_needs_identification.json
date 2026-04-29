@@ -1,0 +1,100 @@
+{
+  "item_number": 8,
+  "item_name": "문의 파악 및 재확인(복창)",
+  "category": "니즈 파악",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["상품문의", "환불취소", "배송문의", "클레임", "일반문의"],
+  "dialog_stages": ["main"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "examples": [
+    {
+      "example_id": "GS-08-CS-FULL-001",
+      "item_number": 8,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 제가 어제 주문한 거 취소하고 싶어서요\n상담사: 네 고객님 본인 확인 먼저 도와드리겠습니다 성함과 휴대폰 번호 부탁드립니다\n고객: 홍길동이구요 공일공 일이삼사 오륙칠팔입니다\n상담사: 네 홍길동 고객님 맞으시고요 어제 삼월 이십일 일자 주문서 조회해 보니까 코오롱스포츠 아웃도어 재킷 주문하신 거 확인되는데요 이 건을 취소 요청하신 거 맞으실까요\n고객: 네 맞아요 그거 취소해 주세요",
+      "rationale": "[문의파악] 본인확인 → 주문서 조회 → 취소 대상 복창까지 3단 확인 완료 → 만점\n - 상담사#2: 본인확인 절차 시작\n - 상담사#4: 주문 일자/상품명 재확인 후 복창 \"취소 요청하신 거 맞으실까요\"\n - 고객 동의 회답으로 의사 확정",
+      "rationale_tags": ["item_8", "full_compliance", "repeat_confirm", "identity_verify", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_021",
+        "variant": "full_repeat_confirm",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-08-CS-PARTIAL-001",
+      "item_number": 8,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "상품문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 제가 전에 산 제품이 좀 이상해서요\n상담사: 아 네 어떤 게 이상하세요\n고객: 그 지퍼가 잘 안 올라가는 것 같아서요\n상담사: 네 교환으로 도와드릴까요 반품으로 도와드릴까요",
+      "rationale": "[문의파악] 증상 질의는 수행했으나 복창/재확인 누락 → 3점\n - 상담사#2: 증상 추가 질의는 있었음\n - 상담사#4: 재확인/복창 없이 바로 해결 옵션 제시 (\"교환으로/반품으로\")\n - 제품 식별(구매 일자/제품명) 미확인",
+      "rationale_tags": ["item_8", "partial_compliance", "no_repeat", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_022",
+        "variant": "missing_repeat",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-08-CS-ZERO-001",
+      "item_number": 8,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "배송문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 배송 왜 안 와요\n상담사: 아 네 송장번호 주세요\n고객: 그게 어디 있는지 모르겠는데요\n상담사: 그럼 주문번호라도요\n고객: 몰라요 그냥 언제 오는지 알려주시면 되잖아요\n상담사: 그거 없으면 저희가 못 찾는데요",
+      "rationale": "[문의파악] 구체 니즈 재질의/복창 없이 책임 회피성 단절 응대 → 0점\n - 상담사#2, #4: 식별 정보만 요구, 고객 상황 파악 시도 없음\n - 상담사#6: \"못 찾는데요\" 로 차단 — 대안 탐색 부재\n - 본인확인 수단 제안 (성명+전화번호) 등 대체 경로 제시 없음",
+      "rationale_tags": ["item_8", "no_effort", "dismissive", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_023",
+        "variant": "dismissive_zero",
+        "human_score_verified": false
+      }
+    },
+    {
+      "example_id": "GS-08-CS-FULL-002",
+      "item_number": 8,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "클레임",
+      "dialog_stage": "main",
+      "segment_text": "고객: 아 진짜 황당해서 전화했는데 제품이 완전 불량이에요\n상담사: 아이구 고객님 많이 불편하셨겠어요 어떤 부분이 불량이신지 조금만 더 자세히 여쭤봐도 될까요\n고객: 바지 밑단이 이미 풀려서 왔어요\n상담사: 네 밑단 봉제 부분이 뜯어진 상태로 배송된 거 말씀이시죠 구매하신 상품과 구매일 같이 확인 부탁드립니다",
+      "rationale": "[문의파악] 공감 표현 → 구체 증상 재질의 → 증상·제품·일자 복창까지 모두 수행 → 만점\n - 상담사#2: 공감 후 구체 질의 \"어떤 부분이\"\n - 상담사#4: 고객 표현 재정리 \"밑단 봉제 부분이 뜯어진\" + 제품/일자 추가 요청\n - \"말씀이시죠\" 로 복창/재확인 형태 갖춤",
+      "rationale_tags": ["item_8", "full_compliance", "empathy_first", "repeat_confirm", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "synthetic_cs",
+        "source": "kolon_inbound_cs_bootstrap_2026-04-24",
+        "sample_id": "cs_sample_024",
+        "variant": "empathy_repeat",
+        "human_score_verified": false
+      }
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+{
+  "item_number": 909,
+  "item_name": "정확한 안내 ★",
+  "category": "shinhan_crm_accuracy",
+  "max_score": 15,
+  "allowed_steps": [
+    15,
+    10,
+    5,
+    0
+  ],
+  "intents": [
+    "TM상품권유",
+    "카드교체발급",
+    "계좌정보변경"
+  ],
+  "version": "shinhan_crm_v1",
+  "examples": [
+    {
+      "example_id": "GS-909-FULL-shinhan-crm-001",
+      "item_number": 909,
+      "score": 15,
+      "score_bucket": "full",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 안녕하십니까 신한카드 CRM부 김상담입니다 본 통화는 상품 안내를 위한 통화이며 품질 향상을 위해 녹취되고 있습니다 고객님 잠시 통화 가능하신가요\n고객: 네 말씀하세요\n상담사: 감사합니다 고객님께 신한 디오 체크카드 신상품을 안내드리려 연락드렸습니다 본 카드는 연회비 1만 원 면제 조건은 전월 30만 원 이상 사용이며 면제 조건 미충족 시 1만 원이 차감됩니다 또한 할부 이자율은 최저 5.9 퍼센트에서 최대 19.9 퍼센트까지 신용평점에 따라 차등 적용되며 현금서비스 수수료는 별도 4.5 퍼센트입니다\n고객: 혜택은 어떤 게 있나요\n상담사: 네 핵심 혜택 안내드리겠습니다 첫째 대형마트 5 퍼센트 청구할인 월 한도 1만 원 둘째 카페·편의점 10 퍼센트 적립 월 한도 5천 원 셋째 통신비 자동이체 시 2천 원 할인입니다 변경 대상 결제 계좌는 현재 등록된 신한은행 1234 계좌이며 다른 계좌로 변경 원하시면 추가 안내 도와드리겠습니다\n고객: 알겠습니다",
+      "rationale": "[정확한 안내] 5대 핵심 정보 (혜택/연회비/이자율/수수료/변경 대상 계좌) 모두 정확하게 고지 → 만점\n - 상담사: \"연회비 1만 원 면제 조건은 전월 30만 원 이상 사용이며 면제 조건 미충족 시 1만 원이 차감됩니다\" (연회비)\n - 상담사: \"할부 이자율은 최저 5.9 퍼센트에서 최대 19.9 퍼센트까지 신용평점에 따라 차등 적용\" (이자율)\n - 상담사: \"현금서비스 수수료는 별도 4.5 퍼센트입니다\" (수수료)\n - 상담사: \"대형마트 5 퍼센트 청구할인 월 한도 1만 원 / 카페·편의점 10 퍼센트 적립 월 한도 5천 원\" (혜택)\n - 상담사: \"변경 대상 결제 계좌는 현재 등록된 신한은행 1234 계좌\" (계좌)",
+      "rationale_tags": [
+        "item_909",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-909-PARTIAL-shinhan-crm-002",
+      "item_number": 909,
+      "score": 10,
+      "score_bucket": "partial",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 신한카드 박상담입니다 신상품 안내드리려 통화 부탁드립니다 본 통화는 녹취되고 있습니다\n고객: 네 짧게 부탁해요\n상담사: 신한 트래블 신용카드인데요 연회비는 2만 원이고 첫해는 면제됩니다 해외 가맹점 1.5 퍼센트 적립이 가장 큰 혜택이세요\n고객: 이자율은 어떻게 되죠\n상담사: 일시불은 무이자고 할부는 신용평점 기준으로 다양하게 적용됩니다 정확한 비율은 가입 후 안내드릴게요\n고객: 수수료는요\n상담사: 일반 사용에는 수수료 없으세요\n고객: 네 알겠습니다",
+      "rationale": "[정확한 안내] 연회비/혜택은 정확하나 이자율/수수료가 모호 (구체 % 미고지) + 변경 대상 계좌 미언급 → 부분 감점\n - 상담사: \"연회비는 2만 원이고 첫해는 면제됩니다\" (연회비 정확)\n - 상담사: \"해외 가맹점 1.5 퍼센트 적립\" (혜택 정확)\n - 상담사: \"신용평점 기준으로 다양하게 적용됩니다 정확한 비율은 가입 후 안내드릴게요\" (이자율 모호)\n - 상담사: \"일반 사용에는 수수료 없으세요\" (현금서비스 별도 수수료 미고지)\n - 변경 대상 계좌 발화 부재",
+      "rationale_tags": [
+        "item_909",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-909-ZERO-shinhan-crm-003",
+      "item_number": 909,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 신한카드인데요 좋은 상품 있어서 연락드렸어요\n고객: 어떤 상품이에요\n상담사: 새로 나온 신용카드인데 혜택 정말 좋아요 무조건 가입하시면 이득이세요\n고객: 연회비는요\n상담사: 그건 약관에 적혀 있고요 어쨌든 거의 없는 수준이에요\n고객: 이자율은요\n상담사: 그것도 평균적인 수준이라 신경 안 쓰셔도 돼요\n고객: 결제 계좌는 그대로 가나요\n상담사: 그 부분은 가입 후에 따로 알려드릴게요 일단 신청부터 하시죠",
+      "rationale": "[정확한 안내] 5대 핵심 정보 모두 미고지 + 단정적 표현 (\"무조건 이득\") + 정보 회피 (\"약관에 적혀 있고\") → 0점\n - 상담사: \"무조건 가입하시면 이득이세요\" (단정 표현, #921 부당권유 동시 위반)\n - 상담사: \"그건 약관에 적혀 있고요 어쨌든 거의 없는 수준이에요\" (연회비 회피)\n - 상담사: \"그것도 평균적인 수준이라 신경 안 쓰셔도 돼요\" (이자율 회피)\n - 상담사: \"그 부분은 가입 후에 따로 알려드릴게요\" (결제 계좌 회피) - 5대 정보 0/5 고지",
+      "rationale_tags": [
+        "item_909",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

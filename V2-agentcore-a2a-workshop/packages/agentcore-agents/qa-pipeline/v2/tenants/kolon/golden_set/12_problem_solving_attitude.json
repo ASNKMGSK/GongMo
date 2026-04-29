@@ -1,0 +1,504 @@
+{
+  "item_number": 12,
+  "item_name": "문제 해결 의지",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "상품문의",
+    "환불취소"
+  ],
+  "version": "kolon_v4_fixed",
+  "examples": [
+    {
+      "example_id": "GS-12-FULL-668437",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 예\n상담사: 아 알겠습니다 몇 가지만 확인해보고요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\n고객: 네 네\n...\n고객: 예\n상담사: 말씀 만약에 드리고 택배기사가 방문하지 않으면요 저희 쪽으로 다시 연락 부탁드리겠구요\n고객: 응\n...\n고객: 네\n상담사: 만약에 회수가 안 되면은 저희 쪽으로 다시 연락 주셔야 되시구요\n고객: 아 십삼 일",
+      "rationale": "[문제해결] 적극 대안 제시 (3건) → 만점\n - 상담사#7: \"아 알겠습니다 몇 가지만 확인해보고요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\"\n - 상담사#49: \"말씀 만약에 드리고 택배기사가 방문하지 않으면요 저희 쪽으로 다시 연락 부탁드리겠구요\"\n - 상담사#83: \"만약에 회수가 안 되면은 저희 쪽으로 다시 연락 주셔야 되시구요\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 49
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 83
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668437",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668451",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 여보세요\n...\n고객: 음 이름 알려드릴까요\n상담사: 어 말씀하셔도 되는데요 고객님 어떤 문의로 전화 주셨어요\n고객: 네 아 이게 여러 개를 주문을 했는데\n...\n고객: 할려고 그러는데 고게 지금 안 되더라고요 하나만\n상담사: 아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\n고객: 네",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"어 말씀하셔도 되는데요 고객님 어떤 문의로 전화 주셨어요\"\n - 상담사#17: \"아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668451",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668464",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 네\n상담사: 그렇다 보니까는 케이스 제공 여부 가능 불가능은요 지금은 알 수가 없어서요 입점사 확인해보고 다시 한번 연락을 드려도 괜찮으시겠습니까\n고객: 네 아니 뭐 이 이렇게 그냥 그것도 비닐봉투리요 어 이게 찍히이 붙어있잖아요 끝부분에\n...\n고객: 네 네 그렇게 해주세요\n상담사: 네 알겠습니다 다시 연락드려도 통화 안 되는 기간 있으세요\n고객: 네",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 2건 / 회피 0건) → 3점\n - 상담사#47: \"그렇다 보니까는 케이스 제공 여부 가능 불가능은요 지금은 알 수가 없어서요 입점사 확인해보고 다시 한번 연락을 드려도 괜찮으시겠습니까\"\n - 상담사#57: \"네 알겠습니다 다시 연락드려도 통화 안 되는 기간 있으세요\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 47
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 57
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668464",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668481",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아니 그 바지를 시켰는데 그게 또 없습니까\n상담사: 아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 아 무심터이다\n...\n고객: 아 다른 데는 다 물건을 시키잖아요 배송을 딱 거리 가잖아요 그러면 매장 배송 매장 배송 없으면 없다 바로바로 해요 근데 왜 코오롱 그건 왜 그게 안돼요\n상담사: 고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\n고객: 뭐 재고 수급한다고 매장 재고 수습한다고 떠 있던데 그게 무슨 말인데요 또",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 0건 / 회피 0건) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"\n - 상담사#15: \"고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668481",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668488",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 안녕하세요 코오롱몰에서 구매한 제품이 있는데요\n고객: 좀 교환이 될지 한번 여쭤보고 싶어서요\n상담사: 교환이 될지라고 해주셨는데요 그러면 제가 주문 건 먼저 확인 후에 안내 도와드려도 괜찮으실까요\n고객: 네 음 네\n상담사: 교환 관련으로 많이 궁금하실 텐데요 고객님 연락처와 성함 말씀 부탁드리겠습니다\n고객: * * * *",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#1: \"습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#5: \"교환이 될지라고 해주셨는데요 그러면 제가 주문 건 먼저 확인 후에 안내 도와드려도 괜찮으실까요\"\n - 상담사#7: \"교환 관련으로 많이 궁금하실 텐데요 고객님 연락처와 성함 말씀 부탁드리겠습니다\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668488",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668507",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 예 ***라고 합니다\n상담사: 감사합니다 *** 고객님 어떤 것 때문에 연락을 주셨을까요\n고객: 네 네 예 사 월 사 일 날 주문했던 거\n...\n고객: 네네네\n상담사: 소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\n고객: 네 네 네\n...\n고객: 네네네네\n상담사: 아 네 그러면 그대로 구십 오 사이즈 착용 원하시는 거 맞으실까요\n고객: 네네네네",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#11: \"감사합니다 *** 고객님 어떤 것 때문에 연락을 주셨을까요\"\n - 상담사#25: \"소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\"\n - 상담사#31: \"아 네 그러면 그대로 구십 오 사이즈 착용 원하시는 거 맞으실까요\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 31
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668507",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668526",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 아 이거 부분 반품할려고 하는데요 이거 하나 취소돼서 못 온다고 해서 부분 반품할려구요\n상담사: 아 방문 방법이요 네 고객님 성함이랑 연락처번호 어떻게 되실까요\n고객: 네 ****구요\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\n고객: 이거 이엠비 시트 티셔셔츠하구요\n...\n고객: 가야 되겠네\n상담사: 음 아 네 십 일만 천 이백 원 구매했던 그 회색 그레이 색상 티 맞으실까요\n고객: 네 네네 네",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 0건 / 회피 0건) → 3점\n - 상담사#3: \"아 방문 방법이요 네 고객님 성함이랑 연락처번호 어떻게 되실까요\"\n - 상담사#9: \"네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\"\n - 상담사#21: \"음 아 네 십 일만 천 이백 원 구매했던 그 회색 그레이 색상 티 맞으실까요\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 21
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668526",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668542",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 예 그 여보세요\n...\n고객: 반품 환불 문의 좀 할라고요\n상담사: 아 네 알겠습니다 저희 그러면은 본인 확인 좀 될 텐데요\n고객: 환불 환불\n...\n고객: 예예\n상담사: 네 소중한 정보 감사합니다 고객님 어떤 상품 반품 신청하신 걸까요\n고객: 예 저 주문번호가요",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#11: \"아 네 알겠습니다 저희 그러면은 본인 확인 좀 될 텐데요\"\n - 상담사#17: \"네 소중한 정보 감사합니다 고객님 어떤 상품 반품 신청하신 걸까요\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668542",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668605",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아 네 수고하십니다 어 저기 반품 땜에 그러는데요\n...\n고객: 예 * * * * * * * *\n상담사: 예 소중한 정보 확인 감사합니다 *** 고객님 본인 맞으실까요\n고객: 예 맞아요 저기 와크 셔츠가 두 가지가 있습니다\n고객: 예 고구를 저기 라지 사이즈로 교환을 하면 저기 예 교환을 좀 할까 하는데요\n상담사: 잠시만요 며칠 날 주문하신 어떤 제품에 대해서 문의하시는 건가요\n고객: 리키는 뭐 있구요 브랜드가 와입니다",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"예 소중한 정보 확인 감사합니다 *** 고객님 본인 맞으실까요\"\n - 상담사#11: \"잠시만요 며칠 날 주문하신 어떤 제품에 대해서 문의하시는 건가요\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668605",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668610",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 바지 반바지를 구매를 했는데요 사이즈가 맞지 않아서 반품할려고 보니까 그 첫 번 뭐 사이즈 교환은 비용을 부담해준다고 써있길래\n...\n고객: 네 어떻게 되는 겁니까\n상담사: 네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\n고객: 언택 * * * * * * * * * * *\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\n고객: 네",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 1건 / 회피 0건) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\"\n - 상담사#11: \"네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668610",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668675",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 안녕하세요 어저께 그쪽에 주문한 물건을 받았는데요\n...\n고객: 버클이 쫌 이게 집이 보여서 밑에 집 보여가지고 그래서 연락드렸어요\n상담사: 아 그러세요 고객님 일단 불편하게 해드려서 정말 죄송합니다\n고객: 네네\n상담사: 여기 몇 가지만 확인해보구요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\n고객: 네네 네",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"아 그러세요 고객님 일단 불편하게 해드려서 정말 죄송합니다\"\n - 상담사#9: \"여기 몇 가지만 확인해보구요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668675",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668697",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 같이 나오 같이 이렇게 연결해서 나오는 거라고 얘기를 하던데\n상담사: 아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***\n...\n고객: 네네\n상담사: 네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\n고객: 그 로지\n...\n고객: 네네네\n상담사: 아 아 네 고객님 저희 나 음 저희가 그 상품 티자서 리부 쪽으로 확인해보니까 지금 옆에 있는 둘 말씀하시는 거죠 키링식 이러에 지금\n고객: 네 네네네네네",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 0건 / 회피 0건) → 3점\n - 상담사#7: \"아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#15: \"네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\"\n - 상담사#41: \"아 아 네 고객님 저희 나 음 저희가 그 상품 티자서 리부 쪽으로 확인해보니까 지금 옆에 있는 둘 말씀하시는 거죠 키링식 이러에 지금\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 41
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668697",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-668736",
+      "item_number": 12,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 수고하십니다 주문한 거 오늘 핸드백을 받았는데요\n...\n고객: 그 나무로 한 거 그거 있잖아요 그거 그 핸드백인데 우글글해요\n상담사: 고객님 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 벗겨던 이름이 *** 요\n...\n고객: 예 예 맞아요\n상담사: 네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\n고객: 미래가 안 어졌는데요",
+      "rationale": "[문제해결] 기본 안내만, 추가 대안 미흡 (대안 0건 / 회피 0건) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#9: \"고객님 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"\n - 상담사#17: \"네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\"",
+      "rationale_tags": [
+        "item_12",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668736",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-12-FULL-668771",
+      "item_number": 12,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네 물건도 보냈어요\n상담사: 네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***구요\n고객: * * * * * * * * * * * 이여\n상담사: 아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\n고객: 네 네\n고객: 네 네 네 맞아요\n상담사: 아 맞으세요 잠시만요 고객님 엔지니어드 에어리 도트 팬츠 말씀하시는 거죠\n고객: 네",
+      "rationale": "[문제해결] 적극 대안 제시 (0건) → 만점\n - 상담사#5: \"네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#9: \"아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\"\n - 상담사#13: \"아 맞으세요 잠시만요 고객님 엔지니어드 에어리 도트 팬츠 말씀하시는 거죠\"",
+      "rationale_tags": [
+        "item_12",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668771",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

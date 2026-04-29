@@ -1,0 +1,37 @@
+{
+  "item_number": 904,
+  "item_name": "정당한 채권추심 절차 고지",
+  "version": "shinhan_collection_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_904_synthetic_coll_031",
+      "score": 5,
+      "rationale": "[정당 절차 고지 · 만점] 4요소 전부 준수: 사실(미납 사실/카드/금액) / 근거(채권추심법 제8조의2) / 소속(신한카드 컬렉션관리부 채권관리팀 + 사번) / 민원방법(자사 1544-7000 + 금감원 1332 + 신용회복위) 명시.\n - 상담사#2: \"신한카드 컬렉션관리부 채권관리팀의 *** 상담사입니다 사번은 SH-***-21번이고요\"\n - 상담사#4: \"채권추심법 제8조의2에 따라 변제 요청 안내드리고 있습니다\"\n - 상담사#6: \"신한카드 고객센터 1544-7000 민원 접수 가능하시고요 금융감독원 민원 ☎ 1332 또는 e-금융민원센터에서 접수 가능하십니다\"",
+      "quote_example": "상담사: 채권추심법 제8조의2에 따라 변제 요청 안내드리고 있습니다",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_904", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_031"
+    },
+    {
+      "record_id": "r_904_synthetic_coll_032",
+      "score": 3,
+      "rationale": "[정당 절차 고지 · 부분점수 3점] 사실(미납 일자) / 소속(신한카드 컬렉션) 일부 안내. 그러나 사번 미언급, 채권추심법 근거 미언급, 외부 민원기관(금감원/신용회복위) 미안내.\n - 상담사#2: \"신한카드 컬렉션 부서 *** 입니다\"\n - 상담사#4: \"카드값 미납 건 안내드리려고요 사 월 십 일 결제 못 하신 거 확인되셔서요\"\n - 상담사#6: \"그러면 저희 고객센터로 다시 전화 주시면 됩니다\"",
+      "quote_example": "상담사: 그러면 저희 고객센터로 다시 전화 주시면 됩니다",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_904", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_032"
+    },
+    {
+      "record_id": "r_904_synthetic_coll_033",
+      "score": 0,
+      "rationale": "[정당 절차 고지 · 0점] 4요소 전부 누락. 소속(카드사 어딘지) / 사번 미고지, 법적 근거 회피(\"그냥 미납이니까\"), 민원방법 안내 거부.\n - 상담사#2: \"카드사라고 보시면 되고요 미납 건으로 전화드렸어요\"\n - 상담사#4: \"그건 본인 정보라 자세히 못 알려드리고요\"\n - 상담사#6: \"그냥 미납이니까 받는 거죠 다른 근거가 뭐가 필요해요\"",
+      "quote_example": "상담사: 그냥 미납이니까 받는 거죠 다른 근거가 뭐가 필요해요",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_904", "zero_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_033"
+    }
+  ]
+}

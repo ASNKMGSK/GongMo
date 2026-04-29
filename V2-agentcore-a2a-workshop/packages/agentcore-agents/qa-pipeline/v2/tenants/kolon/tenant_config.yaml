@@ -1,0 +1,194 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — Multi-tenant Configuration: `kolon`
+#
+# Phase: kolon pilot, Created: 2026-04-20
+#
+# 이 파일은 "kolon" 테넌트(코오롱몰 의류 쇼핑몰 고객센터) 의 테넌시 설정이다.
+# 코오롱스포츠 / 헨리코튼 / 넥스 / 왁 / 골든베어 등 자사 브랜드 CS 업무에 특화.
+# Layer 3 Orchestrator 가 로드하여 Sub Agent 들에게 주입한다.
+
+tenant_id: kolon
+tenant_name: "코오롱몰 CS (Kolon)"
+domain: apparel_ecommerce
+description: >
+  한국 의류 쇼핑몰 (코오롱스포츠, 헨리코튼, 넥스, 왁, 골든베어 등 자사 브랜드)
+  고객센터 특화 테넌트. 주요 업무는 교환/반품 요청, 사이즈 변경, 상품 불량
+  판정, 회수 기사 방문 안내, 반송장 보관 안내, 1회 무상 교환 정책 안내 등.
+  intent 분포는 환불취소 / 상품문의 / 주문배송 중심이며, 보험/IT 특화 조항은
+  적용하지 않는다.
+
+version:
+  schema: "v2.0.0"                  # tenant_config 스키마 버전 (generic 과 동일)
+  rubric: "kolon_v1"                # kolon pilot 최초 확정 (2026-04-20)
+  golden_set: "kolon_v1"            # kolon pilot seed (시니어 합의 전 pilot 예시 수록)
+  last_updated: "2026-04-20"
+
+# ---------------------------------------------------------------------------
+# PII 엄격도 정책 (#17/#18 평가 노드 주입용)
+# ---------------------------------------------------------------------------
+pii_policy:
+  strictness: standard        # strict | standard | relaxed
+  masking_required: true      # 전사에 주민번호/계좌/카드번호 노출 시 즉시 감점
+  third_party_disclosure:
+    allowed_scope: ["일반 상품 개요", "절차 안내", "교환/반품 정책"]
+    blocked_scope:
+      - "특정 계약 정보"
+      - "금융거래 세부"
+      - "주소/연락처 제공"
+      - "고객 주소"
+      - "고객 연락처"
+      - "고객 주문번호"
+  prohibited_terms_file: "prohibited_terms.txt"
+
+# ---------------------------------------------------------------------------
+# 감점 정책 (ALLOWED_STEPS 공통 스키마, qa_rules.py 와 일치해야 함)
+# ---------------------------------------------------------------------------
+# generic 테넌트와 동일한 V2 스키마 호환 값 유지. kolon 자체 override 없음.
+scoring_policy:
+  max_total: 100
+  allowed_steps:
+    "1":  [5, 3, 0]        # 첫인사
+    "2":  [5, 3, 0]        # 끝인사
+    # "3" 경청/말겹침/말자름 — 2026-04-21 제거 (5점은 #15 로 이관)
+    "4":  [5, 3, 0]        # 호응 및 공감
+    "5":  [5, 3, 0]        # 대기 멘트
+    "6":  [5, 3, 0]        # 정중한 표현
+    "7":  [5, 3, 0]        # 쿠션어 활용
+    "8":  [5, 3, 0]        # 문의 파악 / 재확인
+    "9":  [5, 3, 0]        # 고객 정보 확인 (force_t3)
+    "10": [10, 7, 5, 0]    # 설명 명확성 (4단계)
+    "11": [5, 3, 0]        # 두괄식 답변
+    "12": [5, 3, 0]        # 문제 해결 의지
+    "13": [5, 3, 0]        # 부연 설명 및 추가 안내
+    "14": [5, 3, 0]        # 사후 안내
+    "15": [15, 10, 5, 0]   # 정확한 안내 — 2026-04-21 확장 [10,5,0]→[15,10,5,0]
+    "16": [5, 3, 0]        # 필수 안내 이행
+    "17": [5, 3, 0]        # 정보 확인 절차 (force_t3)
+    "18": [5, 3, 0]        # 정보 보호 준수 (force_t3)
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목
+  force_t3_items: [9, 17, 18]
+
+  # 즉시 0점 트리거 (카테고리 전체 영향)
+  critical_violations:
+    - id: privacy_leak
+      triggers: ["주소 유출", "주민번호 유출", "계좌번호 유출", "제3자 민감정보 제공"]
+      impact: ["17", "18"]
+    - id: unkind_treatment
+      triggers: ["반말", "비하", "욕설", "업무회피"]
+      impact: total_zero           # 총점 0점
+    - id: misinformation_uncorrected
+      triggers: ["허위 안내 미정정"]
+      impact: ["15"]
+  # 인프라 폴백 무효화 정책 (V1 reconciler.reconcile_evaluation 연동)
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Intent 분류 (Layer 1 전처리 → Sub Agent RAG retrieval key 일부)
+# ---------------------------------------------------------------------------
+# Layer 1 (Dev1) 이 transcript 에서 이 목록 중 하나로 intent 를 분류.
+# kolon 은 Layer1 이 emit 하는 한국어 라벨 체계를 그대로 사용.
+supported_intents:
+  - 상품문의
+  - 주문배송
+  - 환불취소
+  - 변경해지
+  - 장애문의
+  - 결제문의
+  - 가입상담
+  - 계약문의
+  - 본인확인
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 — 설계서 7.4 매핑
+# ---------------------------------------------------------------------------
+# Sub Agent 가 RAG 호출 시 어떤 발화 구간을 segment_text 로 전달할지 정책.
+segment_strategy:
+  "1":  first_utterances_3_5      # 첫인사: 시작 3~5 발화
+  "2":  last_utterances_3_5       # 끝인사: 종료 3~5 발화
+  # "3" 말겹침 — 2026-04-21 제거
+  "4":  emotion_windows           # 공감: 감정 표현/사과 근처 윈도우
+  "5":  hold_windows              # 대기: 대기 마커/사전·사후 안내 근처
+  "6":  full_agent_utterances     # 정중한 표현: 전 에이전트 발화
+  "7":  refusal_windows           # 쿠션어: 거절/불가/양해 발화 근처
+  "8":  agent_long_blocks         # 니즈 파악: 에이전트 장문 발화
+  "9":  identity_verification_window  # 고객 정보 확인: PII 질의응답 근처
+  "10": agent_long_blocks         # 설명 명확성: 에이전트 장문 발화(50자+)
+  "11": answer_opening_3          # 두괄식: 답변 첫 3 발화
+  "12": problem_solving_windows   # 적극성 문제해결
+  "13": post_answer_windows       # 부연 설명
+  "14": closing_windows           # 사후 안내
+  "15": qa_pair                   # 정확한 안내: 고객 질문 + 에이전트 답변 pair
+  "16": intent_cross_check        # 필수 안내: intent 기반 script 대조
+  "17": pii_query_window          # 개인정보 확인: PII 토큰 근처 N 발화
+  "18": pii_leak_scan             # 개인정보 보호: PII 유출 스캔 전체
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — Dev4 RAG 3종과 연결
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["15"]        # #15 정확한 안내 는 이 RAG 필수
+    fallback_mode: "unevaluable"  # RAG 부재 시 unevaluable
+
+# ---------------------------------------------------------------------------
+# 필수 안내 스크립트 (#16)
+# ---------------------------------------------------------------------------
+mandatory_scripts:
+  source_file: "mandatory_scripts/intent_to_script.yaml"
+
+# ---------------------------------------------------------------------------
+# Routing (Layer 4 Tier calibration)
+# ---------------------------------------------------------------------------
+routing:
+  initial_t0_cap: 0.30
+  t1_sample_rate: 0.05
+  t1_sample_rate_max: 0.10
+  grade_boundary_margin: 3
+
+# ---------------------------------------------------------------------------
+# Confidence (Layer 4 신호 calibration)
+# ---------------------------------------------------------------------------
+confidence:
+  rag_min_sample_size: 3
+  rag_small_sample_weight: 0.5
+
+  item_weights:
+    "1":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    "2":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    # "3" 경청 — 2026-04-21 제거
+    "4":  { llm_self: 0.35, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.20 }
+    "5":  { llm_self: 0.25, rule_llm_agreement: 0.35, rag_stdev: 0.15, evidence_quality: 0.25 }
+    "6":  { llm_self: 0.30, rule_llm_agreement: 0.30, rag_stdev: 0.15, evidence_quality: 0.25 }
+    "7":  { llm_self: 0.40, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.15 }
+    "8":  { llm_self: 0.30, rule_llm_agreement: 0.20, rag_stdev: 0.20, evidence_quality: 0.30 }
+    "9":  { llm_self: 0.15, rule_llm_agreement: 0.45, rag_stdev: 0.10, evidence_quality: 0.30 }
+    "10": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "11": { llm_self: 0.30, rule_llm_agreement: 0.25, rag_stdev: 0.20, evidence_quality: 0.25 }
+    "12": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "13": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "14": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "15": { llm_self: 0.15, rule_llm_agreement: 0.35, rag_stdev: 0.10, evidence_quality: 0.40 }
+    "16": { llm_self: 0.20, rule_llm_agreement: 0.45, rag_stdev: 0.10, evidence_quality: 0.25 }
+    "17": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+    "18": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+
+# ---------------------------------------------------------------------------
+# 언어 / UI 설정
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

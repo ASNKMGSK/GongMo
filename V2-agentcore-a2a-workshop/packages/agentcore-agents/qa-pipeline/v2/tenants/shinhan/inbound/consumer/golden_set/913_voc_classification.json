@@ -1,0 +1,77 @@
+{
+  "item_number": 913,
+  "item_name": "민원 유형 분류 및 원인 파악 ★",
+  "category": "shinhan_cons_complaint",
+  "max_score": 15,
+  "allowed_steps": [15, 10, 5, 0],
+  "intents": ["민원", "이의제기"],
+  "version": "shinhan_consumer_v1",
+  "examples": [
+    {
+      "example_id": "GS-913-FULL-shinhan-cons-001",
+      "item_number": 913,
+      "score": 15,
+      "score_bucket": "full",
+      "intent": "민원",
+      "segment_text": "고객: 어제 카드 결제했는데 이중 결제가 됐어요 너무 당황스럽고 환불도 며칠째 안 와서 화가 나요\n상담사: 네 고객님 신한카드 소비자보호부 *** 입니다 우선 이중 결제로 불편 끼쳐 드려서 정말 죄송합니다\n고객: 네 짜증이 나서요\n상담사: 네 충분히 이해됩니다 말씀해 주신 내용 정확히 분류하면 결제 / 청구 카테고리 중 \"이중청구·중복승인\" 유형이시고요 환불 지연이 함께 발생하고 있어서 \"환불 처리 지연\" 유형도 같이 등록하겠습니다\n고객: 네\n상담사: 원인 파악 위해 확인 좀 드리면 결제 일시 / 결제 가맹점 / 결제 금액 / 결제 방식(승인/매입) 4가지 정보 부탁드릴게요\n고객: 사 월 이십육 일 저녁 일곱 시쯤 카페에서 만 사천 원 결제했는데 두 번 찍혔어요\n상담사: 네 확인되었고요 가맹점 단말기 중복 승인 / 매입 미취소 가능성으로 보이고요 가맹점 매입 데이터 확인하면 원인 명확해질 것 같습니다 영업일 일 일 내 처리 결과 안내드리겠습니다\n고객: 네",
+      "rationale": "[VOC 분류 · 만점] 민원 카테고리 정확 매핑(\"이중청구·중복승인\" + \"환불 처리 지연\" 복수 분류) + 원인 파악을 위한 4가지 정보 요청 + 가설(중복 승인/매입 미취소) 명시 + SLA(영업일 1일) 안내.\n - 상담사#4: \"결제 / 청구 카테고리 중 \\\"이중청구·중복승인\\\" 유형이시고요 환불 지연이 함께 발생하고 있어서 \\\"환불 처리 지연\\\" 유형도 같이 등록하겠습니다\"\n - 상담사#6: \"결제 일시 / 결제 가맹점 / 결제 금액 / 결제 방식(승인/매입) 4가지 정보 부탁드릴게요\"\n - 상담사#8: \"가맹점 단말기 중복 승인 / 매입 미취소 가능성으로 보이고요\"",
+      "rationale_tags": ["item_913", "full_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_consumer_v1",
+        "sample_id": "synthetic_cons_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-913-PARTIAL-shinhan-cons-002",
+      "item_number": 913,
+      "score": 5,
+      "score_bucket": "partial",
+      "intent": "민원",
+      "segment_text": "고객: 카드 이중 결제됐는데요 환불도 안 와요\n상담사: 네 결제 관련 문제로 보이시네요\n고객: 네\n상담사: 확인해 보고 처리해 드리겠습니다\n고객: 어떻게 처리하시는 거예요\n상담사: 일단 결제 내역 확인해 봐야 되고요 결과 나오면 다시 연락드릴게요\n고객: 언제까지요\n상담사: 그건 처리 시간이 좀 다양해서 정확히 말씀드리긴 어렵고요",
+      "rationale": "[VOC 분류 · 부분점수 5점] \"결제 관련\" 광범위 분류만 진행 — 세부 카테고리(이중청구 / 환불지연) 미식별. 원인 파악 정보 요청 누락. SLA 시점 모호 (\"좀 다양해서\").\n - 상담사#2: \"결제 관련 문제로 보이시네요\"\n - 상담사#4: \"확인해 보고 처리해 드리겠습니다\"\n - 상담사#8: \"그건 처리 시간이 좀 다양해서 정확히 말씀드리긴 어렵고요\"",
+      "rationale_tags": ["item_913", "partial_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_consumer_v1",
+        "sample_id": "synthetic_cons_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-913-ZERO-shinhan-cons-003",
+      "item_number": 913,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "민원",
+      "segment_text": "고객: 카드 이중 결제 됐고 환불도 안 와요 너무 화나요\n상담사: 네 그건 자주 있는 일이고요 좀 기다려 보세요\n고객: 며칠째 기다리고 있어요\n상담사: 그러면 가맹점에 직접 연락해 보시는 게 빠를 거예요\n고객: 카드사에서 처리해 줘야 되는 거 아닌가요\n상담사: 그건 가맹점 잘못이라서요 저희가 어쩌기 어렵고요\n고객: 그래도 분류는 해 주셔야 되는 거 아닌가요\n상담사: 따로 분류 안 해도 처리는 됩니다",
+      "rationale": "[VOC 분류 · 0점] critical_violation 트리거. 민원 카테고리 분류 거부 (\"따로 분류 안 해도\"), 원인 파악 회피, 책임 가맹점 전가. 사실상 단순문의로 처리.\n - 상담사#2: \"그건 자주 있는 일이고요 좀 기다려 보세요\"\n - 상담사#6: \"그건 가맹점 잘못이라서요 저희가 어쩌기 어렵고요\"\n - 상담사#8: \"따로 분류 안 해도 처리는 됩니다\"",
+      "rationale_tags": ["item_913", "zero_compliance", "critical_violation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 6},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_consumer_v1",
+        "sample_id": "synthetic_cons_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

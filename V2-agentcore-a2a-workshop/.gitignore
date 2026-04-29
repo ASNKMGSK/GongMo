@@ -1,0 +1,133 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.venv/
+venv/
+ENV/
+env/
+
+# CDK
+cdk.out/
+*.d.ts
+
+# Lock files (can be regenerated)
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+uv.lock
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+.nyc_output/
+.coverage
+*.coverage
+
+# Pytest
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Temporary files
+*.tmp
+*.temp
+.tmp*
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.production.local
+.env.test.local
+
+# Kiro CLI project-specific config
+.kiro/
+
+.bedrock_agentcore.yaml
+*.bkp
+
+# Next.js (chatbot-ui-next)
+.next/
+out/
+next-env.d.ts
+.turbo/
+
+# QA result outputs (HITL snapshots)
+QA평가결과/
+
+# 실 상담 데이터 / 개인정보 — 절대 커밋 금지
+tb_ai_ta_data_*.csv
+*상담*.csv
+*상담*.xlsx
+batch_*.json
+batch_*.csv
+
+# 프롬프트 튜닝 산출물 (대용량)
+prompt_tuning/
+tuning_*/
+test_outputs/
+validation/reports/
+
+# Claude Code session artifacts
+.claude/plans/
+.claude/cache/
+
+# 백업 / 임시
+*.bak
+*.bak-*
+_server_logs/

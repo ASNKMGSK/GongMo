@@ -1,0 +1,7 @@
+aws-cdk-lib==2.231.0
+aws-cdk.aws-bedrock-agentcore-alpha==2.231.0a0
+constructs>=10.0.0,<11.0.0
+cdk_nag
+aws_cdk.aws_lambda_python_alpha
+bedrock-agentcore-starter-toolkit
+python-dotenv

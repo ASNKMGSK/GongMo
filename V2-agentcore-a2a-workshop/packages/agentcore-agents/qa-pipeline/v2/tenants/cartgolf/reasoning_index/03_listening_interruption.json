@@ -1,0 +1,43 @@
+{
+  "item_number": 3,
+  "item_name": "경청/말겹침",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "STT 타임스탬프 기반 말겹침/말자름 평가는 음성 스킵 모드 기본 만점 고정 — evaluation_mode=skipped",
+      "quote_example": "상담사: 네 말씀 듣고 있습니다 (끝까지 경청 후 응대)",
+      "evaluator_id": "senior_a",
+      "tags": ["stt_skipped", "default_full"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "고객 불만 토로 중 끊지 않고 끝까지 경청 후 공감 응대 — skipped 정책 기본 만점",
+      "quote_example": "상담사: 네 고객님 말씀 끝까지 들었고요 불편하셨겠어요",
+      "evaluator_id": "senior_b",
+      "tags": ["stt_skipped", "active_listening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 5,
+      "rationale": "넥스 경량 패딩 상품 설명 중 고객 설명을 충분히 청취 후 요약 재확인, skipped 모드 5점",
+      "quote_example": "상담사: 주름이 있다라는 거죠 어떤 말씀인지 알 거 같애요",
+      "evaluator_id": "senior_c",
+      "tags": ["stt_skipped", "summarization"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 5,
+      "rationale": "코오롱스포츠 재킷 사이즈 문의 상담 중 고객 설명 중단 없음 — 기본 skipped 만점",
+      "quote_example": "상담사: 네 사이즈 말씀 주셨고요 (중간 끊김 없이 완결)",
+      "evaluator_id": "senior_a",
+      "tags": ["stt_skipped", "no_interruption"],
+      "stub_seed": true
+    }
+  ]
+}

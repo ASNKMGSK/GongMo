@@ -1,0 +1,37 @@
+{
+  "item_number": 17,
+  "item_name": "정보 확인 절차",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_17_shinhan_001",
+      "score": 5,
+      "rationale": "[정보 확인 절차] 본인확인 선행 (성함 + 생년월일) + 추가 1요소 (휴대폰 뒤 4자리) → 만점\n - 상담사#2: \"본인확인 위해 성함과 생년월일 부탁드리겠습니다\"\n - 상담사#4: \"박지훈 고객님 본인 맞으십니까\"\n - 상담사#6: \"등록 휴대폰 번호 뒤 사 자리만 한 번 더 확인 부탁드릴게요\"",
+      "quote_example": "상담사: 본인확인 위해 성함과 생년월일 부탁드리겠습니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_17", "full_compliance", "two_factor_verification"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_17_shinhan_002",
+      "score": 3,
+      "rationale": "[정보 확인 절차] 성함 1요소만 확인 + 추가 검증 (생년월일 / 카드번호 / 휴대폰) 누락 → 부분점수\n - 상담사#2: \"네 성함 부탁드릴게요\" — 1요소 단독\n - 상담사#4: \"네 이서연 고객님 결제일 변경 도와드릴게요\" — 추가 확인 없이 진행",
+      "quote_example": "상담사: 네 성함 부탁드릴게요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_17", "partial_compliance", "single_factor"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_17_shinhan_003",
+      "score": 0,
+      "rationale": "[정보 확인 절차] 본인확인 절차 자체 부재 + 검증 없이 분실 처리 + 신규 카드 배송 진행 → 0점\n - 상담사#2: \"아 네 처리해드릴게요\" — 본인확인 생략\n - 상담사#4: \"분실 처리 완료되었구요 신규 카드는 등록 주소로 배송됩니다\" — 신원 미확인 상태에서 후속 처리",
+      "quote_example": "상담사: 분실 처리 완료되었구요 신규 카드는 등록 주소로 배송됩니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_17", "non_compliance", "no_verification"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

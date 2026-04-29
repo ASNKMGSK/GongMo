@@ -1,0 +1,43 @@
+{
+  "item_number": 17,
+  "item_name": "정보 확인 절차",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "성함 + 생년월일 + 연락처 3요소 본인확인 + 확인 완료 멘트 만점",
+      "quote_example": "성함 생년월일 연락처 확인 감사합니다 본인확인 완료되었습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_iv_procedure"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "iter05 확장 — 2요소만 확인, 1요소 누락 3점 (ALLOWED_STEPS [5,3,0])",
+      "quote_example": "성함 생년월일 확인 부탁드립니다",
+      "evaluator_id": "senior_b",
+      "tags": ["partial_iv", "iter05_extended"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "본인확인 절차 전무 — 즉시 진행 0점",
+      "quote_example": "바로 처리해드릴게요",
+      "evaluator_id": "senior_c",
+      "tags": ["no_iv", "force_t3"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "preemptive disclosure — 상담사가 고객 정보 먼저 발화",
+      "quote_example": "홍길동 고객님 (PII) 확인드립니다",
+      "evaluator_id": "senior_a",
+      "tags": ["preemptive_disclosure", "critical"],
+      "stub_seed": true
+    }
+  ]
+}

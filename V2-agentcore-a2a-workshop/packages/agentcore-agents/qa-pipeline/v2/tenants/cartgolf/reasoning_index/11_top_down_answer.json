@@ -1,0 +1,52 @@
+{
+  "item_number": 11,
+  "item_name": "두괄식 답변",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "교환 가능 여부 질문에 결론(가능) 먼저 명시 후 조건 부연 만점",
+      "quote_example": "상담사: 교환 가능하십니다 다만 1회 무상이시고 회수 기사가 방문하실 거예요",
+      "evaluator_id": "senior_a",
+      "tags": ["top_down", "conclusion_first"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "반품 배송비 발생 여부 질문에 결론 즉답 후 차감 안내 만점",
+      "quote_example": "상담사: 반품 배송비 2,500원 발생하고요 환불 금액에서 차감됩니다",
+      "evaluator_id": "senior_b",
+      "tags": ["top_down", "fee_clear"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "조건/배경 설명이 먼저 나오고 결론이 뒤에 배치 3점",
+      "quote_example": "상담사: 상품 불량인지는 입고 후 검수해봐야 하고 원단 특성도 있고 해서 우선 교환 접수는 가능하세요",
+      "evaluator_id": "senior_c",
+      "tags": ["lead_delayed", "bottom_up"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "결론이 답변 중간에 섞여 있음, 핵심 답변 즉각성 부족",
+      "quote_example": "상담사: 음 그게 지금 말씀하신 내용이 그러니까 교환은 가능은 하세요",
+      "evaluator_id": "senior_a",
+      "tags": ["mid_lead", "hesitant"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "결론 없이 조건만 나열, 고객 질문에 대한 답 부재 0점",
+      "quote_example": "상담사: 이게 뭐 경우에 따라서 다르고요 상황 봐야 알 수 있어요",
+      "evaluator_id": "senior_b",
+      "tags": ["no_conclusion", "evasive"],
+      "stub_seed": true
+    }
+  ]
+}

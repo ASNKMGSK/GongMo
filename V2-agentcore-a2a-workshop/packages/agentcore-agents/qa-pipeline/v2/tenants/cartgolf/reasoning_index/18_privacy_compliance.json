@@ -1,0 +1,52 @@
+{
+  "item_number": 18,
+  "item_name": "정보 보호 준수",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "주문번호/연락처/주소 등 PII 타 고객 발설 없음 + 회수지 확인 시 기존 주소 범위 내 제한 만점 (force_t3)",
+      "quote_example": "상담사: 회수지는 기존 주소와 동일하실까요 네 동일한 주소로 접수 도와드리겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_compliance", "force_t3"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "선물 발송 상담 중 수령인 정보 추가 노출 없이 주문자 본인 한정 안내 준수",
+      "quote_example": "상담사: 주문자 본인 확인 완료되었고 수령인 정보는 별도 안내 제한드리는 점 양해 부탁드려요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_compliance", "third_party_blocked"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "PII 대부분 보호되나 주문서상 결제수단 말미 일부 노출 3점 (iter05 확장 ALLOWED_STEPS [5,3,0])",
+      "quote_example": "상담사: 카드 뒷자리 1234로 결제 확인되었고요 (부분 노출)",
+      "evaluator_id": "senior_c",
+      "tags": ["partial_leak", "minor"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "제3자 수취인 성함 일부 발설 — 허용 범위 경계 3점",
+      "quote_example": "상담사: 선물 받으신 분 성함이 OOO 이시네요 (수취인 성함 언급)",
+      "evaluator_id": "senior_a",
+      "tags": ["third_party_name", "borderline"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "고객 주소 또는 주민번호 일부 유출 — critical 위반 즉시 0점",
+      "quote_example": "상담사: 서울시 OO구 OO동 OOO 번지로 회수 진행하겠습니다 (주소 전체 발설)",
+      "evaluator_id": "senior_b",
+      "tags": ["address_leak", "critical"],
+      "stub_seed": true
+    }
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "item_number": 910,
+  "item_name": "필수 안내 이행",
+  "version": "shinhan_crm_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_910_synthetic_004",
+      "score": 5,
+      "rationale": "[필수 안내] 4대 의무 항목 (전화목적 / 녹취고지 / 청약철회권 / 개인정보 동의) 모두 도입부에서 명시적 이행 + 동의 명시적 획득 → 만점\n - 상담사: \"신한 디오 신용카드 상품 안내를 위한 통화\" (전화목적)\n - 상담사: \"상담 품질 향상을 위해 녹취되고 있습니다\" (녹취고지)\n - 상담사: \"14일 이내 청약철회권 행사가 가능하시며\" (청약철회권)\n - 상담사: \"개인정보를 활용하게 되며 동의하지 않으시면 가입은 어려우십니다 동의하시는지요\" (개인정보 동의)",
+      "quote_example": "상담사: 14일 이내 청약철회권 행사가 가능하시며",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_910",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_004"
+    },
+    {
+      "record_id": "r_910_synthetic_005",
+      "score": 3,
+      "rationale": "[필수 안내] 전화목적/녹취고지 이행 / 청약철회권 명시 누락 + 개인정보 활용 동의 절차 부재 → 부분 감점\n - 상담사: \"본 통화 녹취되고 있습니다\" (녹취고지 이행)\n - 상담사: \"카드 교체 발급 안내드리려 연락드렸어요\" (전화목적 이행)\n - 청약철회권 발화 부재 (\"14일 이내 사용 시작\"은 사용 안내일 뿐)",
+      "quote_example": "상담사: 도착하시면 14일 이내 사용 시작 부탁드립니다",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_910",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_005"
+    },
+    {
+      "record_id": "r_910_synthetic_006",
+      "score": 0,
+      "rationale": "[필수 안내] 4대 의무 항목 모두 미고지 → 0점\n - 신한카드 소속 미고지 / 통화 목적 모호 / 녹취고지 부재 / 청약철회권 부재 / 개인정보 동의 부재",
+      "quote_example": "상담사: 좋은 상품 있어서 전화드렸어요 한번 들어보시면 분명 마음에 드실 거예요",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_910",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_006"
+    }
+  ]
+}

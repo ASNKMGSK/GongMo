@@ -1,0 +1,61 @@
+{
+  "item_number": 8,
+  "item_name": "문의 파악 / 재확인",
+  "category": "니즈 파악",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "examples": [
+    {
+      "example_id": "GS-08-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 패딩 좀 교환하고 싶어서요. 상담사: 넥스 경량 패딩 교환 요청이신 거죠? 동일 상품 사이즈 변경인지, 다른 상품으로 변경인지 말씀해 주실 수 있을까요?",
+      "rationale": "고객 문의 요약 복창 + 교환 유형 명확화 질문.",
+      "rationale_tags": ["복창 + 명확화"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-08-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "고객: 왁 셔츠 사이즈 문제로요. 상담사: 왁 셔츠 사이즈 교환 문의이시죠? 현재 주문하신 사이즈와 원하시는 사이즈 말씀 부탁드리겠습니다.",
+      "rationale": "문의 복창 + 필요 정보 요청.",
+      "rationale_tags": ["복창 + 명확화"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-08-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "고객: 주문한 게 아직 안 왔어요. 상담사: 네 확인해 드리겠습니다.",
+      "rationale": "문의 파악은 되었으나 복창/재확인 절차 생략.",
+      "rationale_tags": ["재확인 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-08-PARTIAL-02",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "결제문의",
+      "segment_text": "고객: 결제가 좀 이상해요. 상담사: 네 결제 부분이요, 확인해 드릴게요.",
+      "rationale": "간단 복창만. 명확화 질문 없음.",
+      "rationale_tags": ["명확화 부족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-08-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "고객: 코오롱스포츠 자켓 반품 좀 하려고요. 상담사: 네 어떻게 도와드릴까요?",
+      "rationale": "고객이 이미 반품 의사를 밝혔는데도 파악 없이 재질문.",
+      "rationale_tags": ["문의 파악 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

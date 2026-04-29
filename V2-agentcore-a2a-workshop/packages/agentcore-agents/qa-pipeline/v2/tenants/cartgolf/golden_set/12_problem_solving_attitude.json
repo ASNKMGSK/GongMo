@@ -1,0 +1,51 @@
+{
+  "item_number": 12,
+  "item_name": "문제 해결 의지",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "examples": [
+    {
+      "example_id": "GS-12-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 우선 교환 접수 바로 진행하고, 입고 시 검수 팀에 이 부분 꼼꼼히 확인하도록 내용 전달해 드리겠습니다. 수령 후에도 동일 문제면 반품으로 전환 가능한 점 함께 안내 드릴게요.",
+      "rationale": "즉시 접수 + 검수 팀 이관 + 대안 제시 — 다층 해결책.",
+      "rationale_tags": ["다층 해결 의지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-12-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 지금 라지 사이즈 재고 확인 중이고요. 혹시 품절이면 다른 색상 또는 유사 상품도 함께 안내 드리고 필요 시 매장 재고까지 조회 도와드릴게요.",
+      "rationale": "재고 조회 + 대안 제시 + 매장 조회까지 확장 — 적극적 해결.",
+      "rationale_tags": ["다층 해결 의지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 저희가 방법을 찾아 보겠습니다.",
+      "rationale": "해결 의지는 있으나 구체적 제안 없음.",
+      "rationale_tags": ["구체성 부족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-12-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 그건 저희 파트가 아니에요. 본사로 다시 전화해 주세요.",
+      "rationale": "업무 회피 — 이관 노력 전무.",
+      "rationale_tags": ["업무 회피"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

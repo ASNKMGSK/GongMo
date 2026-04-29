@@ -1,0 +1,57 @@
+{
+  "item_number": 14,
+  "item_name": "후속 조치",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["프로모션안내", "재예약유도", "회원갱신"],
+  "dialog_stages": ["outro"],
+  "version": "kolon_outbound_telesales_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "fixed_window",
+    "details": "상담 종료 5~8발화 — 후속 연락/구매 링크/재콜백 안내 여부 체크",
+    "window_size_turns": 8,
+    "anchor": "dialog_end"
+  },
+  "examples": [
+    {
+      "example_id": "GS-14-TS-FULL-001",
+      "item_number": 14,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "회원갱신",
+      "dialog_stage": "outro",
+      "segment_text": "상담사: 네 고객님 오늘 안내드린 멤버십 갱신 상품 링크를 방금 문자로 보내드렸고요 혹시 결정하시는데 시간 필요하시면 다음 주 수요일에 제가 다시 한번 확인 전화 드려도 될까요 편하신 시간 알려주시면 그 시간대에 맞춰서 연락드리겠습니다",
+      "rationale": "[후속 조치] 링크 발송 + 추가 콜백 제안 + 시간 선택권 제공까지 3단 실행 → 만점\n - 구매 가능 링크 즉시 전달\n - 재콜백 일정 사전 조율\n - 고객 선택권 제공 (편한 시간 문의)",
+      "rationale_tags": ["item_14", "full_compliance", "link_sent", "callback_proposed", "customer_choice", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 28}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_021","variant":"proactive_followup","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-14-TS-PARTIAL-001",
+      "item_number": 14,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "프로모션안내",
+      "dialog_stage": "outro",
+      "segment_text": "상담사: 네 그럼 링크 문자로 보내드릴게요 확인해 보세요\n고객: 네 알겠어요",
+      "rationale": "[후속 조치] 링크 발송은 있으나 재콜백 제안 없음 → 3점\n - 최소한의 후속 조치만 수행\n - 결정 유도/재연락 일정 논의 없음\n - 고객이 선택 권한 행사할 프레임 미제공",
+      "rationale_tags": ["item_14", "partial_compliance", "link_only", "no_callback", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 24}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_022","variant":"link_only","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-14-TS-ZERO-001",
+      "item_number": 14,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "재예약유도",
+      "dialog_stage": "outro",
+      "segment_text": "고객: 음 생각해 볼게요\n상담사: 네 그러세요 끊어 드릴게요",
+      "rationale": "[후속 조치] 후속 조치 전무 → 0점\n - 링크·자료 미발송\n - 재연락 일정 미제안\n - \"끊어 드릴게요\" 로 대화 조기 종료\n - 영업 전환 기회 포기",
+      "rationale_tags": ["item_14", "no_followup", "premature_close", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 22}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_023","variant":"abandoned_lead","human_score_verified":false}
+    }
+  ]
+}

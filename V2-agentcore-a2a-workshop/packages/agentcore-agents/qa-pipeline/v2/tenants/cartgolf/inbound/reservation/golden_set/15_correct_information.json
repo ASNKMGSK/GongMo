@@ -1,0 +1,58 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내 (요금/정책)",
+  "category": "업무 정확도",
+  "max_score": 15,
+  "allowed_steps": [15, 10, 5, 0],
+  "intents": ["예약신청", "예약변경", "예약취소", "가용문의"],
+  "dialog_stages": ["main"],
+  "version": "cartgolf_inbound_reservation_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "qa_pair",
+    "details": "intent classifier 로 고객 핵심 질문(\"요금 얼마\"/\"취소 수수료\") + 상담사 핵심 답변 pair 추출 → Business Knowledge RAG 매칭 (PDF §7.4)"
+  },
+  "examples": [
+    {
+      "example_id": "GS-15-RES-FULL-001",
+      "item_number": 15,
+      "score": 15,
+      "score_bucket": "full",
+      "intent": "예약신청",
+      "dialog_stage": "main",
+      "segment_text": "고객: 주말 라운드 요금 얼마예요\n상담사: 네 고객님 주말 그린피는 십팔 홀 기준 회원 십오만 원 비회원 이십이만 원이세요 여기에 카트비 팔만 원과 캐디피 십사만 원이 별도로 추가되시고요 네 분 동반 시 카트비 캐디피는 일 인당 이만 원 삼만 오천 원 정도로 나누어집니다",
+      "rationale": "[정확한 안내] 그린피 · 부대비용 · 분담 기준까지 완전 분해 안내 → 만점\n - 회원/비회원 분기 명시\n - 카트비/캐디피 별도 표기\n - 분담 가정 (4인) 수치 제공",
+      "rationale_tags": ["item_15", "full_compliance", "fee_breakdown", "membership_branching", "reservation"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 6}],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_011","variant":"full_fee","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-15-RES-PARTIAL-001",
+      "item_number": 15,
+      "score": 10,
+      "score_bucket": "partial",
+      "intent": "예약취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 취소 수수료 얼마예요\n상담사: 네 일주일 전까지는 무료시고요 그 이후에는 수수료 있으세요\n고객: 얼마요\n상담사: 어 보통 예약금 반 정도라고 보시면 돼요",
+      "rationale": "[정확한 안내] 구조는 맞으나 단계별 수치 누락 → 10점\n - 취소 단계 기본 프레임(일주일 전 무료) 은 정확\n - 이후 구체 수치 (7일~3일 전 50%, 2일~전일 70%, 당일 100%) 미전달\n - \"반 정도\" 추정 표현",
+      "rationale_tags": ["item_15", "partial_compliance", "estimated_figure", "reservation"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_012","variant":"partial_figures","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-15-RES-INCORRECT-001",
+      "item_number": 15,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "예약취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 내일 라운드 취소할 수 있어요\n상담사: 네 가능하세요 수수료도 없으시고요\n고객: 정말요 괜찮은 거죠\n상담사: 네네 그냥 취소하시면 돼요",
+      "rationale": "[정확한 안내] 정책 오안내 (당일 취소는 예약금 100% 수수료) → 0점\n - 실제 정책: 전일 취소 70%, 당일 100%\n - 고객 재확인에도 동일 오정보 반복\n - 추후 분쟁/환불 민원 유발 가능",
+      "rationale_tags": ["item_15", "incorrect_info", "policy_violation", "dispute_risk", "reservation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_reservation","source":"cartgolf_reservation_bootstrap_2026-04-24","sample_id":"res_sample_013","variant":"incorrect_policy","human_score_verified":false}
+    }
+  ]
+}

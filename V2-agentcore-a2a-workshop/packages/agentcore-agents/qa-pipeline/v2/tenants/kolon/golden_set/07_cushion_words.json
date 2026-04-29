@@ -1,0 +1,484 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어 활용",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "상품문의",
+    "환불취소"
+  ],
+  "version": "kolon_v4_fixed",
+  "examples": [
+    {
+      "example_id": "GS-07-ZERO-668437",
+      "item_number": 7,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 예 다만 이게 좀 생각하신 거랑 다르게 회수랑 배송이 따로따로지게 돼요 그래서\n고객: 예 예\n상담사: 배송받고 나서 어떻게 바로 그 배송받자마자 어떻게 바로 다시 보내는 건 좀 어렵구요\n고객: 네\n상담사: 일단 그 하얀색 모자도 되고 따로 포장하시 포장하시긴 하셔야 되거든요",
+      "rationale": "[쿠션어] 거절/불가 통보에 쿠션어 전무 → 0점\n - 고객#122: \"예 예\"\n - 상담사#123: \"배송받고 나서 어떻게 바로 그 배송받자마자 어떻게 바로 다시 보내는 건 좀 어렵구요\"\n - 고객#124: \"네\"",
+      "rationale_tags": [
+        "item_7",
+        "zero_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 122
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 123
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 124
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668437",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-668451",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 여보세요\n상담사: 안녕하세요\n고객: 네 제가 그 언제지 날짜는 여기 지금 조회 지금 들어와서 볼까요",
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 1회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"안녕하세요\"",
+      "rationale_tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668451",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668464",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 음 알겠습니다 일단은 고객님께서 말씀하셨던 부분 이해는 되었지만요 해당 제품은 저희 코오롱몰에 입점에서 판매하고 있는 입점사 제품입니다\n고객: 네\n상담사: 그렇다 보니까는 케이스 제공 여부 가능 불가능은요 지금은 알 수가 없어서요 입점사 확인해보고 다시 한번 연락을 드려도 괜찮으시겠습니까\n고객: 네 아니 뭐 이 이렇게 그냥 그것도 비닐봉투리요 어 이게 찍히이 붙어있잖아요 끝부분에\n고객: 이거를 몇 번을 붙였다 했다 했던 거를 사용을 해가지고 밑에서부터 두 줄이 들어가 있었고 이게 종 이 비닐을 몇 번을 사용을 했나 봐요\n상담사: \n고객: 그러고 왔어요 이걸 어떻게 선물을 박스에다 쳐 선물을 해요\n상담사: 음 네네 고객님께서 인제 불편하셨던 부분에 대해서 충분히 이해가 되었지만요 앞서 말씀드린 거 다시 한번 정리해서 말씀드린다면요 입전산 상품은 제가 가능 불가능은 지금 답변은 어렵다 보니까는",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 고객#46: \"네\"\n - 상담사#47: \"그렇다 보니까는 케이스 제공 여부 가능 불가능은요 지금은 알 수가 없어서요 입점사 확인해보고 다시 한번 연락을 드려도 괜찮으시겠습니까\"\n - 고객#48: \"네 아니 뭐 이 이렇게 그냥 그것도 비닐봉투리요 어 이게 찍히이 붙어있잖아요 끝부분에\"\n - 고객#53: \"그러고 왔어요 이걸 어떻게 선물을 박스에다 쳐 선물을 해요\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 46
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 47
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 48
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 53
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668464",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668481",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 쇼핑몰보다 이\n고객: 여보세요 똑같은 말 지금 몇 번 들어 제가 제가 할 금만 할 때마다 얘기하잖아요 다른 데는 되는데 왜 이거는 안 되냐고\n상담사: 죄송합니다 저희가 바로 개선이 좀 어려워요 고객님 그 부분은 시스템적으로 개선이 어렵다고 합니다 일단은 불편하신 내용은\n고객: 왜 시스템부터 이렇게 어디가 어려워요 근데 왜 다른 데는 그게 다 돼요 그 참된 거잖아요 다른 데는 된다는 그거 내 다시 있는데 안 한다는 거잖아요\n상담사: 그렇진 않습니다 고객님 저희도 개선할려고 여러 번 건의를 했구요 본사에서도 검토를 했지만 저희가 현재 가지고 있는 시스템만으로는 개선이 어렵다고 합니다\n상담사: 일단 저희도 최대한 반영할려고 노력은 하고 있습니다 고객님",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 고객#35: \"여보세요 똑같은 말 지금 몇 번 들어 제가 제가 할 금만 할 때마다 얘기하잖아요 다른 데는 되는데 왜 이거는 안 되냐고\"\n - 상담사#36: \"죄송합니다 저희가 바로 개선이 좀 어려워요 고객님 그 부분은 시스템적으로 개선이 어렵다고 합니다 일단은 불편하신 내용은\"\n - 고객#37: \"왜 시스템부터 이렇게 어디가 어려워요 근데 왜 다른 데는 그게 다 돼요 그 참된 거잖아요 다른 데는 된다는 그거 내 다시 있는데 안 한다는 거잖아요\"\n - 상담사#38: \"그렇진 않습니다 고객님 저희도 개선할려고 여러 번 건의를 했구요 본사에서도 검토를 했지만 저희가 현재 가지고 있는 시스템만으로는 개선이 어렵다고 합니다\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 35
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 36
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 37
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 38
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668481",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668488",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 안녕하세요 코오롱몰에서 구매한 제품이 있는데요\n상담사: 네 안녕하세요 네 고객님\n고객: 좀 교환이 될지 한번 여쭤보고 싶어서요",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 안녕하세요 네 고객님\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668488",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668507",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 재고 아 그러면 음 일단은 저희도 상품이 회수가 된 상품이 흐름이 있어야 출고도 알아보고 진행을 해드리기 때문에\n고객: 네네네 네\n상담사: 현재로서는 이게 출고가 될 수 있다 말씀드리기가 어렵거든요\n고객: 그렇죠 예\n상담사: 에 그래서 원복 요청하시면 지금 처럼 원복을 해드릴 건데요",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 고객#91: \"네네네 네\"\n - 상담사#92: \"현재로서는 이게 출고가 될 수 있다 말씀드리기가 어렵거든요\"\n - 고객#93: \"그렇죠 예\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 91
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 92
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 93
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668507",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668526",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요\n고객: 아 이거 부분 반품할려고 하는데요 이거 하나 취소돼서 못 온다고 해서 부분 반품할려구요\n상담사: 아 방문 방법이요 네 고객님 성함이랑 연락처번호 어떻게 되실까요\n고객: 네 ****구요",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요\"\n - 상담사#3: \"아 방문 방법이요 네 고객님 성함이랑 연락처번호 어떻게 되실까요\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668526",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-668542",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 예 그 여보세요\n상담사: 네 고객님 전화 연결되었습니다\n고객: 예 저 뭐냐 이름은 ***이구요",
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 고객님 전화 연결되었습니다\"",
+      "rationale_tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668542",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668605",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아 네 수고하십니다 어 저기 반품 땜에 그러는데요\n상담사: 네네 예예\n고객: 그 이름은 예 ***",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네네 예예\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668605",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668610",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 바지 반바지를 구매를 했는데요 사이즈가 맞지 않아서 반품할려고 보니까 그 첫 번 뭐 사이즈 교환은 비용을 부담해준다고 써있길래\n상담사: 네네\n고객: 네 네 그래서 다시 반품으로 아니까 교환으로 들어갔더니 배송비용이 육천 원이 발생이 하 발생하는 거 같더라고요",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 1회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네네\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668610",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-668675",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "상품문의",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 안녕하세요 어저께 그쪽에 주문한 물건을 받았는데요\n상담사: 네 고객님 예\n고객: 어 가방을 준비했는데 이렇게 주문했는데 그 앞에 가방 버클 있는 데가 좀 이게 들혀있더라고 보통 새 제품을 사면은 버클에 그 비닐 같은 게 이게 붙여져 있는데 그것도 붙어져 있지 않은 상태였고",
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 고객님 예\"",
+      "rationale_tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668675",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-FULL-668697",
+      "item_number": 7,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\n고객: 네 제가 코오롱몰에서 가방을 두 개를 구매를 했는데요\n상담사: 네\n고객: 네 그중에서 가방 하나 있으니 옆에 악세사처럼 달려있는 게 안 왔어요 저는 그걸 따로 구입하는 건 줄 알고 매장에 가서 물어보니까 같이",
+      "rationale": "[쿠션어] 거절/불가 상황에서 쿠션어 0회 활용 또는 거절 상황 없음 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\"\n - 상담사#3: \"네\"",
+      "rationale_tags": [
+        "item_7",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668697",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-668736",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 근데 제가 이미지를 봐도요 고객님 저희 쪽에 첨부된 이미지 있잖아요 상품 페이지에 있는 이미지요\n고객: 예 예 예\n상담사: 거기에도 약간 주글거리게 보이시거든요 고객님 이게 약간 평평하게 표지는 스타일은 아니신 거 같아요 약간 울 불가한 면이 있으세요\n고객: 근데 뒷면은 또 괜찮하거든요\n상담사: 네\n고객: 뒷면은 청청한데 앞면이 죽을거려 그래서\n상담사: 쪼글거린다는 게 울 불가하다는 말씀이신 거죠",
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 고객#78: \"예 예 예\"\n - 상담사#79: \"거기에도 약간 주글거리게 보이시거든요 고객님 이게 약간 평평하게 표지는 스타일은 아니신 거 같아요 약간 울 불가한 면이 있으세요\"\n - 고객#80: \"근데 뒷면은 또 괜찮하거든요\"\n - 고객#82: \"뒷면은 청청한데 앞면이 죽을거려 그래서\"",
+      "rationale_tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 78
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 79
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 80
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 82
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668736",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-668771",
+      "item_number": 7,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\n고객: 가 네 그 저 혹시 반품은 언제 되는지 여쭤보려고 전화했거든요\n상담사: 반품 신청하셨어요 고객님\n고객: 네 물건도 보냈어요",
+      "rationale": "[쿠션어] 형식적/일부 누락 (쿠션어 0회) → 3점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\"\n - 상담사#3: \"반품 신청하셨어요 고객님\"",
+      "rationale_tags": [
+        "item_7",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668771",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

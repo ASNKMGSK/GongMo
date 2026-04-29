@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>QA 성능 추적 — Trend</title>
+<style>
+ body { font-family: -apple-system, "Segoe UI", sans-serif; background:#0f172a; color:#e2e8f0; padding:20px; margin:0; }
+ h1 { color:#fbbf24; font-size:20px; margin-bottom:6px; }
+ .meta { color:#94a3b8; font-size:12px; margin-bottom:20px; }
+ table { border-collapse:collapse; width:100%; margin-bottom:24px; font-size:12px; background:#1e293b; }
+ th, td { padding:8px 10px; border-bottom:1px solid #334155; text-align:right; }
+ th:first-child, td:first-child { text-align:left; }
+ th { background:#334155; color:#fbbf24; font-weight:600; position:sticky; top:0; }
+ tr.alert-warn { background:rgba(245,158,11,0.08); }
+ tr.alert-critical { background:rgba(239,68,68,0.12); }
+ .delta-up { color:#fb7185; font-weight:600; }
+ .delta-down { color:#34d399; font-weight:600; }
+ .delta-zero { color:#94a3b8; }
+ .badge { display:inline-block; padding:2px 6px; border-radius:3px; font-size:10px; font-weight:700; margin-left:6px; }
+ .badge.warn { background:#f59e0b; color:#000; }
+ .badge.critical { background:#ef4444; color:#fff; }
+ .alert-card { padding:10px 14px; border-radius:6px; margin-bottom:8px; font-size:12px; }
+ .alert-card.warn { background:rgba(245,158,11,0.1); border-left:3px solid #f59e0b; }
+ .alert-card.critical { background:rgba(239,68,68,0.12); border-left:3px solid #ef4444; }
+ .label { color:#fbbf24; font-weight:600; }
+ .sha { font-family:monospace; color:#94a3b8; font-size:11px; }
+ svg { background:#1e293b; border-radius:6px; }
+ .legend { font-size:11px; color:#94a3b8; margin-bottom:6px; }
+</style></head><body>
+<h1>QA 성능 추적 — 시계열</h1>
+<div class="meta">총 2 건 · TRACKING_ROOT: <span class="sha">C:\Users\META M\Desktop\업무\qa\V2 QA개발\V2-agentcore-a2a-workshop\packages\agentcore-agents\qa-pipeline\v2\validation\tracking\runs</span></div>
+<h2 style="font-size:14px;color:#fbbf24">⚠ 회귀 알람 (1 건)</h2>
+<div class="alert-card warn"><span class="badge warn">WARN</span> <b>MAE</b> · item#6 → 항목 #6 (정중한 표현) MAE 악화 +0.64</div>
+<div class="legend">메트릭: <b>MAE</b> (낮을수록 사람 점수와 유사). 붉은 점 = 직전 대비 악화 / 초록 = 개선 / 노랑 = 첫 run.</div><svg width="760" height="200" viewBox="0 0 760 200"><line x1="36" x2="724" y1="164.0" y2="164.0" stroke="#334155" stroke-dasharray="2,3"/><text x="6" y="168.0" fill="#64748b" font-size="10">0.0</text>
+<line x1="36" x2="724" y1="100.0" y2="100.0" stroke="#334155" stroke-dasharray="2,3"/><text x="6" y="104.0" fill="#64748b" font-size="10">0.6</text>
+<line x1="36" x2="724" y1="36.0" y2="36.0" stroke="#334155" stroke-dasharray="2,3"/><text x="6" y="40.0" fill="#64748b" font-size="10">1.1</text><path d="M36.0,52.7 L724.0,71.5" stroke="#fbbf24" stroke-width="2" fill="none"/><circle cx="36.0" cy="52.7" r="4" fill="#fbbf24"><title>baseline_training_20260422 · MAE=0.97</title></circle><circle cx="724.0" cy="71.5" r="4" fill="#34d399"><title>baseline_test_20260422 · MAE=0.81</title></circle></svg>
+<h2 style="font-size:14px;color:#fbbf24">전체 run 메트릭</h2><table><tr><th>run_id</th><th>label</th><th>git</th><th>dataset</th><th>n</th><th>MAE</th><th>ΔMAE</th><th>RMSE</th><th>ΔRMSE</th><th>Bias</th><th>MAPE</th><th>MaxAbs</th><th>Over%</th><th>Under%</th></tr>
+<tr class=""><td>20260422_092950__baseline_training_20260422</td><td><span class="label">baseline_training_20260422</span></td><td class="sha">-</td><td>training</td><td>14/14</td><td>0.97</td><td>—</td><td>1.71</td><td>—</td><td>-0.47</td><td>18.05</td><td>5</td><td>10.95</td><td>26.67</td></tr>
+<tr class="alert-warn"><td>20260422_092957__baseline_test_20260422</td><td><span class="label">baseline_test_20260422</span></td><td class="sha">-</td><td>test</td><td>9/9</td><td>0.81</td><td><span class="delta-down">-0.16</span></td><td>1.59</td><td><span class="delta-down">-0.12</span></td><td>-0.58</td><td>15.11</td><td>5</td><td>5.19</td><td>25.19</td></tr></table>
+</body></html>

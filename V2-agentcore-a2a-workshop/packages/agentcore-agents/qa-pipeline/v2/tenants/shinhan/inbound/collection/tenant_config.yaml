@@ -1,0 +1,109 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/inbound/collection 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속.
+# 본 파일은 컬렉션관리부 부서특화 평가 항목 (#901-#904) 만 정의한다.
+
+tenant_id: shinhan_collection
+team_id: collection
+channel: inbound
+department: collection
+domain: debt_collection
+description: >
+  신한카드 컬렉션관리부 인바운드 — 카드 연체 안내 콜 평가 (연체경과일수,
+  결제 원금/수수료/총납부, 거래정지/블랙리스트 등재 여부, 가용한도 안내).
+  채권추심법(제8조의2 정당 절차, 제9조 금지 행위) 준수 영역 포함.
+
+version:
+  schema: "v2.0.0"
+  rubric: "shinhan_collection_v1"
+  golden_set: "shinhan_collection_v1"
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# 부서특화 평가 항목 (site 공통 #1~#18 외 추가 — qa_rules.py 와 정합)
+# ---------------------------------------------------------------------------
+# allowed_steps 는 부서특화 dept items (#901-#904) 만 명시.
+# 공통 #1~#18 은 site (shinhan/tenant_config.yaml) 에서 fallback.
+scoring_policy:
+  allowed_steps:
+    "901": [15, 10, 5, 0]   # 정확한 안내 ★ (연체경과/원금·수수료/총납부/납부기한/결제계좌)
+    "902": [5, 3, 0]        # 필수 안내 이행 (거래정지/블랙리스트/가용한도)
+    "903": [5, 3, 0]        # 불공정 채권추심 금지 [채권추심법 제9조]
+    "904": [5, 3, 0]        # 정당한 채권추심 절차 고지 [채권추심법 제8조의2]
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목
+  force_t3_items: [903, 904]
+
+  # 부서 critical 위반 (즉시 0점 트리거)
+  critical_violations:
+    - id: unfair_collection
+      triggers: ["위협", "공포감", "수치심 유발", "야간 반복연락", "제3자 공개"]
+      impact: ["903"]
+    - id: misinformation_uncorrected
+      triggers: ["허위 안내 미정정", "연체금액 오안내"]
+      impact: ["901"]
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Frontend 노드 매핑 (lib/pipeline.ts SHINHAN_DEPT_NODE_IDS 정합)
+# ---------------------------------------------------------------------------
+dept_evaluation:
+  - node_id: coll_accuracy
+    label: "업무 정확도"
+    score: 20
+    items:
+      - "정확한 안내 (연체경과 / 원금·수수료 / 총납부 / 납부기한 / 결제계좌)"
+      - "필수 안내 이행 (거래정지 / 블랙리스트 / 가용한도)"
+  - node_id: coll_debt_compliance
+    label: "채권추심 법규 준수"
+    score: 10
+    items:
+      - "불공정 채권추심 금지 (위협 / 공포 / 수치심)"
+      - "정당한 채권추심 절차 고지 (사실 / 근거 / 소속 / 민원방법)"
+
+# ---------------------------------------------------------------------------
+# Intent 분류 — 컬렉션 도메인 특화
+# ---------------------------------------------------------------------------
+supported_intents:
+  - 연체상담
+  - 분할납부문의
+  - 한도확인
+  - 거래정지문의
+  - 블랙리스트문의
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 (부서특화 항목만)
+# ---------------------------------------------------------------------------
+segment_strategy:
+  "901": qa_pair_with_rag                       # 정확한 안내: 고객 질문 + 에이전트 답변 + RAG 매뉴얼 대조
+  "902": intent_cross_check                     # 필수 안내: 거래정지/블랙리스트/한도 안내 의무 cross-check
+  "903": refusal_windows + harsh_pattern_scan   # 불공정 추심: 거절/감정 발화 + 위협 패턴 전체 스캔
+  "904": closing_windows                        # 정당 절차: 종료부 + 소속/민원방법 고지 윈도우
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — 부서 매뉴얼 chunk 인덱싱
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["901"]        # #901 정확한 안내 ★ 는 BK RAG 필수
+    fallback_mode: "unevaluable"
+
+# ---------------------------------------------------------------------------
+# 언어 / UI
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

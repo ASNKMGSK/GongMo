@@ -1,0 +1,37 @@
+{
+  "item_number": 18,
+  "item_name": "정보 보호 준수",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_18_shinhan_001",
+      "score": 5,
+      "rationale": "[정보 보호] 카드번호는 뒤 4자리만 / 휴대폰은 끝 4자리만 마스킹 일관성 유지 + 상담사 선발화 없음 → 만점\n - 상담사#1: \"카드번호 뒤 사 자리만 부탁드리겠습니다\" — 마스킹 정책 준수\n - 상담사#3: \"카드번호 뒤 ****자리 확인되었습니다\" — 마스킹 복창\n - 상담사#5: \"등록 휴대폰 번호 끝 사 자리만 추가 확인드릴게요\" — 마스킹 일관",
+      "quote_example": "상담사: 카드번호 뒤 사 자리만 부탁드리겠습니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_18", "full_compliance", "masked_pii"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_18_shinhan_002",
+      "score": 3,
+      "rationale": "[정보 보호] 휴대폰 번호 전체 / 카드번호 안내 요청 시 '카드번호' 단독 표현 → 부분점수 (마스킹 일관성 미흡)\n - 상담사#1: \"등록 휴대폰 번호 부탁드릴게요\" — 휴대폰 번호 전체 안내 유도 (뒤 4자리 한정 명시 없음)\n - 상담사#3: \"카드번호 좀 알려주세요\" — '뒤 4자리' 한정 누락",
+      "quote_example": "상담사: 카드번호 좀 알려주세요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_18", "partial_compliance", "incomplete_masking"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_18_shinhan_003",
+      "score": 0,
+      "rationale": "[정보 보호] 상담사가 카드번호 / 주민번호 / 주소를 선발화 + 마스킹 없이 풀 노출 → 0점 (critical_violations: privacy_leak)\n - 상담사#1: \"고객님 카드번호가 ****-****-****-****이시구요 주민번호는 ******-*******로 등록되어 있으세요\" — 카드번호 / 주민번호 상담사 선발화\n - 상담사#3: \"등록 주소도 서울시 강남구 *** 로 확인됩니다\" — 주소 선발화",
+      "quote_example": "상담사: 고객님 카드번호가 ****-****-****-****이시구요 주민번호는 ******-*******로 등록되어 있으세요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_18", "non_compliance", "pii_leak"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

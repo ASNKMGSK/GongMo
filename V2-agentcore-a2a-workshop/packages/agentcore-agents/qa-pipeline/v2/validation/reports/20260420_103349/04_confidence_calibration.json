@@ -1,0 +1,141 @@
+{
+  "distribution": {
+    "1": 0,
+    "2": 20,
+    "3": 0,
+    "4": 32,
+    "5": 29,
+    "-1": 81
+  },
+  "percent": {
+    "1": 0.0,
+    "2": 12.3,
+    "3": 0.0,
+    "4": 19.8,
+    "5": 17.9,
+    "-1": 50.0
+  },
+  "low_confidence_items": [
+    {
+      "sample_id": "668437_result",
+      "item_number": 4,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668437_result",
+      "item_number": 5,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668437_result",
+      "item_number": 8,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668437_result",
+      "item_number": 9,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668464_result",
+      "item_number": 4,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668464_result",
+      "item_number": 5,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668464_result",
+      "item_number": 8,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668464_result",
+      "item_number": 9,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668481_result",
+      "item_number": 5,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668488_result",
+      "item_number": 5,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668488_result",
+      "item_number": 8,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668507_result",
+      "item_number": 4,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668507_result",
+      "item_number": 9,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668526_result",
+      "item_number": 4,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668526_result",
+      "item_number": 5,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668542_result",
+      "item_number": 5,
+      "score": 3,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668542_result",
+      "item_number": 9,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668605_result",
+      "item_number": 5,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668605_result",
+      "item_number": 8,
+      "score": 5,
+      "confidence_final": 2
+    },
+    {
+      "sample_id": "668605_result",
+      "item_number": 9,
+      "score": 5,
+      "confidence_final": 2
+    }
+  ],
+  "low_confidence_count": 20
+}

@@ -1,0 +1,294 @@
+{
+  "overall": {
+    "n": 210,
+    "MAE": 0.971,
+    "RMSE": 1.707,
+    "Bias": -0.467,
+    "MAPE": 18.05,
+    "MaxAbs": 5,
+    "Over%": 10.95,
+    "Under%": 26.67
+  },
+  "per_item": {
+    "1": {
+      "n": 14,
+      "MAE": 0.0,
+      "RMSE": 0.0,
+      "Bias": 0.0,
+      "MAPE": 0.0,
+      "MaxAbs": 0,
+      "Over%": 0.0,
+      "Under%": 0.0,
+      "item_name": "첫인사",
+      "max_score": 5
+    },
+    "2": {
+      "n": 14,
+      "MAE": 1.286,
+      "RMSE": 1.964,
+      "Bias": -1.286,
+      "MAPE": 25.71,
+      "MaxAbs": 5,
+      "Over%": 0.0,
+      "Under%": 50.0,
+      "item_name": "끝인사",
+      "max_score": 5
+    },
+    "4": {
+      "n": 14,
+      "MAE": 0.929,
+      "RMSE": 1.711,
+      "Bias": 0.643,
+      "MAPE": 18.57,
+      "MaxAbs": 5,
+      "Over%": 28.57,
+      "Under%": 7.14,
+      "item_name": "호응 및 공감",
+      "max_score": 5
+    },
+    "5": {
+      "n": 14,
+      "MAE": 1.5,
+      "RMSE": 1.793,
+      "Bias": -0.5,
+      "MAPE": 30.0,
+      "MaxAbs": 3,
+      "Over%": 21.43,
+      "Under%": 50.0,
+      "item_name": "대기 멘트",
+      "max_score": 5
+    },
+    "6": {
+      "n": 14,
+      "MAE": 1.143,
+      "RMSE": 1.512,
+      "Bias": -0.857,
+      "MAPE": 22.86,
+      "MaxAbs": 2,
+      "Over%": 7.14,
+      "Under%": 50.0,
+      "item_name": "정중한 표현",
+      "max_score": 5
+    },
+    "7": {
+      "n": 14,
+      "MAE": 1.071,
+      "RMSE": 1.793,
+      "Bias": 1.071,
+      "MAPE": 21.43,
+      "MaxAbs": 5,
+      "Over%": 42.86,
+      "Under%": 0.0,
+      "item_name": "쿠션어 활용",
+      "max_score": 5
+    },
+    "8": {
+      "n": 14,
+      "MAE": 2.929,
+      "RMSE": 3.596,
+      "Bias": -2.643,
+      "MAPE": 58.57,
+      "MaxAbs": 5,
+      "Over%": 7.14,
+      "Under%": 64.29,
+      "item_name": "문의 파악 및 재확인(복창)",
+      "max_score": 5
+    },
+    "9": {
+      "n": 14,
+      "MAE": 0.571,
+      "RMSE": 1.069,
+      "Bias": -0.571,
+      "MAPE": 11.43,
+      "MaxAbs": 2,
+      "Over%": 0.0,
+      "Under%": 28.57,
+      "item_name": "고객정보 확인",
+      "max_score": 5
+    },
+    "10": {
+      "n": 14,
+      "MAE": 2.071,
+      "RMSE": 2.632,
+      "Bias": -2.071,
+      "MAPE": 20.71,
+      "MaxAbs": 5,
+      "Over%": 0.0,
+      "Under%": 64.29,
+      "item_name": "설명의 명확성",
+      "max_score": 10
+    },
+    "11": {
+      "n": 14,
+      "MAE": 1.357,
+      "RMSE": 1.946,
+      "Bias": -1.357,
+      "MAPE": 27.14,
+      "MaxAbs": 5,
+      "Over%": 0.0,
+      "Under%": 57.14,
+      "item_name": "두괄식 답변",
+      "max_score": 5
+    },
+    "12": {
+      "n": 14,
+      "MAE": 0.857,
+      "RMSE": 1.309,
+      "Bias": 0.571,
+      "MAPE": 17.14,
+      "MaxAbs": 2,
+      "Over%": 35.71,
+      "Under%": 7.14,
+      "item_name": "문제 해결 의지",
+      "max_score": 5
+    },
+    "13": {
+      "n": 14,
+      "MAE": 0.286,
+      "RMSE": 0.756,
+      "Bias": 0.0,
+      "MAPE": 5.71,
+      "MaxAbs": 2,
+      "Over%": 7.14,
+      "Under%": 7.14,
+      "item_name": "부연 설명 및 추가 안내",
+      "max_score": 5
+    },
+    "14": {
+      "n": 14,
+      "MAE": 0.429,
+      "RMSE": 0.926,
+      "Bias": 0.143,
+      "MAPE": 8.57,
+      "MaxAbs": 2,
+      "Over%": 14.29,
+      "Under%": 7.14,
+      "item_name": "사후 안내",
+      "max_score": 5
+    },
+    "17": {
+      "n": 14,
+      "MAE": 0.143,
+      "RMSE": 0.535,
+      "Bias": -0.143,
+      "MAPE": 2.86,
+      "MaxAbs": 2,
+      "Over%": 0.0,
+      "Under%": 7.14,
+      "item_name": "정보 확인 절차",
+      "max_score": 5
+    },
+    "18": {
+      "n": 14,
+      "MAE": 0.0,
+      "RMSE": 0.0,
+      "Bias": 0.0,
+      "MAPE": 0.0,
+      "MaxAbs": 0,
+      "Over%": 0.0,
+      "Under%": 0.0,
+      "item_name": "정보 보호 준수",
+      "max_score": 5
+    }
+  },
+  "per_sample": {
+    "668437": {
+      "ai_total": 66,
+      "human_total": 68,
+      "max_total": 80,
+      "diff": -2,
+      "n_items": 15
+    },
+    "668451": {
+      "ai_total": 71,
+      "human_total": 72,
+      "max_total": 80,
+      "diff": -1,
+      "n_items": 15
+    },
+    "668464": {
+      "ai_total": 62,
+      "human_total": 69,
+      "max_total": 80,
+      "diff": -7,
+      "n_items": 15
+    },
+    "668481": {
+      "ai_total": 54,
+      "human_total": 69,
+      "max_total": 80,
+      "diff": -15,
+      "n_items": 15
+    },
+    "668488": {
+      "ai_total": 69,
+      "human_total": 78,
+      "max_total": 80,
+      "diff": -9,
+      "n_items": 15
+    },
+    "668507": {
+      "ai_total": 68,
+      "human_total": 76,
+      "max_total": 80,
+      "diff": -8,
+      "n_items": 15
+    },
+    "668526": {
+      "ai_total": 62,
+      "human_total": 76,
+      "max_total": 80,
+      "diff": -14,
+      "n_items": 15
+    },
+    "668542": {
+      "ai_total": 59,
+      "human_total": 69,
+      "max_total": 80,
+      "diff": -10,
+      "n_items": 15
+    },
+    "668605": {
+      "ai_total": 68,
+      "human_total": 80,
+      "max_total": 80,
+      "diff": -12,
+      "n_items": 15
+    },
+    "668610": {
+      "ai_total": 70,
+      "human_total": 71,
+      "max_total": 80,
+      "diff": -1,
+      "n_items": 15
+    },
+    "668675": {
+      "ai_total": 61,
+      "human_total": 63,
+      "max_total": 80,
+      "diff": -2,
+      "n_items": 15
+    },
+    "668697": {
+      "ai_total": 58,
+      "human_total": 65,
+      "max_total": 80,
+      "diff": -7,
+      "n_items": 15
+    },
+    "668736": {
+      "ai_total": 71,
+      "human_total": 67,
+      "max_total": 80,
+      "diff": 4,
+      "n_items": 15
+    },
+    "668771": {
+      "ai_total": 62,
+      "human_total": 76,
+      "max_total": 80,
+      "diff": -14,
+      "n_items": 15
+    }
+  }
+}

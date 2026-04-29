@@ -1,0 +1,43 @@
+{
+  "item_number": 16,
+  "item_name": "필수 안내사항 이행 (아웃바운드)",
+  "category": "업무 정확도",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["프로모션안내", "만기안내", "재예약유도", "회원갱신"],
+  "dialog_stages": ["intro", "main"],
+  "version": "kolon_outbound_telesales_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "intent_script_crosscheck",
+    "details": "아웃바운드 필수 고지 (영업 목적 / 녹취 / 개인정보 수집 동의 / 마케팅 활용 동의) cross-check. intent_to_script.yaml 참조.",
+    "script_registry": "../mandatory_scripts/intent_to_script.yaml"
+  },
+  "examples": [
+    {
+      "example_id": "GS-16-TS-FULL-001",
+      "item_number": 16,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "프로모션안내",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 네 고객님 본격적인 안내 드리기 전에 한 가지 먼저 말씀드리면요 이 통화는 프로모션 영업 목적으로 진행되고 있고요 서비스 품질 향상을 위해 녹음되고 있다는 점 안내드립니다 혹시 괜찮으실까요\n고객: 네 괜찮아요",
+      "rationale": "[필수 안내사항] 영업 목적 + 녹취 고지 2요소 모두 이행 + 동의 확인 → 만점\n - 영업 목적 명시: \"프로모션 영업 목적\"\n - 녹취 고지: \"녹음되고 있다는 점\"\n - 진행 동의 확인 회답 수신",
+      "rationale_tags": ["item_16", "full_compliance", "purpose_disclosed", "recording_disclosed", "consent_obtained", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 5}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_031","variant":"full_disclosure","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-16-TS-ZERO-001",
+      "item_number": 16,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "회원갱신",
+      "dialog_stage": "intro",
+      "segment_text": "상담사: 안녕하세요 홍길동 고객님 멤버십 갱신 안내드리려고 전화드렸어요\n고객: 네 말씀하세요\n상담사: 이번에 혜택이 엄청 좋으니까 꼭 갱신하시는 게 좋을 것 같아요",
+      "rationale": "[필수 안내사항] 영업 목적 고지 생략 + 녹취 고지 생략 → 0점\n - 통화녹음/품질관리 녹취 고지 전무\n - 영업/마케팅 목적 명시 없음\n - 통신판매업 규정 위반 소지",
+      "rationale_tags": ["item_16", "missing_recording_notice", "missing_purpose_notice", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 1}, {"speaker": "상담사", "turn_id": 5}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_032","variant":"no_disclosure","human_score_verified":false}
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "item_number": 5,
+  "item_name": "대기 멘트",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "대기 전 양해 + 대기 후 감사 2요소 모두 이행",
+      "quote_example": "잠시 확인 후 말씀드리겠습니다 기다려주셔서 감사합니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_hold_procedure"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "사전 안내만 있고 사후 감사 누락 3점",
+      "quote_example": "잠시만 기다려주세요 ... 네 확인했습니다",
+      "evaluator_id": "senior_b",
+      "tags": ["missing_post_hold"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "대기 상황에서 사전/사후 안내 전무",
+      "quote_example": "(대기 마커만, 멘트 없음)",
+      "evaluator_id": "senior_c",
+      "tags": ["no_hold_notice"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 5,
+      "rationale": "대기 상황 자체가 없는 상담 — skipped 만점",
+      "quote_example": "(대기 상황 없음)",
+      "evaluator_id": "senior_a",
+      "tags": ["skipped"],
+      "stub_seed": true
+    }
+  ]
+}

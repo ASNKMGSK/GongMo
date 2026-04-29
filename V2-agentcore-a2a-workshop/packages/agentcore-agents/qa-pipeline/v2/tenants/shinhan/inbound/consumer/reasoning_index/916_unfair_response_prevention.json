@@ -1,0 +1,37 @@
+{
+  "item_number": 916,
+  "item_name": "부당 응대·2차 가해 방지",
+  "version": "shinhan_consumer_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_916_synthetic_cons_031",
+      "score": 5,
+      "rationale": "[부당 응대 방지 · 만점] 강압적 발화 전무 + 본인 의사 존중 멘트 + 휴식/매니저 연결 옵션 제공 + 녹취 사본 권리 안내 (소비자보호기준 4요소). 욕설 직전의 고객을 안정시키며 진행 옵션 명확.\n - 상담사#2: \"본인 의사 무시되거나 강요받는 일 절대 없으시고요 어떤 표현을 하셔도 양해드리고 있겠습니다\"\n - 상담사#4: \"잠시 휴식 후 재연결도 가능하시고요 또는 본부 소비자보호 매니저 직접 연결도 도와드릴 수 있습니다\"\n - 상담사#6: \"본인 권리에 따라 녹취 사본 요청도 가능하십니다\"",
+      "quote_example": "상담사: 본인 의사 무시되거나 강요받는 일 절대 없으시고요 어떤 표현을 하셔도 양해드리고 있겠습니다",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_916", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_031"
+    },
+    {
+      "record_id": "r_916_synthetic_cons_032",
+      "score": 3,
+      "rationale": "[부당 응대 방지 · 부분점수 3점] 직접적 모욕/강요 발화는 없으나 \"진정하시고요\" 가벼운 압박, 매니저 연결 거부(\"보통 처리가 어렵고요\") + \"저랑 빠를 거예요\" 자가 대체 유도. 본인 권리 안내 부족.\n - 상담사#2: \"네 그러시면 일단 좀 진정하시고요\"\n - 상담사#4: \"알겠습니다 그래도 통화는 진행해야 하니까요\"\n - 상담사#6: \"그건 보통 처리가 어렵고요 일단 저랑 진행하시는 게 빠를 거예요\"",
+      "quote_example": "상담사: 그건 보통 처리가 어렵고요 일단 저랑 진행하시는 게 빠를 거예요",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_916", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_032"
+    },
+    {
+      "record_id": "r_916_synthetic_cons_033",
+      "score": 0,
+      "rationale": "[부당 응대 방지 · 0점] critical_violation. 비하(\"본인이 골라서\") + 책임 전가 + 모욕(\"이상하게 들리시는 거\" / \"본인이 잘못 이해\") + 비교 압박(\"다른 분들은 이렇게까지 화 안 내시거든요\"). 소비자보호기준 명백 위반 — 2차 가해.\n - 상담사#2: \"누가 이중 결제 할 만한 가맹점에서 결제하라고 했나요 본인이 골라서 결제하신 거잖아요\"\n - 상담사#4: \"지금 흥분하셔서 말씀하시는 게 다 이상하게 들리시는 거고요\"\n - 상담사#6: \"본인이 잘못 이해하시는 거 아닐까요 다른 분들은 이렇게까지 화 안 내시거든요\"",
+      "quote_example": "상담사: 본인이 잘못 이해하시는 거 아닐까요 다른 분들은 이렇게까지 화 안 내시거든요",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_916", "zero_compliance", "critical_violation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_033"
+    }
+  ]
+}

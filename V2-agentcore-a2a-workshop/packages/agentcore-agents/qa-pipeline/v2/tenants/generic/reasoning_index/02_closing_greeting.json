@@ -1,0 +1,43 @@
+{
+  "item_number": 2,
+  "item_name": "끝인사",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "추가 문의 확인 + 인사말 + 상담사명 3요소 모두 포함, 만점",
+      "quote_example": "더 궁금하신 점 있으신가요 감사합니다 상담사 김○○ 이었습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_compliance", "closing"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "iter03_clean 2요소 완화 — 추가 문의 확인 + 인사말 포함, 상담사명 누락 3점",
+      "quote_example": "더 궁금한 점 없으시면 감사합니다",
+      "evaluator_id": "senior_b",
+      "tags": ["missing_name", "closing_relaxed"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "인사말 + 상담사명 있으나 추가 문의 확인 절차 누락",
+      "quote_example": "감사합니다 상담사 박○○ 이었습니다",
+      "evaluator_id": "senior_c",
+      "tags": ["missing_inquiry_check", "closing"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "끝인사 자체 미진행 — 통화 즉시 종료",
+      "quote_example": "네 알겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["no_closing"],
+      "stub_seed": true
+    }
+  ]
+}

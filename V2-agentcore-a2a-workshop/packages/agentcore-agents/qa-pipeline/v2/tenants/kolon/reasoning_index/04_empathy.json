@@ -1,0 +1,203 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "version": "kolon_v4_fixed",
+  "reasoning_records": [
+    {
+      "record_id": "r_04_668437",
+      "score": 5,
+      "rationale": "[공감] 공감/호응 표현 1회 확인 → 만점\n - 상담사#11: \"네\"\n - 상담사#13: \"예\"\n - 상담사#61: \"예\"",
+      "quote_example": "상담사: 네",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668437"
+    },
+    {
+      "record_id": "r_04_668451",
+      "score": 5,
+      "rationale": "[공감] 다양한 공감 표현 1회 확인 → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"안녕하세요\"\n - 상담사#5: \"\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668451"
+    },
+    {
+      "record_id": "r_04_668464",
+      "score": 5,
+      "rationale": "[공감] 공감/호응 표현 1회 확인 → 만점\n - 상담사#3: \"네\"\n - 상담사#7: \"네\"\n - 상담사#19: \"네\"",
+      "quote_example": "상담사: 네",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668464"
+    },
+    {
+      "record_id": "r_04_668481",
+      "score": 5,
+      "rationale": "[공감] 공감/호응 표현 3회 확인 → 만점\n - 상담사#15: \"고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\"\n - 상담사#22: \"이게 불편드린 점\"\n - 상담사#24: \"불편드린 점은 죄송합니다 고객님 어제 주문을 해주셨구요 저희가 현재 재고 확인 중에 있습니다 고객님 조금 빠르게\"",
+      "quote_example": "상담사: 고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668481"
+    },
+    {
+      "record_id": "r_04_668488",
+      "score": 5,
+      "rationale": "[공감] 다양한 공감 표현 1회 확인 → 만점\n - 고객#38: \"신청상이 아 예 그래서 이걸로 교환이 될지\"\n - 상담사#39: \"네 음 신상이 좀 심하다 보니깐 상품에 문제가 있다라는 느낌이신 거죠\"\n - 고객#40: \"예 제가 봤을 때는 그렇게 느껴지거든요 예\"\n - 고객#44: \"네네\"",
+      "quote_example": "고객: 신청상이 아 예 그래서 이걸로 교환이 될지",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668488"
+    },
+    {
+      "record_id": "r_04_668507",
+      "score": 5,
+      "rationale": "[공감] 다양한 공감 표현 1회 확인 → 만점\n - 상담사#1: \"나 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 안녕하십니까\"\n - 상담사#5: \"네\"",
+      "quote_example": "상담사: 나 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668507"
+    },
+    {
+      "record_id": "r_04_668526",
+      "score": 5,
+      "rationale": "[공감] 공감/호응 표현 1회 확인 → 만점\n - 상담사#5: \"네\"\n - 상담사#19: \"네\"\n - 상담사#27: \"네\"",
+      "quote_example": "상담사: 네",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668526"
+    },
+    {
+      "record_id": "r_04_668542",
+      "score": 3,
+      "rationale": "[공감] 단순 \"네\" 위주, full 공감 0회 → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 고객님 전화 연결되었습니다\"\n - 상담사#5: \"네\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668542"
+    },
+    {
+      "record_id": "r_04_668605",
+      "score": 5,
+      "rationale": "[공감] 고객 상황 맞춤 응대 확인 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"예 소중한 정보 확인 감사합니다 *** 고객님 본인 맞으실까요\"\n - 상담사#11: \"잠시만요 며칠 날 주문하신 어떤 제품에 대해서 문의하시는 건가요\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668605"
+    },
+    {
+      "record_id": "r_04_668610",
+      "score": 5,
+      "rationale": "[공감] 고객 상황 맞춤 응대 확인 → 만점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\"\n - 상담사#11: \"네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668610"
+    },
+    {
+      "record_id": "r_04_668675",
+      "score": 0,
+      "rationale": "[공감] 공감 표현 전무, 감정 호소에 건조한 응답 → 0점\n - 고객#6: \"버클이 쫌 이게 집이 보여서 밑에 집 보여가지고 그래서 연락드렸어요\"\n - 상담사#7: \"아 그러세요 고객님 일단 불편하게 해드려서 정말 죄송합니다\"\n - 고객#8: \"네네\"",
+      "quote_example": "고객: 버클이 쫌 이게 집이 보여서 밑에 집 보여가지고 그래서 연락드렸어요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "zero_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668675"
+    },
+    {
+      "record_id": "r_04_668697",
+      "score": 3,
+      "rationale": "[공감] 단순 \"네\" 위주, full 공감 1회 → 3점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\"\n - 상담사#3: \"네\"\n - 상담사#5: \"아\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668697"
+    },
+    {
+      "record_id": "r_04_668736",
+      "score": 3,
+      "rationale": "[공감] 단순 \"네\" 위주, full 공감 0회 → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"네 감사합니다 예 예\"\n - 상담사#5: \"네\"",
+      "quote_example": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668736"
+    },
+    {
+      "record_id": "r_04_668771",
+      "score": 5,
+      "rationale": "[공감] 다양한 공감 표현 1회 확인 → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\"\n - 상담사#3: \"반품 신청하셨어요 고객님\"\n - 상담사#5: \"네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"",
+      "quote_example": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요",
+      "evaluator_id": "kolon_v4_senior",
+      "tags": [
+        "item_4",
+        "full_compliance",
+        "aggregated"
+      ],
+      "stub_seed": false,
+      "sample_id": "668771"
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "item_number": 5,
+  "item_name": "대기 멘트",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "한도조정",
+    "청구문의",
+    "카드심사",
+    "결제일변경",
+    "연체상담",
+    "부가서비스"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-05-FULL-shinhan-001",
+      "item_number": 5,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "한도조정",
+      "segment_text": "고객: 한도 좀 확인해주세요\n상담사: 네 가용한도 확인 도와드리겠습니다 시스템 조회가 필요해서 잠시만 기다려 주시겠어요 고객님\n고객: 네\n상담사: (잠시 후) 네 오래 기다리셨습니다 고객님 현재 총 한도 삼백만원에 이용 잔액 백이십만원 확인되시구요 가용한도는 백팔십만원입니다",
+      "rationale": "[대기] 사전 양해 + 사후 인사 양쪽 모두 충족 → 만점\n - 상담사#2: \"네 가용한도 확인 도와드리겠습니다 시스템 조회가 필요해서 잠시만 기다려 주시겠어요 고객님\"\n - 상담사#4: \"네 오래 기다리셨습니다 고객님 현재 총 한도 삼백만원에 이용 잔액 백이십만원 확인되시구요\"",
+      "rationale_tags": ["item_5", "full_compliance", "pre_post_notice"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-PARTIAL-shinhan-002",
+      "item_number": 5,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "청구문의",
+      "segment_text": "고객: 사월 청구 내역 확인 좀\n상담사: 네 잠시만요\n고객: 네\n상담사: (잠시 후) 사월 청구 내역 확인되었습니다 총액 이백사십삼만원이시구요",
+      "rationale": "[대기] 사전 양해는 짧게 있으나 (\"잠시만요\") 사후 인사 누락 → 부분점수\n - 상담사#2: \"네 잠시만요\" — 사전 양해는 있음\n - 상담사#4: \"사월 청구 내역 확인되었습니다 총액 이백사십삼만원이시구요\" — 사후 인사 부재",
+      "rationale_tags": ["item_5", "partial_compliance", "missing_post_notice"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-05-ZERO-shinhan-003",
+      "item_number": 5,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "카드심사",
+      "segment_text": "고객: 카드 신청한 거 결과 좀 확인해주세요\n상담사: ...\n고객: 여보세요\n상담사: 네 신청 건 보면 거절되셨네요\n고객: 거절요 왜요",
+      "rationale": "[대기] 사전 양해 / 사후 인사 모두 부재 + 무응답 침묵 → 0점\n - 상담사#2: 무응답 (대기 마커 없음)\n - 상담사#4: \"네 신청 건 보면 거절되셨네요\" — 사후 인사 / 양해 부재",
+      "rationale_tags": ["item_5", "non_compliance", "silence"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

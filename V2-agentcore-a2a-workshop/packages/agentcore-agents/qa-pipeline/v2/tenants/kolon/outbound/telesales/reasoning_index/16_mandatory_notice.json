@@ -1,0 +1,28 @@
+{
+  "item_number": 16,
+  "item_name": "필수 안내사항 이행 (아웃바운드)",
+  "version": "kolon_outbound_telesales_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 아웃바운드 필수 고지. 통신판매업·개인정보보호법 준수 증명이 핵심.",
+  "reasoning_records": [
+    {
+      "record_id": "r_16_ts_sample_031",
+      "score": 5,
+      "rationale": "영업 목적 명시와 녹취 고지가 본론 진입 전에 모두 이행. 마지막에 \"괜찮으실까요\" 동의 회답까지 확보하여 향후 분쟁 시 증빙 가능. 통신판매 규정 준수 모범.",
+      "quote_example": "상담사: 이 통화는 프로모션 영업 목적으로 진행되고 있고요 서비스 품질 향상을 위해 녹음되고 있다는 점 안내드립니다 혹시 괜찮으실까요",
+      "evaluator_id": "kolon_telesales_senior_synthetic",
+      "tags": ["item_16", "full_compliance", "purpose_disclosed", "recording_disclosed", "consent_obtained", "telesales"],
+      "stub_seed": false,
+      "sample_id": "ts_sample_031"
+    },
+    {
+      "record_id": "r_16_ts_sample_032",
+      "score": 0,
+      "rationale": "영업 목적·녹취 고지 모두 생략한 채 본론 진행. 통신판매업 시행령상 본인확인 후 본론 진입 전 고지 의무가 있음에도 미이행. 규정 위반으로 0점이 원칙.",
+      "quote_example": "상담사: 이번에 혜택이 엄청 좋으니까 꼭 갱신하시는 게 좋을 것 같아요",
+      "evaluator_id": "kolon_telesales_senior_synthetic",
+      "tags": ["item_16", "missing_recording_notice", "missing_purpose_notice", "regulation_violation", "telesales"],
+      "stub_seed": false,
+      "sample_id": "ts_sample_032"
+    }
+  ]
+}

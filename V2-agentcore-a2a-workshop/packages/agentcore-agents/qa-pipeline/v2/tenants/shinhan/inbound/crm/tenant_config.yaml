@@ -1,0 +1,30 @@
+﻿# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/inbound/crm 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속
+
+tenant_id: shinhan
+team_id: crm
+channel: inbound
+department: crm
+description: >
+  CRM부 — TM 신규 상품, outbound 안내, cooling-off 고지
+
+version:
+  schema: "v2.0.0"
+  last_updated: "2026-04-28"
+
+dept_evaluation:
+  - node_id: crm_accuracy
+    label: "업무 정확도"
+    score: 20
+    items:
+      - "정확한 안내 (상품 혜택 / 수수료 / 부가서비스)"
+      - "필수 안내 이행 (가입 절차 / 해지 방법)"
+  - node_id: crm_tm_compliance
+    label: "TM 법규 준수"
+    score: 10
+    items:
+      - "녹취 동의 / 모집인 신원 고지"
+      - "청약철회권 / cooling-off 안내"

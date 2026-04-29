@@ -1,0 +1,80 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "연체상담",
+    "민원",
+    "카드심사",
+    "분실신고",
+    "한도조정",
+    "청구문의"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-04-FULL-shinhan-001",
+      "item_number": 4,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "민원",
+      "segment_text": "고객: 아니 그러니까 제가 카드를 분실했다고 신고했는데 그 사이에 부정 사용이 됐다고요 너무 당황스러워요\n상담사: 아 네 고객님 정말 많이 놀라셨겠어요 분실 신고 후에 부정 사용 발생하신 점 진심으로 죄송합니다\n고객: 어떻게 해야 되는 거예요 이거\n상담사: 너무 걱정 마시구요 부정 사용 건은 부정사용 대응팀에서 조사 후 보상 처리 도와드릴 수 있도록 제가 안내해드리겠습니다\n고객: 네\n상담사: 불편 끼쳐드려서 정말 죄송합니다 신한카드 측에서 책임지고 처리해드릴 테니 안심하셔도 됩니다",
+      "rationale": "[공감] 고객 감정 인정 + 사과 + 안심 멘트 3요소 충족 → 만점\n - 상담사#2: \"아 네 고객님 정말 많이 놀라셨겠어요 분실 신고 후에 부정 사용 발생하신 점 진심으로 죄송합니다\"\n - 상담사#6: \"불편 끼쳐드려서 정말 죄송합니다 신한카드 측에서 책임지고 처리해드릴 테니 안심하셔도 됩니다\"",
+      "rationale_tags": ["item_4", "full_compliance", "empathy_apology"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-04-PARTIAL-shinhan-002",
+      "item_number": 4,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "연체상담",
+      "segment_text": "고객: 제가 이번 달에 좀 사정이 어려워서요 결제일을 좀 미루고 싶은데\n상담사: 네 그러시군요 결제 유예 가능한지 확인해드릴게요\n고객: 부탁드려요 정말 힘들어서요\n상담사: 네 한번 보겠습니다 잠시만 기다려 주세요",
+      "rationale": "[공감] '그러시군요' 단순 호응만 있고 깊은 감정 인정 / 사과 부재 → 부분점수\n - 상담사#2: \"네 그러시군요 결제 유예 가능한지 확인해드릴게요\" — 형식적 호응",
+      "rationale_tags": ["item_4", "partial_compliance", "shallow_response"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-04-ZERO-shinhan-003",
+      "item_number": 4,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "민원",
+      "segment_text": "고객: 아니 이거 너무 부당한 거 아니에요 제가 신청한 적도 없는데 자동가입 됐다고요\n상담사: 그건 약관에 다 나와있어요 가입하실 때 동의하신 부분이에요\n고객: 동의한 적 없어요\n상담사: 시스템상으로는 동의하신 걸로 되어 있습니다",
+      "rationale": "[공감] 고객 감정 무시 + 약관 책임 전가 + 단정적 태도 → 0점\n - 상담사#2: \"그건 약관에 다 나와있어요 가입하실 때 동의하신 부분이에요\" — 공감 없는 책임 전가\n - 상담사#4: \"시스템상으로는 동의하신 걸로 되어 있습니다\" — 사과 / 양해 부재",
+      "rationale_tags": ["item_4", "non_compliance", "no_empathy"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

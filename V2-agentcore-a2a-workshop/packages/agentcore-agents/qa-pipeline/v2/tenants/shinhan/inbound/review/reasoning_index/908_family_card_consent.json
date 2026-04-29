@@ -1,0 +1,37 @@
+{
+  "item_number": 908,
+  "item_name": "가족카드·배우자 기준 동의 확인",
+  "version": "shinhan_review_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_908_synthetic_rev_031",
+      "score": 5,
+      "rationale": "[가족카드 동의 · 만점] 여신금융 감독규정 제15조 명시 + 배우자 본인 명시적 동의 절차 수행. 한도 공유 / 책임 범위 / 분실 신고 의무 4요소 직접 안내 후 본인 동의 확보.\n - 상담사#4: \"가족카드는 여신금융 감독규정 제15조에 따라 본인 한도 내에서 가족 사용분이 함께 차감되시고요 그래서 배우자 본인의 명시적 동의가 반드시 필요합니다\"\n - 상담사#8: \"가족카드 약관 / 한도 공유 / 책임 범위 / 분실 시 본인 책임 사항 직접 안내드리고 동의 받겠습니다\"\n - 상담사#10: \"가족카드 한도는 주카드 한도 내에서 공유됨 / 분실 시 본인이 즉시 신고 의무 있음 동의하시는 거 맞으실까요\"",
+      "quote_example": "상담사: 가족카드는 여신금융 감독규정 제15조에 따라 본인 한도 내에서 가족 사용분이 함께 차감되시고요 그래서 배우자 본인의 명시적 동의가 반드시 필요합니다",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_908", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_031"
+    },
+    {
+      "record_id": "r_908_synthetic_rev_032",
+      "score": 3,
+      "rationale": "[가족카드 동의 · 부분점수 3점] 한도 공유 / 분실 신고 일부 안내. 그러나 배우자 본인 직접 동의 절차 미수행 (주카드 회원이 대신 동의), 여신금융 감독규정 근거 미언급. 약관 사후 송부 (사전 안내 부족).\n - 상담사#2: \"배우자분 성함과 생년월일 부탁드립니다\"\n - 상담사#4: \"한도는 본인 한도 내에서 같이 사용하시는 형태이세요\"\n - 상담사#6: \"약관은 추후 카드랑 같이 책자로 보내드릴 거예요 분실 시에는 본인이 신고 부탁드리겠습니다\"",
+      "quote_example": "상담사: 한도는 본인 한도 내에서 같이 사용하시는 형태이세요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_908", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_032"
+    },
+    {
+      "record_id": "r_908_synthetic_rev_033",
+      "score": 0,
+      "rationale": "[가족카드 동의 · 0점] critical_violation. 여신금융 감독규정 제15조 위반 — 배우자 본인 직접 동의 절차 완전 누락. 주카드 회원의 대리 동의로 처리 진행. 책임 범위 / 분실 의무 사전 안내 부재.\n - 상담사#2: \"본인 정보로 신청 처리해드리겠습니다\"\n - 상담사#4: \"본인 가족이시니까 따로 확인 안 받으셔도 처리됩니다\"\n - 상담사#8: \"그건 분실되면 그때 다시 안내드릴게요\"",
+      "quote_example": "상담사: 본인 가족이시니까 따로 확인 안 받으셔도 처리됩니다",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_908", "zero_compliance", "critical_violation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_033"
+    }
+  ]
+}

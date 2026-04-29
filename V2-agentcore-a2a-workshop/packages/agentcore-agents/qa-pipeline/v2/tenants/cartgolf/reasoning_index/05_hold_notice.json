@@ -1,0 +1,52 @@
+{
+  "item_number": 5,
+  "item_name": "대기 멘트",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "판매페이지 확인 전 사전 양해 멘트 + 대기 후 감사 멘트 2요소 모두 포함 만점",
+      "quote_example": "상담사: 잠시만 기다려 주세요 고객님 / (확인 후) 기다려 주셔서 감사합니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_hold_notice", "bookend"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "코오롱스포츠 재킷 주문서 조회 대기 중 사전/사후 양해 멘트 완전",
+      "quote_example": "상담사: 주문 내역 잠시만 확인해 보겠습니다 / 기다려 주셔서 감사합니다",
+      "evaluator_id": "senior_b",
+      "tags": ["full_hold_notice", "order_lookup"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "사전 양해 멘트는 있으나 대기 종료 후 감사 멘트 누락 3점",
+      "quote_example": "상담사: 잠시만요 (이후 복귀 시 곧바로 안내 시작)",
+      "evaluator_id": "senior_c",
+      "tags": ["missing_resume_thanks"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "무통보 무음 대기 후 재개 시 감사 멘트만 있음 3점",
+      "quote_example": "상담사: (무음 15초) 기다려 주셔서 감사합니다",
+      "evaluator_id": "senior_a",
+      "tags": ["missing_pre_notice"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "3초 이상 대기 발생했으나 사전/사후 양해 멘트 모두 누락 0점",
+      "quote_example": "상담사: (무음 10초 후 바로 본론)",
+      "evaluator_id": "senior_b",
+      "tags": ["no_hold_notice", "silent_hold"],
+      "stub_seed": true
+    }
+  ]
+}

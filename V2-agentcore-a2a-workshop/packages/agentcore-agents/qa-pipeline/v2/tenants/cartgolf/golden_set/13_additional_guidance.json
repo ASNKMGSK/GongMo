@@ -1,0 +1,51 @@
+{
+  "item_number": 13,
+  "item_name": "부연 설명 및 추가 안내",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "examples": [
+    {
+      "example_id": "GS-13-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 교환 접수 완료되셨고요. 추가로 말씀드리면, 자사 상품이라 1회 무상 교환 가능하시고, 수령 후 동일 문제 있으시면 반품 전환도 가능합니다. 반송장은 꼭 보관 부탁드리겠습니다.",
+      "rationale": "핵심 답변 + 자사 무상 교환 정책 + 반품 전환 대안 + 반송장 보관 3종 선제 안내.",
+      "rationale_tags": ["선제 부연 안내"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-13-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "주문배송",
+      "segment_text": "상담사: 주문 건 두 개 합포장 반송 가능하시고요. 한 건은 교환비 무료, 한 건은 반품비 5천원 차감 환불됩니다. 카톡 알림톡으로 결제 링크 발송 예정이에요.",
+      "rationale": "합포장 가능 + 비용 구분 + 알림톡 안내 — 3종 선제 부연.",
+      "rationale_tags": ["선제 부연 안내"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 교환 접수 완료되셨습니다.",
+      "rationale": "핵심 답변만. 부연 설명/추가 안내 없음.",
+      "rationale_tags": ["부연 없음"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-13-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "상품문의",
+      "segment_text": "상담사: 뭐 그 정도입니다. 더 자세한 건 홈페이지요.",
+      "rationale": "답변 자체가 회피성. 부연 설명 거부.",
+      "rationale_tags": ["설명 거부"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

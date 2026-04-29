@@ -1,0 +1,62 @@
+{
+  "item_number": 9,
+  "item_name": "고객 정보 확인",
+  "category": "니즈 파악",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["환불취소", "변경해지", "주문배송", "결제문의", "본인확인"],
+  "version": "kolon_v1",
+  "notes": "force_t3 항목. 성함 + 연락처 2요소 본인확인 선행. 주문번호는 고객 발화 후 확인.",
+  "examples": [
+    {
+      "example_id": "GS-09-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 교환 관련으로 많이 궁금하실 텐데요, 고객님 성함과 연락처 차례로 말씀 부탁드리겠습니다. 고객: (응답). 상담사: 네 본인 맞으십니까?",
+      "rationale": "성함 + 연락처 2요소 요청 + 본인확인 선행. 상담사가 정보를 먼저 발화하지 않음.",
+      "rationale_tags": ["2요소 본인확인"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-09-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "변경해지",
+      "segment_text": "상담사: 주문 정보 변경을 위해 성함과 등록된 연락처 말씀해 주시겠어요? 고객: (응답). 상담사: 소중한 정보 확인 감사드립니다.",
+      "rationale": "2요소 본인확인 + 확인 완료 멘트.",
+      "rationale_tags": ["2요소 본인확인"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-09-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 성함만 말씀해 주시겠어요?",
+      "rationale": "성함만 확인, 연락처 누락.",
+      "rationale_tags": ["일부 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-09-PARTIAL-02",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "상담사: 주문번호 말씀해 주세요.",
+      "rationale": "주문번호만 요청, 성함/연락처 본인확인 누락. 본인확인 절차 불완전.",
+      "rationale_tags": ["본인확인 약함"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-09-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "변경해지",
+      "segment_text": "상담사: 이수연 고객님 맞으시죠?",
+      "rationale": "상담사가 성함을 먼저 발화 — preemptive disclosure. 본인확인 절차 위반.",
+      "rationale_tags": ["선제 공개"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

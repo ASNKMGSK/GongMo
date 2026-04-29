@@ -1,0 +1,114 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/outbound/crm 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속.
+# 본 파일은 CRM부 (TM 아웃바운드) 부서특화 평가 항목 (#909-#912) 만 정의한다.
+
+tenant_id: shinhan_crm
+team_id: crm
+channel: outbound
+department: crm
+domain: outbound_tm_sales
+description: >
+  신한카드 CRM부 아웃바운드 — 카드 상품 통신판매(TM) 콜 평가. 신규/교체/추가/
+  갱신 발급, 계좌정보 변경, 부가서비스 가입 등을 outbound 채널로 권유. 통신판매
+  법 / 방문판매법 / 여신전문금융업법 상의 도입 의무(전화목적·녹취고지) +
+  청약철회권 안내 + 가입의사 명시적 확인이 핵심 점검 영역.
+
+version:
+  schema: "v2.0.0"
+  rubric: "shinhan_crm_v1"
+  golden_set: "shinhan_crm_v1"
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# 부서특화 평가 항목 (site 공통 #1~#18 외 추가 — qa_rules.py 와 정합)
+# ---------------------------------------------------------------------------
+# allowed_steps 는 부서특화 dept items (#909-#912) 만 명시.
+# 공통 #1~#18 은 site (shinhan/tenant_config.yaml) 에서 fallback.
+scoring_policy:
+  allowed_steps:
+    "909": [15, 10, 5, 0]   # 정확한 안내 ★ (혜택 / 연회비 / 이자율 / 수수료 / 변경 대상 계좌)
+    "910": [5, 3, 0]        # 필수 안내 이행 (전화목적 / 녹취고지 / 청약철회권 / 개인정보 활용 동의)
+    "911": [5, 3, 0]        # 전화 목적·녹취 고지 [통신판매 기본 고지 의무]
+    "912": [5, 3, 0]        # 청약철회권 안내 및 가입의사 확인 [방문판매법·여신전문금융업법]
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목
+  force_t3_items: [911, 912]
+
+  # 부서 critical 위반 (즉시 0점 트리거)
+  critical_violations:
+    - id: missing_call_purpose
+      triggers: ["통화목적 미고지", "녹취고지 누락", "상담사 신원 미고지"]
+      impact: ["911"]
+    - id: missing_withdrawal_right
+      triggers: ["청약철회권 미안내", "가입의사 확정 미확인"]
+      impact: ["912"]
+    - id: misinformation_uncorrected
+      triggers: ["혜택 오안내 미정정", "이자율 오안내 미정정", "연회비 오안내 미정정", "수수료 오안내 미정정"]
+      impact: ["909"]
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Frontend 노드 매핑 (lib/pipeline.ts SHINHAN_DEPT_NODE_IDS 정합)
+# ---------------------------------------------------------------------------
+dept_evaluation:
+  - node_id: crm_accuracy
+    label: "업무 정확도"
+    score: 20
+    items:
+      - "정확한 안내 (혜택 / 연회비 / 이자율 / 수수료 / 변경 대상 계좌)"
+      - "필수 안내 이행 (전화목적 / 녹취고지 / 청약철회권 / 개인정보 활용 동의)"
+  - node_id: crm_tm_compliance
+    label: "TM 법규 준수"
+    score: 10
+    items:
+      - "전화 목적·녹취 고지 (통신판매 도입 의무)"
+      - "청약철회권 안내 및 가입의사 확인 (방문판매법·여신전문금융업법)"
+
+# ---------------------------------------------------------------------------
+# Intent 분류 — TM 아웃바운드 도메인 특화
+# ---------------------------------------------------------------------------
+supported_intents:
+  - TM상품권유
+  - 카드교체발급
+  - 카드추가발급
+  - 계좌정보변경
+  - 부가서비스가입
+  - 본인확인
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 (부서특화 항목만)
+# ---------------------------------------------------------------------------
+segment_strategy:
+  "909": qa_pair_with_rag         # 정확한 안내: 고객 질문 + 에이전트 답변 + RAG 매뉴얼 대조
+  "910": intent_cross_check       # 필수 안내: 통화목적/녹취/철회권/개인정보 4종 cross-check
+  "911": opening_windows_5        # 전화목적·녹취고지: 시작 5 발화 윈도우
+  "912": confirm_intent_window    # 청약철회권/가입의사: 가입 확정 직전·직후 윈도우
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — 부서 매뉴얼 chunk 인덱싱
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["909"]        # #909 정확한 안내 ★ 는 BK RAG 필수
+    fallback_mode: "unevaluable"
+
+# ---------------------------------------------------------------------------
+# 언어 / UI
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

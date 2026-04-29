@@ -1,0 +1,137 @@
+{
+  "item_number": 919,
+  "item_name": "설명의무 이행 ★",
+  "category": "shinhan_compliance_unfair_sale_check",
+  "max_score": 15,
+  "allowed_steps": [
+    15,
+    10,
+    5,
+    0
+  ],
+  "intents": [
+    "불완전판매점검",
+    "약관설명"
+  ],
+  "version": "shinhan_compliance_v1",
+  "examples": [
+    {
+      "example_id": "GS-919-FULL-shinhan-compliance-001",
+      "item_number": 919,
+      "score": 15,
+      "score_bucket": "full",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 김상담 / 고객 60세]\n상담사: 신한 디오 신용카드 안내드리겠습니다 본 상품은 신용카드입니다\n상담사: 연회비는 1만 원이며 전월 30만 원 이상 사용하시면 면제 적용되시고 미달 시 1만 원이 청구됩니다\n상담사: 할부 이자율은 신용평점에 따라 최저 5.9 퍼센트에서 최대 19.9 퍼센트까지 차등 적용됩니다\n상담사: 현금서비스 수수료는 별도 4.5 퍼센트입니다\n상담사: 핵심 혜택은 대형마트 5 퍼센트 청구할인이며 월 한도는 1만 원입니다\n상담사: 신용카드 사용 시 발생할 수 있는 위험 안내드립니다 연체 시 신용평점 하락 / 거래정지 / 추가 수수료가 발생할 수 있으며 과도한 사용 시 본인의 결제 능력 초과로 인한 채무 부담이 가중될 수 있습니다\n\n[점검 결과]\n점검자: 금융소비자보호법 제19조 설명의무 6대 항목 (상품명 / 연회비 / 이자율 / 수수료 / 혜택 / 위험) 모두 발화 시점 명확하고 구체 수치 동반 → 설명의무 이행 충족",
+      "rationale": "[설명의무 이행] 금소법 제19조 6대 항목 모두 명시적·구체적 고지 → 만점\n - 상담사: \"본 상품은 신용카드입니다\" (상품명·종류)\n - 상담사: \"연회비는 1만 원이며 전월 30만 원 이상 사용하시면 면제\" (연회비)\n - 상담사: \"할부 이자율은 최저 5.9 퍼센트에서 최대 19.9 퍼센트\" (이자율)\n - 상담사: \"현금서비스 수수료는 별도 4.5 퍼센트\" (수수료)\n - 상담사: \"대형마트 5 퍼센트 청구할인 월 한도 1만 원\" (혜택)\n - 상담사: \"연체 시 신용평점 하락 / 거래정지 / 추가 수수료\" (위험)",
+      "rationale_tags": [
+        "item_919",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_101",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-919-PARTIAL-shinhan-compliance-002",
+      "item_number": 919,
+      "score": 10,
+      "score_bucket": "partial",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 박상담 / 고객 45세]\n상담사: 신한 트래블 신용카드 안내드릴게요 연회비 2만 원이고 첫해 면제\n상담사: 해외 가맹점 1.5 퍼센트 적립이 가장 큰 혜택입니다\n상담사: 일시불은 무이자고 할부 이자율은 신용평점 기준이라 가입 후 안내드리겠습니다\n\n[점검 결과]\n점검자: 상품명/연회비/혜택은 충족하나 이자율이 모호 (구체 % 미고지) + 수수료 미고지 + 위험 고지 누락 → 6대 항목 중 3.5개만 충족",
+      "rationale": "[설명의무 이행] 6대 항목 중 상품명/연회비/혜택 충족 / 이자율 모호 + 수수료·위험 미고지 → 부분 감점\n - 상담사: \"신한 트래블 신용카드 안내드릴게요\" (상품명 충족)\n - 상담사: \"연회비 2만 원이고 첫해 면제\" (연회비 충족)\n - 상담사: \"해외 가맹점 1.5 퍼센트 적립\" (혜택 충족)\n - 상담사: \"가입 후 안내드리겠습니다\" (이자율 모호 — 가입 전 고지 의무 미이행)\n - 수수료 / 위험 발화 부재",
+      "rationale_tags": [
+        "item_919",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_102",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-919-ZERO-shinhan-compliance-003",
+      "item_number": 919,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 이상담 / 고객 70세]\n상담사: 신한카드인데요 좋은 카드 있어서 안내드려요\n상담사: 혜택 정말 좋고 거의 모든 고객이 만족하세요\n상담사: 연회비나 자세한 건 약관에 다 적혀 있으니까 일단 가입하시고 보세요\n상담사: 신용카드는 다들 쓰시는 거니까 위험 같은 거 신경 안 쓰셔도 돼요\n\n[점검 결과]\n점검자: 6대 항목 (상품명 / 연회비 / 이자율 / 수수료 / 혜택 / 위험) 모두 미고지 또는 적극 회피 + 위험 무시 발언으로 금소법 제19조 위반 + 70세 고령 고객 보호 조치 부재 (#920 동시 위반)",
+      "rationale": "[설명의무 이행] 6대 항목 모두 미고지 또는 회피 + 위험 무시 발언 → 0점\n - 상담사: \"좋은 카드 있어서 안내드려요\" (상품명·종류 모호)\n - 상담사: \"연회비나 자세한 건 약관에 다 적혀 있으니까\" (연회비 회피)\n - 상담사: \"신용카드는 다들 쓰시는 거니까 위험 같은 거 신경 안 쓰셔도 돼요\" (위험 적극 회피)\n - 이자율 / 수수료 / 혜택 발화 부재 또는 모호 (\"혜택 정말 좋고\")\n - 70세 고령 고객 대상 → #920 취약계층 보호 조치 동시 위반",
+      "rationale_tags": [
+        "item_919",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_103",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

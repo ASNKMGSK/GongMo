@@ -1,0 +1,78 @@
+{
+  "item_number": 908,
+  "item_name": "가족카드·배우자 기준 동의 확인",
+  "category": "shinhan_iss_terms_compliance",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["가족카드발급", "카드발급"],
+  "version": "shinhan_review_v1",
+  "examples": [
+    {
+      "example_id": "GS-908-FULL-shinhan-rev-001",
+      "item_number": 908,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "가족카드발급",
+      "segment_text": "고객: 와이프 카드도 같이 만들고 싶은데요 가족카드로\n상담사: 네 고객님 가족카드 발급 안내드리겠습니다 본인 신한카드 회원이시고요 배우자분 신청하시는 거 맞으실까요\n고객: 네 맞아요\n상담사: 네 안내드리면 가족카드는 여신금융 감독규정 제15조에 따라 본인 한도 내에서 가족 사용분이 함께 차감되시고요 그래서 배우자 본인의 명시적 동의가 반드시 필요합니다\n고객: 네\n상담사: 첫째 배우자 본인이 직접 동의하셔야 하므로 지금 통화에 함께 계신가요 또는 별도로 본인 인증 절차를 진행하시겠어요\n고객: 옆에 있어요 바꿔드릴게요\n상담사: 네 그럼 배우자분 본인 확인 진행하면서 가족카드 약관 / 한도 공유 / 책임 범위 / 분실 시 본인 책임 사항 직접 안내드리고 동의 받겠습니다\n고객배우자: 네\n상담사: 네 *** 님 본인 확인되셨고요 가족카드 발급 시 본인이 사용하신 금액은 주카드 회원께 청구됨 / 가족카드 한도는 주카드 한도 내에서 공유됨 / 분실 시 본인이 즉시 신고 의무 있음 동의하시는 거 맞으실까요\n고객배우자: 네 동의합니다",
+      "rationale": "[가족카드 동의 · 만점] 여신금융 감독규정 제15조 명시 + 배우자 본인 명시적 동의 절차 수행. 한도 공유 / 책임 범위 / 분실 신고 의무 4요소 직접 안내 후 본인 동의 확보.\n - 상담사#4: \"가족카드는 여신금융 감독규정 제15조에 따라 본인 한도 내에서 가족 사용분이 함께 차감되시고요 그래서 배우자 본인의 명시적 동의가 반드시 필요합니다\"\n - 상담사#8: \"가족카드 약관 / 한도 공유 / 책임 범위 / 분실 시 본인 책임 사항 직접 안내드리고 동의 받겠습니다\"\n - 상담사#10: \"가족카드 한도는 주카드 한도 내에서 공유됨 / 분실 시 본인이 즉시 신고 의무 있음 동의하시는 거 맞으실까요\"",
+      "rationale_tags": ["item_908", "full_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 8},
+        {"speaker": "상담사", "turn_id": 10},
+        {"speaker": "고객배우자", "turn_id": 11}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_review_v1",
+        "sample_id": "synthetic_rev_031",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-908-PARTIAL-shinhan-rev-002",
+      "item_number": 908,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "가족카드발급",
+      "segment_text": "고객: 가족카드 만들고 싶어요 와이프 거\n상담사: 네 가족카드 신청 도와드릴게요 배우자분 성함과 생년월일 부탁드립니다\n고객: ***\n상담사: 네 등록되었고요 한도는 본인 한도 내에서 같이 사용하시는 형태이세요\n고객: 네\n상담사: 약관은 추후 카드랑 같이 책자로 보내드릴 거예요 분실 시에는 본인이 신고 부탁드리겠습니다\n고객: 네 알겠습니다",
+      "rationale": "[가족카드 동의 · 부분점수 3점] 한도 공유 / 분실 신고 일부 안내. 그러나 배우자 본인 직접 동의 절차 미수행 (주카드 회원이 대신 동의), 여신금융 감독규정 근거 미언급. 약관 사후 송부 (사전 안내 부족).\n - 상담사#2: \"배우자분 성함과 생년월일 부탁드립니다\"\n - 상담사#4: \"한도는 본인 한도 내에서 같이 사용하시는 형태이세요\"\n - 상담사#6: \"약관은 추후 카드랑 같이 책자로 보내드릴 거예요 분실 시에는 본인이 신고 부탁드리겠습니다\"",
+      "rationale_tags": ["item_908", "partial_compliance"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_review_v1",
+        "sample_id": "synthetic_rev_032",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-908-ZERO-shinhan-rev-003",
+      "item_number": 908,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "가족카드발급",
+      "segment_text": "고객: 와이프 가족카드 만들어 주세요 제가 동의했으니까\n상담사: 네 그러면 본인 정보로 신청 처리해드리겠습니다\n고객: 와이프한테는 따로 확인 안 해도 돼요\n상담사: 네 본인 가족이시니까 따로 확인 안 받으셔도 처리됩니다\n고객: 한도는 어떻게 되는 거예요\n상담사: 본인 거 같이 쓰시는 거고요\n고객: 분실하면 어떻게 되나요\n상담사: 그건 분실되면 그때 다시 안내드릴게요",
+      "rationale": "[가족카드 동의 · 0점] critical_violation. 여신금융 감독규정 제15조 위반 — 배우자 본인 직접 동의 절차 완전 누락. 주카드 회원의 대리 동의로 처리 진행. 책임 범위 / 분실 의무 사전 안내 부재.\n - 상담사#2: \"본인 정보로 신청 처리해드리겠습니다\"\n - 상담사#4: \"본인 가족이시니까 따로 확인 안 받으셔도 처리됩니다\"\n - 상담사#8: \"그건 분실되면 그때 다시 안내드릴게요\"",
+      "rationale_tags": ["item_908", "zero_compliance", "critical_violation"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_review_v1",
+        "sample_id": "synthetic_rev_033",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

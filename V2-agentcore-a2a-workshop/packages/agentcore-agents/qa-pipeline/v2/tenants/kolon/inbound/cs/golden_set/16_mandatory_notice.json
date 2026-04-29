@@ -1,0 +1,43 @@
+{
+  "item_number": 16,
+  "item_name": "필수 안내사항 이행",
+  "category": "업무 정확도",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["환불취소", "상품문의", "클레임"],
+  "dialog_stages": ["main", "outro"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "intent_script_crosscheck",
+    "details": "Intent 분류 후 해당 유형 mandatory script 리스트와 cross-check (PDF §7.4)",
+    "script_registry": "../../../_shared/mandatory_scripts/intent_to_script.yaml"
+  },
+  "examples": [
+    {
+      "example_id": "GS-16-CS-FULL-001",
+      "item_number": 16,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 네 고객님 환불 접수 전에 한 번 더 안내드리면요 단순 변심으로 인한 반품은 왕복 배송비 고객 부담이시고요 반품 상품이 훼손되거나 사용 흔적이 있을 경우 환불이 어려울 수 있다는 점 반드시 양해 부탁드립니다\n고객: 아 네 알겠어요",
+      "rationale": "[필수 안내사항] 반품 정책 필수 고지 2요소 모두 이행 → 만점\n - 왕복 배송비 고객 부담 고지\n - 훼손/사용 흔적 시 환불 제한 고지\n - 고객 확인 회답 받음",
+      "rationale_tags": ["item_16", "full_compliance", "refund_policy_disclosed", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 18}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_071","variant":"refund_full_disclosure","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-16-CS-ZERO-001",
+      "item_number": 16,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 반품하려고요\n상담사: 네 알겠습니다 바로 접수 처리해 드리겠습니다\n고객: 배송비는요\n상담사: 아 네 처리됩니다",
+      "rationale": "[필수 안내사항] 왕복 배송비 고객 부담 고지 누락 + 훼손 제한 고지 누락 → 0점\n - 고객이 배송비 질의했음에도 \"처리됩니다\" 모호 응답\n - 부담 주체 명확화 없음\n - 훼손 시 환불 제한 고지 전무",
+      "rationale_tags": ["item_16", "missing_shipping_notice", "missing_damage_notice", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_072","variant":"missing_refund_notice","human_score_verified":false}
+    }
+  ]
+}

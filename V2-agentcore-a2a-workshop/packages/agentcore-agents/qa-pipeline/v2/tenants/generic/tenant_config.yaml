@@ -1,0 +1,227 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — Multi-tenant Configuration: `generic`
+#
+# 이 파일은 "generic" 테넌트(범용 CS 콜센터 도메인)의 테넌시 설정이다.
+# Layer 3 Orchestrator 가 로드하여 Sub Agent 들에게 주입한다.
+#
+# production 전 실제 고객사(보험·통신·은행 등) 별 테넌트 디렉토리를 별도 구성한다.
+# 예: tenants/insurance_seoul/, tenants/telco_lg/, tenants/bank_kb/
+
+tenant_id: generic
+tenant_name: "범용 CS 콜센터 (Generic)"
+domain: general
+description: >
+  특정 업종에 종속되지 않는 범용 CS 콜센터용 디폴트 테넌트. 보험 특화 조항
+  (청약철회/설명의무 등) 과 IT 특화 조항(장애 접수/에스컬레이션) 은 약화시키고
+  모든 도메인에 공통적인 인사/경청/언어/니즈/설명/적극성/정확도/개인정보 기준만 적용.
+
+version:
+  schema: "v2.0.0"                  # tenant_config 스키마 버전
+  rubric: "phase_a2_v1"             # PL Phase A2 최종 확정 (2026-04-20)
+  golden_set: "empty_v0.0"          # 기능 구현만. 실 시니어 라벨링은 Phase 0 세션에서.
+  last_updated: "2026-04-20"
+
+# ---------------------------------------------------------------------------
+# PII 엄격도 정책 (#17/#18 평가 노드 주입용)
+# ---------------------------------------------------------------------------
+pii_policy:
+  strictness: standard        # strict | standard | relaxed
+  masking_required: true      # 상담 전사에 주민번호/계좌번호 노출 시 즉시 감점
+  third_party_disclosure:
+    allowed_scope: ["일반 상품 개요", "절차 안내"]
+    blocked_scope: ["특정 계약 정보", "금융거래 세부", "주소/연락처 제공"]
+  prohibited_terms_file: "prohibited_terms.txt"
+
+# ---------------------------------------------------------------------------
+# 감점 정책 (ALLOWED_STEPS 공통 스키마, qa_rules.py 와 일치해야 함)
+# ---------------------------------------------------------------------------
+# 주의: 본 값은 V1 CLAUDE.md 의 "ALLOWED_STEPS 스키마 주의" 노트를 참조.
+#       프롬프트가 중간 점수(예: 3점) 를 반환해도 reconciler.snap_score 가
+#       아래 단계로 강제 스냅. 프롬프트 변경 시 동기화 필수.
+scoring_policy:
+  max_total: 100
+  # PL Phase A2 최종 확정 (2026-04-20) 반영. Dev5 v2/contracts/rubric.py::ALLOWED_STEPS 와 동일.
+  allowed_steps:
+    "1":  [5, 3, 0]        # 첫인사 (3-요소 중 1개 누락 시 3점)
+    "2":  [5, 3, 0]        # 끝인사 (iter03_clean: 2-요소 완화)
+    # "3" 경청/말겹침/말자름 — 2026-04-21 평가표에서 제거 (STT 한계). 5점은 #15 로 이관.
+    "4":  [5, 3, 0]        # 호응 및 공감
+    "5":  [5, 3, 0]        # 대기 멘트
+    "6":  [5, 3, 0]        # 정중한 표현 — A2 확정 [5,3,0] (이전 [5,0] 폐기)
+    "7":  [5, 3, 0]        # 쿠션어 활용 (iter03_clean: refusal-gated)
+    "8":  [5, 3, 0]        # 문의 파악 / 재확인
+    "9":  [5, 3, 0]        # 고객 정보 확인 (force_t3)
+    "10": [10, 7, 5, 0]    # 설명 명확성 (4단계 — A2 확정)
+    "11": [5, 3, 0]        # 두괄식 답변
+    "12": [5, 3, 0]        # 문제 해결 의지
+    "13": [5, 3, 0]        # 부연 설명 및 추가 안내
+    "14": [5, 3, 0]        # 사후 안내
+    "15": [15, 10, 5, 0]   # 정확한 안내 — 2026-04-21 확장 [10,5,0]→[15,10,5,0] (+5, 오안내 리스크 가중)
+    "16": [5, 3, 0]        # 필수 안내 이행
+    "17": [5, 3, 0]        # 정보 확인 절차 (iter05 회귀 해소 위해 [5,0] → [5,3,0] 확장, force_t3)
+    "18": [5, 3, 0]        # 정보 보호 준수 ([5,0] → [5,3,0] 확장, force_t3)
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목 (Phase A1 계약 §8.2)
+  force_t3_items: [9, 17, 18]
+
+  # 즉시 0점 트리거 (카테고리 전체 영향)
+  critical_violations:
+    - id: privacy_leak
+      triggers: ["주소 유출", "주민번호 유출", "계좌번호 유출", "제3자 민감정보 제공"]
+      impact: ["17", "18"]
+    - id: unkind_treatment
+      triggers: ["반말", "비하", "욕설", "업무회피"]
+      impact: total_zero           # 총점 0점
+    - id: misinformation_uncorrected
+      triggers: ["허위 안내 미정정"]
+      impact: ["15"]
+  # 인프라 폴백 무효화 정책 (V1 reconciler.reconcile_evaluation 연동)
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# (Routing 섹션은 아래 "Routing (Layer 4 Tier calibration)" 블록으로 통합됨 — Q5 지시 2026-04-20)
+#
+# NOTE: 이전 초안에서 여기에 `routing:` 블록이 있었으나, 파일 하단의 확장 블록
+# (grade_boundary_margin 포함) 으로 통합. 중복 top-level key 로 인한 YAML loader
+# override 회피.
+
+# ---------------------------------------------------------------------------
+# Intent 분류 (Layer 1 전처리 → Sub Agent RAG retrieval key 일부)
+# ---------------------------------------------------------------------------
+# Layer 1 (Dev1 담당) 이 transcript 에서 이 목록 중 하나로 intent 를 분류.
+# 이 값은 RAG 호출 시 retrieve_fewshot(item, intent, segment) 의 intent 인자로 전달.
+supported_intents:
+  - general_inquiry       # 일반 문의
+  - complaint             # 불만/민원
+  - info_change           # 정보 변경
+  - cancellation          # 해지/취소
+  - claim                 # 보험금/환불 청구
+  - product_inquiry       # 상품/요금제 문의
+  - technical_support     # IT/장애 지원
+  - billing               # 청구/결제
+  - other
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 — 설계서 7.4 매핑
+# ---------------------------------------------------------------------------
+# Sub Agent 가 RAG 호출 시 어떤 발화 구간을 segment_text 로 전달할지 정책.
+# 실제 추출은 Layer 1 의 segment_extractor 가 수행하고 각 Sub Agent 에 전달.
+segment_strategy:
+  "1":  first_utterances_3_5      # 첫인사: 시작 3~5 발화
+  "2":  last_utterances_3_5       # 끝인사: 종료 3~5 발화
+  # "3" 말겹침 — 2026-04-21 제거
+  "4":  emotion_windows           # 공감: 감정 표현/사과 근처 윈도우
+  "5":  hold_windows              # 대기: 대기 마커/사전·사후 안내 근처
+  "6":  full_agent_utterances     # 정중한 표현: 전 에이전트 발화
+  "7":  refusal_windows           # 쿠션어: 거절/불가/양해 발화 근처
+  "8":  agent_long_blocks         # 니즈 파악: 에이전트 장문 발화
+  "9":  identity_verification_window  # 고객 정보 확인: PII 질의응답 근처
+  "10": agent_long_blocks         # 설명 명확성: 에이전트 장문 발화(50자+)
+  "11": answer_opening_3           # 두괄식: 답변 첫 3 발화
+  "12": problem_solving_windows   # 적극성 문제해결: 문제 언급 → 해결 제안 구간
+  "13": post_answer_windows       # 부연 설명: 답변 직후 에이전트 발화
+  "14": closing_windows           # 사후 안내: 종료 전 에이전트 발화
+  "15": qa_pair                   # 정확한 안내: 고객 질문 + 에이전트 답변 pair
+  "16": intent_cross_check        # 필수 안내: intent 기반 script 대조
+  "17": pii_query_window          # 개인정보 확인: PII 토큰 근처 N 발화
+  "18": pii_leak_scan             # 개인정보 보호: PII 유출 스캔 전체
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — Dev4 RAG 3종과 연결
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"         # prototype: in-memory dict; prod: FAISS/OpenSearch
+  reasoning:
+    # 과거 판정 근거 문장 embedding 인덱스. prototype 에서는 golden_set 의 rationale 재사용
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["15"]        # #15 정확한 안내 는 이 RAG 필수
+    fallback_mode: "unevaluable"  # RAG 부재 시 partial_with_review → unevaluable
+
+# ---------------------------------------------------------------------------
+# 필수 안내 스크립트 (#16)
+# ---------------------------------------------------------------------------
+mandatory_scripts:
+  source_file: "mandatory_scripts/intent_to_script.yaml"
+
+# ---------------------------------------------------------------------------
+# Routing (Layer 4 Tier calibration — PL Q5 지시 2026-04-20 외부화)
+# ---------------------------------------------------------------------------
+# v2/routing/tier_router.py 가 이 섹션을 읽어 Tier 결정 파라미터를 주입한다.
+# 설계서 §8.3 "초기 T0 30~40%" 운영 원칙 구현.
+routing:
+  # T0 (자동 통과) 비중 cap — 현재 샘플의 T0 비중이 이 값을 넘으면 low-confidence
+  # 경계 샘플을 T2 로 승격해 모니터링 대상에 포함 (Phase 0 calibration 보수 정책).
+  # 설계서 §8.3 권고: 초기 0.30~0.40 → 6개월 후 0.70 까지 점진 상향.
+  initial_t0_cap: 0.30
+  # T1 무작위 샘플링 비율 (T0 중 확률적으로 T1 으로 승격). §8.2 권고 5~10%.
+  # t1_sample_rate 는 단일값 호환. t1_sample_rate_max 를 함께 지정하면 consultation 별
+  # [t1_sample_rate, t1_sample_rate_max] 균등분포에서 effective rate 추첨 (2026-04-20).
+  t1_sample_rate: 0.05
+  t1_sample_rate_max: 0.10
+  # 등급 경계 ±margin 이내 자동 T2 — GRADE_BOUNDARY_MARGIN 기본값 override 용.
+  # 미지정 시 v2/schemas/enums.py::GRADE_BOUNDARY_MARGIN (=3) 사용.
+  grade_boundary_margin: 3
+
+# ---------------------------------------------------------------------------
+# Confidence (Layer 4 신호 calibration — PL Q5 지시 2026-04-20)
+# ---------------------------------------------------------------------------
+# v2/confidence/calculator.py 가 이 섹션을 읽어 signal penalty 를 조정한다.
+confidence:
+  # ReasoningResult.sample_size < 이 값 이면 rag_stdev 신호 신뢰도 하향 (penalty 적용).
+  # Dev4 v2/rag/reasoning.py::ReasoningResult.sample_size 와 연동.
+  # Inter-rater baseline 부재 상황에서 소표본 signal 을 약하게 다루기 위한 보수 정책.
+  rag_min_sample_size: 3
+  # penalty 강도 (0.0 = 신호 무시, 1.0 = 신호 그대로). 기본 0.5.
+  rag_small_sample_weight: 0.5
+
+  # -------------------------------------------------------------------------
+  # 항목별 4-신호 가중치 테이블 (v2/confidence/weights.py::ITEM_WEIGHTS 이관, 2026-04-20).
+  # Phase 0 calibration 전 초기값 — 설계서 §8.1 "가중치 자체는 Phase 0 이후 실제 데이터로 calibration".
+  # 각 항목 4개 신호 합 = 1.0. 미등록 항목은 하드코드 fallback → 균등 0.25.
+  # -------------------------------------------------------------------------
+  item_weights:
+    # 인사 예절 — Rule 1차 판정 강함
+    "1":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    "2":  { llm_self: 0.20, rule_llm_agreement: 0.50, rag_stdev: 0.10, evidence_quality: 0.20 }
+    # "3" 경청/말겹침 — 2026-04-21 제거
+    # 호응·공감 — 감정 맥락
+    "4":  { llm_self: 0.35, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.20 }
+    # 대기 멘트
+    "5":  { llm_self: 0.25, rule_llm_agreement: 0.35, rag_stdev: 0.15, evidence_quality: 0.25 }
+    # 언어 표현
+    "6":  { llm_self: 0.30, rule_llm_agreement: 0.30, rag_stdev: 0.15, evidence_quality: 0.25 }
+    # 쿠션어 — 설계서 §8.1 예시 llm_self+rag_stdev↑
+    "7":  { llm_self: 0.40, rule_llm_agreement: 0.15, rag_stdev: 0.30, evidence_quality: 0.15 }
+    # 니즈 파악
+    "8":  { llm_self: 0.30, rule_llm_agreement: 0.20, rag_stdev: 0.20, evidence_quality: 0.30 }
+    # 고객정보 확인 — structural_only / force_t3
+    "9":  { llm_self: 0.15, rule_llm_agreement: 0.45, rag_stdev: 0.10, evidence_quality: 0.30 }
+    # 설명력
+    "10": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "11": { llm_self: 0.30, rule_llm_agreement: 0.25, rag_stdev: 0.20, evidence_quality: 0.25 }
+    # 적극성
+    "12": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "13": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    "14": { llm_self: 0.30, rule_llm_agreement: 0.15, rag_stdev: 0.25, evidence_quality: 0.30 }
+    # 업무 정확도 — 설계서 §8.1 예시 evidence_quality+rule↑
+    "15": { llm_self: 0.15, rule_llm_agreement: 0.35, rag_stdev: 0.10, evidence_quality: 0.40 }
+    "16": { llm_self: 0.20, rule_llm_agreement: 0.45, rag_stdev: 0.10, evidence_quality: 0.25 }
+    # 개인정보 보호 — compliance_based / force_t3
+    "17": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+    "18": { llm_self: 0.15, rule_llm_agreement: 0.50, rag_stdev: 0.05, evidence_quality: 0.30 }
+
+# ---------------------------------------------------------------------------
+# 언어 / UI 설정
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

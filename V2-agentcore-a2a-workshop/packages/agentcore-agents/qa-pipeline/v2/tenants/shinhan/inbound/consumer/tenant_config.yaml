@@ -1,0 +1,108 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/inbound/consumer 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속.
+# 본 파일은 소비자보호부 부서특화 평가 항목 (#913-#916) 만 정의한다.
+
+tenant_id: shinhan_consumer
+team_id: consumer
+channel: inbound
+department: consumer
+domain: voc_handling
+description: >
+  신한카드 소비자보호부 인바운드 — 민원 콜 분석 평가 (VOC 카테고리 매핑,
+  공감·사과 표현, 해결책 제시 / 이관 / 사후 관리, 부당 응대 / 2차 가해
+  방지). 소비자보호기준 / VOC 처리 SLA 준수 영역 포함.
+
+version:
+  schema: "v2.0.0"
+  rubric: "shinhan_consumer_v1"
+  golden_set: "shinhan_consumer_v1"
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# 부서특화 평가 항목 (site 공통 #1~#18 외 추가)
+# ---------------------------------------------------------------------------
+scoring_policy:
+  allowed_steps:
+    "913": [15, 10, 5, 0]   # 민원 유형 분류 및 원인 파악 ★
+    "914": [5, 3, 0]        # 공감·사과 표현 및 감정 관리
+    "915": [5, 3, 0]        # 해결책 제시 및 이관·사후 관리
+    "916": [5, 3, 0]        # 부당 응대·2차 가해 방지 [소비자보호기준 · T3 필수]
+
+  force_t3_items: [916]
+
+  critical_violations:
+    - id: secondary_harm
+      triggers: ["반말", "비하", "조롱", "강요", "취약계층 무시"]
+      impact: ["916"]
+    - id: voc_misclassification
+      triggers: ["민원 분류 오류", "단순문의 처리"]
+      impact: ["913"]
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Frontend 노드 매핑 (lib/pipeline.ts SHINHAN_DEPT_NODE_IDS 정합)
+# ---------------------------------------------------------------------------
+dept_evaluation:
+  - node_id: cons_complaint
+    label: "민원 응대"
+    score: 10
+    items:
+      - "민원 유형 분류 및 원인 파악 (VOC 카테고리 매핑)"
+      - "공감 · 사과 표현 및 감정 관리"
+  - node_id: cons_resolution
+    label: "해결 절차 안내"
+    score: 10
+    items:
+      - "해결책 제시 및 이관 · 사후 관리 (VOC 처리 프로세스)"
+  - node_id: cons_protection
+    label: "2차 피해 방지"
+    score: 10
+    items:
+      - "부당 응대 · 2차 가해 방지"
+
+# ---------------------------------------------------------------------------
+# Intent 분류 — 소비자보호 도메인 특화
+# ---------------------------------------------------------------------------
+supported_intents:
+  - 민원
+  - 이의제기
+  - 환불요청
+  - 사후처리문의
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 (부서특화 항목만)
+# ---------------------------------------------------------------------------
+segment_strategy:
+  "913": qa_pair_with_rag                           # 민원 분류: 고객 호소 + 분류 답변 + RAG 카테고리 대조
+  "914": emotion_windows                            # 공감/사과: 감정 표현 / 사과 발화 근처 윈도우
+  "915": resolution_windows + closing_windows       # 해결책: 해결 안내 + 종료부 사후 안내
+  "916": full_agent_utterances + harsh_pattern_scan # 부당 응대: 전 에이전트 발화 + 위협/모욕 스캔
+
+# ---------------------------------------------------------------------------
+# RAG 설정
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["913"]        # #913 민원 분류 ★ 는 BK RAG 필수 (VOC 카테고리 체계)
+    fallback_mode: "unevaluable"
+
+# ---------------------------------------------------------------------------
+# 언어 / UI
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

@@ -1,0 +1,82 @@
+{
+  "item_number": 17,
+  "item_name": "정보 확인 절차",
+  "category": "개인정보 보호",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "본인확인",
+    "한도조정",
+    "결제일변경",
+    "분실신고",
+    "청구문의",
+    "카드발급"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-17-FULL-shinhan-001",
+      "item_number": 17,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "본인확인",
+      "segment_text": "고객: 카드 한도 좀 변경하고 싶어요\n상담사: 네 한도 변경 도와드리기 전에 본인확인 위해 성함과 생년월일 부탁드리겠습니다\n고객: 박지훈 구공년 일월 이일이요\n상담사: 박지훈 고객님 본인 맞으십니까\n고객: 네\n상담사: 네 소중한 정보 확인 감사드립니다 추가로 등록 휴대폰 번호 뒤 사 자리만 한 번 더 확인 부탁드릴게요\n고객: ***이요\n상담사: 네 확인되었습니다 한도 변경 도와드리겠습니다",
+      "rationale": "[정보 확인 절차] 본인확인 선행 (성함 + 생년월일) + 추가 1요소 (휴대폰 뒤 4자리) → 만점\n - 상담사#2: \"본인확인 위해 성함과 생년월일 부탁드리겠습니다\"\n - 상담사#4: \"박지훈 고객님 본인 맞으십니까\"\n - 상담사#6: \"등록 휴대폰 번호 뒤 사 자리만 한 번 더 확인 부탁드릴게요\"",
+      "rationale_tags": ["item_17", "full_compliance", "two_factor_verification"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 6}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-17-PARTIAL-shinhan-002",
+      "item_number": 17,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "결제일변경",
+      "segment_text": "고객: 결제일 변경 좀\n상담사: 네 성함 부탁드릴게요\n고객: 이서연이요\n상담사: 네 이서연 고객님 결제일 변경 도와드릴게요\n고객: 십오 일이요\n상담사: 네 처리해드릴게요",
+      "rationale": "[정보 확인 절차] 성함 1요소만 확인 + 추가 검증 (생년월일 / 카드번호 / 휴대폰) 누락 → 부분점수\n - 상담사#2: \"네 성함 부탁드릴게요\" — 1요소 단독\n - 상담사#4: \"네 이서연 고객님 결제일 변경 도와드릴게요\" — 추가 확인 없이 진행",
+      "rationale_tags": ["item_17", "partial_compliance", "single_factor"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-17-ZERO-shinhan-003",
+      "item_number": 17,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "분실신고",
+      "segment_text": "고객: 카드 분실 처리 좀\n상담사: 아 네 처리해드릴게요\n고객: 네 빨리요\n상담사: 분실 처리 완료되었구요 신규 카드는 등록 주소로 배송됩니다",
+      "rationale": "[정보 확인 절차] 본인확인 절차 자체 부재 + 검증 없이 분실 처리 + 신규 카드 배송 진행 → 0점\n - 상담사#2: \"아 네 처리해드릴게요\" — 본인확인 생략\n - 상담사#4: \"분실 처리 완료되었구요 신규 카드는 등록 주소로 배송됩니다\" — 신원 미확인 상태에서 후속 처리",
+      "rationale_tags": ["item_17", "non_compliance", "no_verification"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

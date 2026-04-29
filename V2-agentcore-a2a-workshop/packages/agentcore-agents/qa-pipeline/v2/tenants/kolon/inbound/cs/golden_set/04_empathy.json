@@ -1,0 +1,65 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["환불취소", "클레임", "배송문의", "상품문의"],
+  "dialog_stages": ["main"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "keyword_trigger_window",
+    "details": "감정표현·불만·어려움 호소 키워드 (\"힘드\", \"짜증\", \"황당\", \"속상\", \"곤란\", \"안타까\", \"죄송\") 전후 3발화 윈도우 (PDF §7.4)",
+    "trigger_keywords": ["힘드", "짜증", "황당", "속상", "곤란", "당황", "불편", "실망"],
+    "window_size_turns": 3
+  },
+  "examples": [
+    {
+      "example_id": "GS-04-CS-FULL-001",
+      "item_number": 4,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "클레임",
+      "dialog_stage": "main",
+      "segment_text": "고객: 아 진짜 이거 짜증나서 얼마나 기다렸는데요\n상담사: 아이고 많이 불편하셨겠어요 정말 죄송합니다 어떤 부분이 가장 문제되셨는지 자세히 여쭤봐도 될까요\n고객: 그냥 이 품질 자체가 이상해요\n상담사: 네 그러셨군요 확실히 그런 부분 느끼시면 속상하실 거 같아요",
+      "rationale": "[호응 및 공감] 감정 표현 2회 + 구체 공감 어휘 다양 → 만점\n - 상담사#2: \"많이 불편하셨겠어요\" — 감정 직접 수용\n - 상담사#4: \"그러셨군요 속상하실 거 같아요\" — 고객 감정 재확인\n - 정형 맞장구 \"네\" 반복 아닌 풍부 공감",
+      "rationale_tags": ["item_4", "full_compliance", "empathy_rich", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_031","variant":"full_empathy","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-04-CS-PARTIAL-001",
+      "item_number": 4,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이거 진짜 황당하네요 돈 지불했는데 물건 상태가\n상담사: 네 확인해 드릴게요\n고객: 빨리 좀 해결해 주세요\n상담사: 네 지금 바로 조회하겠습니다",
+      "rationale": "[호응 및 공감] 업무적 반응은 있으나 감정 수용 어휘 부재 → 3점\n - \"네 확인해 드릴게요\" — 기능적 응대만 수행\n - 고객 감정 표현(\"황당\") 에 대응 공감어 없음\n - 단순 \"네\" 맞장구는 공감 표현으로 불충분",
+      "rationale_tags": ["item_4", "partial_compliance", "task_only", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_032","variant":"task_only","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-04-CS-ZERO-001",
+      "item_number": 4,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "클레임",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이거 저 화가 좀 나는데요 저희 어머니 선물이었는데\n상담사: 그거야 고객님 사정이죠 저희가 어떻게 합니까\n고객: 뭐라고요\n상담사: 반품 원하시면 절차 진행하실 수 있어요",
+      "rationale": "[호응 및 공감] 공감 부재 + 책임 회피 발화로 신뢰 훼손 → 0점\n - 상담사#2: \"고객님 사정이죠\" — 책임 회피/냉담 반응\n - 감정 수용 어휘 전무\n - 문제해결 전환도 미흡",
+      "rationale_tags": ["item_4", "empathy_absent", "cold_response", "cs"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2}
+      ],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_033","variant":"cold_dismissive","human_score_verified":false}
+    }
+  ]
+}

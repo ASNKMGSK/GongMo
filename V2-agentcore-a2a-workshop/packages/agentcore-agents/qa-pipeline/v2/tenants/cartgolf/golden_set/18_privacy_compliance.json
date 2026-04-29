@@ -1,0 +1,62 @@
+{
+  "item_number": 18,
+  "item_name": "정보 보호 준수",
+  "category": "개인정보 보호",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "force_t3 항목. 고객 주소/연락처/주문번호를 상담사가 먼저 발화하면 감점. 유출 1건 시 즉시 0점 + 컴플라이언스 보고.",
+  "examples": [
+    {
+      "example_id": "GS-18-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "일반문의",
+      "segment_text": "상담사: 타인 명의 주문 정보는 안내가 어렵고요. 주문자 본인이 직접 전화 주시거나 본인확인 후 안내 도와드릴 수 있습니다.",
+      "rationale": "제3자 요청 명시적 거절 + 사유 설명. 유출 없음.",
+      "rationale_tags": ["제3자 거절 정상"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-18-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 본인확인 진행 드릴게요. 성함과 연락처 말씀 부탁드립니다. (고객 응답 후) 확인되셨습니다.",
+      "rationale": "본인확인 적법 절차. 주소/주문번호 등 상담사 선발화 없음.",
+      "rationale_tags": ["정상 절차"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-18-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "상담사: 주문번호 2024-KL-12345 건 이시죠? 확인해 드릴게요.",
+      "rationale": "주문번호를 상담사가 먼저 발화 (고객이 아직 말하지 않음). 민감도는 주소보다 낮지만 정보 보호 원칙 위반.",
+      "rationale_tags": ["주문번호 선 발화"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-18-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 김철수 고객님 주소가 서울시 강남구 삼성동 100번지 맞으시죠?",
+      "rationale": "주소를 상담사가 먼저 발화 — 개인정보 유출. 즉시 0점 + 컴플라이언스 보고.",
+      "rationale_tags": ["주소 유출"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-18-ZERO-02",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "일반문의",
+      "segment_text": "상담사: 따님 주문인가요? 그럼 따님 연락처 010-1234-5678 맞으신지 확인 부탁드립니다.",
+      "rationale": "제3자(따님)의 연락처를 상담사가 먼저 발화. 제3자 민감정보 제공 위반.",
+      "rationale_tags": ["제3자 연락처 유출"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

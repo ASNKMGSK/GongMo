@@ -1,0 +1,37 @@
+{
+  "item_number": 10,
+  "item_name": "설명의 명확성",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_10_shinhan_001",
+      "score": 10,
+      "rationale": "[설명] 장문 3건, 숫자 (잔액 / 이자율 / 회차 / 월 납부액) 명확, 고객 되물음 최소 → 만점\n - 상담사#2: \"분할납부 안내드리면요 현재 연체 잔액 백이십삼만원에 대해서 최대 십이 개월 분할 신청 가능하시구요\"\n - 상담사#4: \"분할납부 시 잔액 기준 연 이십이 점 구 프로 약정이자가 적용되시구요 신청일 다음 영업일부터 발생하시고 매월 회차분에 포함되어 청구됩니다\"\n - 상담사#6: \"십이 개월 분할 기준으로 월 십이만이천원 정도 이자 포함 약 십삼만원 예상되시구요\"",
+      "quote_example": "상담사: 분할납부 시 잔액 기준 연 이십이 점 구 프로 약정이자가 적용되시구요 신청일 다음 영업일부터 발생하시고 매월 회차분에 포함되어 청구됩니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_10", "full_compliance", "numeric_clarity"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_10_shinhan_002",
+      "score": 5,
+      "rationale": "[설명] 내부용어 / 일방 나열 + 고객 되물음 3회 (얼마 / 며칠) 발생 + 숫자 모호 → 5점\n - 상담사#4: \"음 보통 좀 시간이 걸리시고요\" — 모호\n - 상담사#6: \"그건 시스템에 따라 다르세요\" — 책임 회피\n - 상담사#8: \"영업일로는 보통 며칠 정도 보시면 될 것 같아요\" — 모호",
+      "quote_example": "상담사: 음 보통 좀 시간이 걸리시고요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_10", "partial_compliance", "vague_numbers"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_10_shinhan_003",
+      "score": 0,
+      "rationale": "[설명] 설명 자체 부재 + 고객 되물음 3회 + 책임 회피 → 0점\n - 상담사#2: \"그건 그냥 청구돼서 그래요\"\n - 상담사#4: \"그러게요 시스템상 그래요\"\n - 상담사#6: \"그건 잘 모르겠어요 청구된 대로 보세요\"",
+      "quote_example": "상담사: 그건 잘 모르겠어요 청구된 대로 보세요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_10", "non_compliance", "no_explanation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

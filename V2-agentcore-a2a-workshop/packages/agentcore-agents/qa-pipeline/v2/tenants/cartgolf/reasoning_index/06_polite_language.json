@@ -1,0 +1,52 @@
+{
+  "item_number": 6,
+  "item_name": "정중한 표현",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "존댓말 일관 사용 + 부적절 표현 전무, 상담 내내 정중 유지 만점",
+      "quote_example": "상담사: 네 고객님 안내 도와드리겠습니다 부탁드리겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_polite", "consistent"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "헨리코튼 상품 관련 설명 시 존칭어 + 부드러운 어조 유지 만점",
+      "quote_example": "상담사: 헨리코튼 상품 교환 처리 진행 도와드릴게요 고객님",
+      "evaluator_id": "senior_b",
+      "tags": ["full_polite", "soft_tone"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "전반 존대 유지되나 '~같애요' 반복 비격식 표현 섞여 3점",
+      "quote_example": "상담사: 어떤 말씀인지 알 거 같애요",
+      "evaluator_id": "senior_c",
+      "tags": ["informal_phrases", "partial_polite"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "존댓말 사용되나 '~이요' 등 구어체 종결 빈번 3점",
+      "quote_example": "상담사: 아 그게요 사이즈가 그렇게 다르거든요",
+      "evaluator_id": "senior_a",
+      "tags": ["colloquial_ending", "borderline"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "반말/비하성 표현 확인 — 즉시 0점 critical 위반",
+      "quote_example": "상담사: 그건 고객님이 잘못 보신 거예요",
+      "evaluator_id": "senior_b",
+      "tags": ["impolite", "critical"],
+      "stub_seed": true
+    }
+  ]
+}

@@ -1,0 +1,120 @@
+{
+  "item_number": 922,
+  "item_name": "청약철회·이해도 확인",
+  "category": "shinhan_compliance_unfair_sale_check",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "청약철회권안내",
+    "불완전판매점검"
+  ],
+  "version": "shinhan_compliance_v1",
+  "examples": [
+    {
+      "example_id": "GS-922-FULL-shinhan-compliance-001",
+      "item_number": 922,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "청약철회권안내",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 김상담]\n상담사: 가입 진행 전 마지막 안내드리겠습니다 본 카드 가입은 금융소비자보호법 제46조에 따라 14일 이내 청약철회권 행사가 가능합니다 별도 사유 없이도 가능하며 위약금이나 손해배상금이 청구되지 않습니다 철회는 1577 신한카드 고객센터 또는 홈페이지 마이페이지에서 가능합니다\n상담사: 안내드린 내용 중 (1) 연회비 1만 원과 면제 조건 (2) 이자율 5.9-19.9 퍼센트 (3) 청약철회 14일 — 이 부분 모두 이해하셨는지 다시 한번 여쭤보고 싶습니다\n고객: 네 모두 이해했습니다\n상담사: 감사합니다 그럼 가입에 동의하시는지요\n고객: 네 동의합니다\n\n[점검 결과]\n점검자: (1) 법적 근거 (금소법 제46조) + 14일 기간 + 철회 방법 모두 명시 (2) 핵심 항목별 이해도 재확인 (3) 명시적 가입 동의 획득 — 금소법 제46조 충족",
+      "rationale": "[청약철회·이해도 확인] 4요소 (법적 근거 / 14일 기간 / 철회 방법 / 핵심 항목별 이해도 재확인 + 명시적 동의) 모두 이행 → 만점\n - 상담사: \"금융소비자보호법 제46조에 따라 14일 이내\" (법적 근거+기간)\n - 상담사: \"1577 신한카드 고객센터 또는 홈페이지 마이페이지에서 가능합니다\" (구체 철회 방법)\n - 상담사: \"연회비 / 이자율 / 청약철회 14일 — 이 부분 모두 이해하셨는지\" (핵심 항목별 이해도 재확인)\n - 고객: \"네 모두 이해했습니다\" / \"네 동의합니다\" (명시적 동의 획득)",
+      "rationale_tags": [
+        "item_922",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 4
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 6
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_110",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-922-PARTIAL-shinhan-compliance-002",
+      "item_number": 922,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "청약철회권안내",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 박상담]\n상담사: 가입은 14일 이내 청약철회 가능하시고요 1577 고객센터로 전화 주시면 됩니다 진행할까요\n고객: 네 진행해주세요\n\n[점검 결과]\n점검자: 14일 기간 + 철회 방법 일부는 안내 / 법적 근거(금소법 제46조) 미고지 + 핵심 항목별 이해도 재확인 절차 부재 + 가입 동의가 매우 약식 — 부분 감점",
+      "rationale": "[청약철회·이해도 확인] 14일 기간/철회 방법 일부 안내 / 법적 근거 미고지 + 항목별 이해도 재확인 누락 → 부분 감점\n - 상담사: \"14일 이내 청약철회 가능하시고요 1577 고객센터로 전화\" (기간+방법 일부)\n - 상담사: \"진행할까요\" (이해도 재확인 절차 부재 / 핵심 항목 별도 검증 누락)\n - 법적 근거 (금소법 제46조) 미고지",
+      "rationale_tags": [
+        "item_922",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 2
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_111",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-922-ZERO-shinhan-compliance-003",
+      "item_number": 922,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "청약철회권안내",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 이상담]\n상담사: 그럼 가입 처리 진행할게요 도착하시면 사용해보세요\n상담사: 마음에 안 드시면 그냥 안 쓰시면 돼요 알아서 해지될 거예요\n\n[점검 결과]\n점검자: 청약철회권 안내 전무 + 이해도 재확인 절차 부재 + 가입 동의 명시적 재확인 부재 + \"안 쓰시면 알아서 해지\" 라는 허위 정보 — 금소법 제46조 명백 위반",
+      "rationale": "[청약철회·이해도 확인] 청약철회권 안내 전무 + 이해도 / 동의 재확인 모두 부재 + 허위 정보 → 0점\n - 상담사: \"가입 처리 진행할게요\" (의사 재확인 누락 / 일방 통보)\n - 상담사: \"마음에 안 드시면 그냥 안 쓰시면 돼요 알아서 해지될 거예요\" (청약철회권을 단순 미사용으로 오도 + 자동 해지 허위 안내)\n - 14일 기간 / 법적 근거 / 철회 방법 / 이해도 재확인 모두 발화 부재",
+      "rationale_tags": [
+        "item_922",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_112",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

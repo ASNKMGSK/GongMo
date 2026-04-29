@@ -1,0 +1,38 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성",
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 설명력 항목 과거 판정 근거 문장. 장문 발화 블록의 구조화 정도(번호·단계·분기)가 핵심 판정 축.",
+  "reasoning_records": [
+    {
+      "record_id": "r_10_cs_sample_061",
+      "score": 10,
+      "rationale": "단계 번호화(첫째/둘째/셋째/마지막) + 각 단계 주체·기간·결과물 명시 + 마지막 단계에 알림 채널(문자·이메일) 까지 안내해 고객이 다음 접점을 정확히 예측 가능. 설명 명확성 만점의 전형.",
+      "quote_example": "상담사: 첫째 반품 신청 후 택배사가 방문 수거를 해가시고요 둘째 저희 물류센터에 입고되면 검수 후 하자 여부를 확인합니다 셋째 검수 완료 시점부터 영업일 기준 삼 일 이내에 결제 수단으로 환급 처리되시고요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_10", "full_compliance", "structured_steps", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_061"
+    },
+    {
+      "record_id": "r_10_cs_sample_062",
+      "score": 7,
+      "rationale": "리드타임·알림·재배송 대안이 모두 담겨 정보량은 충분하지만, 한 문장으로 이어져 청취 부하가 큼. 번호나 순서 마커가 없어 고객이 단계별로 기억하기 어려움. 정보성은 유지하되 구조화에서 감점.",
+      "quote_example": "상담사: 배송은 주문하시고 영업일 기준 이삼 일 정도 걸리시고 택배사에서 문자 발송되면 그 때 받으실 수 있고 수령 못하실 경우 재배송 신청도 가능하시니 참고 부탁드립니다",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_10", "partial_compliance", "low_structure", "run_on", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_062"
+    },
+    {
+      "record_id": "r_10_cs_sample_063",
+      "score": 0,
+      "rationale": "고객이 세탁 방법이라는 구체 질의를 했음에도 \"그냥\" / \"알아서\" 같은 비명시 어휘로 응답. 라벨/수세미/드라이클리닝 가부 등 어떠한 fact 도 전달하지 않아 설명 명확성이라는 평가 축 자체가 성립하지 않음.",
+      "quote_example": "상담사: 뭐 그냥 세탁하시면 돼요 알아서 하시면 돼요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_10", "no_info", "vague", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_063"
+    }
+  ]
+}

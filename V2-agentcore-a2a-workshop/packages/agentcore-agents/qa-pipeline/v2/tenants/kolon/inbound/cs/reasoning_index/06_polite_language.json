@@ -1,0 +1,38 @@
+{
+  "item_number": 6,
+  "item_name": "정중한 표현",
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "description": "7.2 Reasoning RAG — 정중한 표현 항목. filler 반복·사물존칭 오용·반말 여부가 주된 감점 축.",
+  "reasoning_records": [
+    {
+      "record_id": "r_06_cs_sample_011",
+      "score": 5,
+      "rationale": "존칭 어미(\"완료되십니다\") 와 정중 요청(\"기다려 주시면 감사하겠습니다\") 이 자연스럽게 연결. filler(어·음) 0회, 반말 0회, 사물존칭 오용 0회 — 정중도 3축 모두 최상.",
+      "quote_example": "상담사: 환불이 완료되십니다 조금만 기다려 주시면 감사하겠습니다",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_6", "full_compliance", "formal_consistent", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_011"
+    },
+    {
+      "record_id": "r_06_cs_sample_012",
+      "score": 3,
+      "rationale": "기본 존댓말은 유지되나 짧은 구간에 filler(어/음) 3회 반복 + 사물존칭 오용(\"있으세요\"). 정중도는 보존되지만 전달력·신뢰성 저하로 3점 판정.",
+      "quote_example": "상담사: 어 음 네 잠시만요 확인해 볼게요 / 상담사: 네 음 있으세요 지금 있으세요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_6", "partial_compliance", "filler_overuse", "thing_honorific_error", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_012"
+    },
+    {
+      "record_id": "r_06_cs_sample_013",
+      "score": 0,
+      "rationale": "명령조 반말(\"기다려요\") + 무성의 차단형(\"그거 원래 그래요\") + 추궁/반박(\"아니 그니까\") 이 복합 등장. 정중 표현 기준 자체가 성립하지 않음.",
+      "quote_example": "상담사: 아 그거 원래 그래요 다 그런 거예요 좀 기다려요",
+      "evaluator_id": "kolon_cs_senior_synthetic",
+      "tags": ["item_6", "impolite", "command_tone", "dismissive", "cs"],
+      "stub_seed": false,
+      "sample_id": "cs_sample_013"
+    }
+  ]
+}

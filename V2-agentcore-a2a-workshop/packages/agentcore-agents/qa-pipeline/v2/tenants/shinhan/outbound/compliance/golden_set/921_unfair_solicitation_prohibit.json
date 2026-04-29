@@ -1,0 +1,128 @@
+{
+  "item_number": 921,
+  "item_name": "부당권유 금지",
+  "category": "shinhan_compliance_unfair_sale_check",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "불완전판매점검",
+    "약관설명"
+  ],
+  "version": "shinhan_compliance_v1",
+  "examples": [
+    {
+      "example_id": "GS-921-FULL-shinhan-compliance-001",
+      "item_number": 921,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 김상담]\n상담사: 본 카드는 대형마트 5 퍼센트 청구할인을 제공하며 월 한도는 1만 원입니다 한도 초과 시점 이후 사용분에는 할인이 적용되지 않습니다\n상담사: 또한 연체 시 신용평점이 하락할 수 있으며 거래정지 또는 추가 수수료가 발생할 수 있습니다 본 카드 가입이 모든 고객님께 동일한 효용을 보장하지는 않으며 본인의 사용 패턴에 따라 혜택 체감이 다를 수 있습니다\n상담사: 결정은 충분히 검토하신 후 자율적으로 부탁드립니다\n\n[점검 결과]\n점검자: 혜택의 한도 / 위험 / 불이익 사실 모두 명시적 / 단정·과장·강요 표현 부재 → 금소법 제21조 부당권유 금지 충족",
+      "rationale": "[부당권유 금지] 사실 기반 + 한도·위험·불이익 명시 + 단정·과장·강요 표현 부재 → 만점\n - 상담사: \"한도 초과 시점 이후 사용분에는 할인이 적용되지 않습니다\" (혜택 한도 명시)\n - 상담사: \"연체 시 신용평점이 하락할 수 있으며 거래정지 또는 추가 수수료가 발생할 수 있습니다\" (위험 명시)\n - 상담사: \"모든 고객님께 동일한 효용을 보장하지는 않으며\" (단정 회피)\n - 상담사: \"결정은 충분히 검토하신 후 자율적으로 부탁드립니다\" (강요 회피)",
+      "rationale_tags": [
+        "item_921",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_107",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-921-PARTIAL-shinhan-compliance-002",
+      "item_number": 921,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 박상담]\n상담사: 본 카드는 대형마트 5 퍼센트 청구할인이 가장 큰 혜택입니다\n상담사: 거의 대부분의 고객님이 만족하시는 카드세요\n상담사: 연회비도 면제 조건만 채우시면 부담 없으세요\n\n[점검 결과]\n점검자: 사실 기반 안내는 있으나 (1) 혜택 한도 미고지 (2) \"거의 대부분 만족\" 과장 표현 (3) \"부담 없으세요\" 단정 표현 — 위험·불이익 사실 누락 부분 존재",
+      "rationale": "[부당권유 금지] 일부 사실 안내는 있으나 한도·위험·불이익 누락 + \"거의 대부분 만족\" 과장 + \"부담 없으세요\" 단정 → 부분 감점\n - 상담사: \"대형마트 5 퍼센트 청구할인이 가장 큰 혜택\" (한도 미고지)\n - 상담사: \"거의 대부분의 고객님이 만족하시는 카드세요\" (과장 표현)\n - 상담사: \"부담 없으세요\" (단정 표현)\n - 위험·불이익 사실 발화 부재",
+      "rationale_tags": [
+        "item_921",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_108",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-921-ZERO-shinhan-compliance-003",
+      "item_number": 921,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "불완전판매점검",
+      "segment_text": "[점검 대상 통화 발췌 — 신한카드 CRM부 이상담]\n상담사: 무조건 가입하시면 이득이세요 진짜 후회 안 하세요\n상담사: 다른 카드는 다 안 좋고 우리 카드만 진짜 좋아요\n상담사: 위험 같은 거 신경 안 쓰셔도 됩니다 그런 일 절대 안 일어나요\n상담사: 지금 안 하시면 나중에 못 가입하실 수도 있어요 빨리 결정해 주세요\n\n[점검 결과]\n점검자: 4종 부당권유 행위 모두 발생 — (1) \"무조건 이득\" 단정 (2) \"다 안 좋고 우리만 좋아요\" 허위·비교 폄훼 (3) \"위험 절대 안 일어나요\" 위험 부정 (불이익 누락) (4) \"빨리 결정해 주세요\" 압박. 금소법 제21조 명백 위반",
+      "rationale": "[부당권유 금지] 4대 부당권유 행위 (단정 / 허위·비교 폄훼 / 불이익 누락 / 강요) 모두 발생 → 0점\n - 상담사: \"무조건 가입하시면 이득이세요\" (단정 표현)\n - 상담사: \"다른 카드는 다 안 좋고 우리 카드만 진짜 좋아요\" (허위·비교 폄훼)\n - 상담사: \"위험 같은 거 신경 안 쓰셔도 됩니다 그런 일 절대 안 일어나요\" (위험 부정 / 불이익 사실 누락)\n - 상담사: \"지금 안 하시면 나중에 못 가입하실 수도 있어요 빨리 결정해 주세요\" (시간 압박 / 강요)",
+      "rationale_tags": [
+        "item_921",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_compliance_v1",
+        "sample_id": "synthetic_109",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "item_number": 17,
+  "item_name": "정보 확인 절차",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "연락처 + 성함 요청 → 본인확인 완료 멘트 → 감사 멘트까지 3단계 절차 완비 만점 (force_t3)",
+      "quote_example": "상담사: 성함과 휴대폰 번호 부탁드릴게요 OOO 고객님 본인 맞으십니까 소중한 정보 확인 감사드립니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_iv_procedure", "force_t3"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "코오롱스포츠 주문 확인 전 PII 요청 순서 + 본인확인 멘트 완전 수행",
+      "quote_example": "상담사: 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드릴게요 본인 맞으십니까",
+      "evaluator_id": "senior_b",
+      "tags": ["full_iv_procedure"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "iter05 확장 — 성함만 확인, 연락처 재확인 또는 본인확인 멘트 중 1요소 누락 3점 (ALLOWED_STEPS [5,3,0])",
+      "quote_example": "상담사: 성함 확인했고요 바로 안내드릴게요 (본인확인 멘트 부재)",
+      "evaluator_id": "senior_c",
+      "tags": ["partial_iv", "iter05_extended"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "본인확인 절차 전무, 교환/반품 접수 즉시 진행 0점",
+      "quote_example": "상담사: 바로 반품 접수 도와드릴게요 (정보 확인 생략)",
+      "evaluator_id": "senior_a",
+      "tags": ["no_iv", "force_t3"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "상담사가 고객 정보 선제 발화 — preemptive disclosure 0점 critical",
+      "quote_example": "상담사: OOO 고객님 맞으시죠 (고객 확인 전 성함 노출)",
+      "evaluator_id": "senior_b",
+      "tags": ["preemptive_disclosure", "critical"],
+      "stub_seed": true
+    }
+  ]
+}

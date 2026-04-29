@@ -1,0 +1,65 @@
+# Intent → 필수 안내 스크립트 매핑 — item_16 평가 소스
+#
+# 사용처: v2/agents/group_b item_16_mandatory_notice sub-agent 가 상담의
+# intent 를 판별한 뒤, 이 매핑의 required_phrases 와 transcript 를 cross-check
+# 해서 고지 이행 여부를 판정한다 (PDF §7.4 / §16 평가기준).
+#
+# 생성일: 2026-04-24 (3단계 멀티테넌트 샘플)
+# version: kolon_inbound_cs_v1
+
+tenant_id: kolon-inbound-cs
+version: "kolon_inbound_cs_v1_2026-04-24"
+
+intents:
+  환불취소:
+    required_phrases:
+      - id: "refund_shipping_cost"
+        description: "왕복 배송비 고객 부담 고지"
+        any_of:
+          - "왕복 배송비"
+          - "배송비는 고객님"
+          - "편도 삼천 원"
+          - "편도 3000원"
+        weight: 0.5
+      - id: "refund_damage_limit"
+        description: "훼손/사용 흔적 시 환불 제한 고지"
+        any_of:
+          - "훼손"
+          - "사용 흔적"
+          - "사용하신 흔적"
+        weight: 0.5
+    partial_threshold: 0.5  # 1개만 이행되면 3점, 둘 다 이행되면 5점
+
+  상품문의:
+    required_phrases:
+      - id: "return_policy_14days"
+        description: "반품 가능 기간 14일 고지"
+        any_of:
+          - "십사 일"
+          - "14일"
+        weight: 1.0
+    partial_threshold: 0.0
+
+  클레임:
+    required_phrases:
+      - id: "claim_photo_request"
+        description: "사진 증빙 요청 프로세스 안내"
+        any_of:
+          - "사진"
+          - "이미지 확인"
+          - "증빙"
+        weight: 0.6
+      - id: "claim_review_period"
+        description: "검수 기간 (영업일 3일) 고지"
+        any_of:
+          - "검수"
+          - "영업일 삼 일"
+          - "영업일 3일"
+        weight: 0.4
+    partial_threshold: 0.5
+
+  배송문의:
+    required_phrases: []  # 배송문의는 특별 고지 의무 없음
+
+  일반문의:
+    required_phrases: []

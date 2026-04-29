@@ -1,0 +1,43 @@
+{
+  "item_number": 3,
+  "item_name": "경청/말겹침/말자름",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "말겹침/말자름 마커 없이 고객 발언 끝까지 경청, 만점",
+      "quote_example": "네 고객님 말씀 끝까지 듣겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_listening"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "[동시] 마커 1회 발견 — 말겹침 1회 3점",
+      "quote_example": "[동시]네 그런데 그거는...",
+      "evaluator_id": "senior_b",
+      "tags": ["single_overlap"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "고객 발언 도중 상담사가 말을 자름 — 말자름 1회 즉시 0점",
+      "quote_example": "잠시만요 제가 먼저 설명드리겠습니다",
+      "evaluator_id": "senior_c",
+      "tags": ["interruption", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 5,
+      "rationale": "STT 겹침 구간 미표기 — 감점 근거 부재, 만점 처리 (V1 관행)",
+      "quote_example": "(마커 없음)",
+      "evaluator_id": "senior_a",
+      "tags": ["stt_no_marker", "skipped_evidence"],
+      "stub_seed": true
+    }
+  ]
+}

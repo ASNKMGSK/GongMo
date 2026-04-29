@@ -1,0 +1,111 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/outbound/compliance 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속.
+# 본 파일은 준법관리부 부서특화 평가 항목 (#919-#922) 만 정의한다.
+
+tenant_id: shinhan_compliance
+team_id: compliance
+channel: outbound
+department: compliance
+domain: regulatory_compliance
+description: >
+  신한카드 준법관리부 — CRM부 등 통신판매 상담을 사후 점검하는 메타 평가
+  부서. 금융소비자보호법 (제19조 설명의무 / 적합성 원칙 / 제21조 부당권유 금지 /
+  제46조 청약철회권) 준수 여부를 통화 사후 검토 형태로 평가. 취약계층 식별
+  (고령자 65세+ / 이해 곤란자 / 반복 질문 등) 후 보호 조치 적용 여부 점검.
+
+version:
+  schema: "v2.0.0"
+  rubric: "shinhan_compliance_v1"
+  golden_set: "shinhan_compliance_v1"
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# 부서특화 평가 항목 (site 공통 #1~#18 외 추가 — qa_rules.py 와 정합)
+# ---------------------------------------------------------------------------
+# allowed_steps 는 부서특화 dept items (#919-#922) 만 명시.
+# 공통 #1~#18 은 site (shinhan/tenant_config.yaml) 에서 fallback.
+scoring_policy:
+  allowed_steps:
+    "919": [15, 10, 5, 0]   # 설명의무 이행 ★ [금소법 제19조] (상품명/연회비/이자율/혜택/위험)
+    "920": [5, 3, 0]        # 취약계층 식별 및 보호 조치 [금소법 적합성 원칙]
+    "921": [5, 3, 0]        # 부당권유 금지 [금소법 제21조] (허위·과장·단정·불이익 누락 없이)
+    "922": [5, 3, 0]        # 청약철회·이해도 확인 [금소법 제46조]
+
+  # force_t3: Confidence 무관 강제 T3 라우팅 항목
+  force_t3_items: [920, 921]
+
+  # 부서 critical 위반 (즉시 0점 트리거)
+  critical_violations:
+    - id: unfair_solicitation
+      triggers: ["허위 표시", "과장 표현", "단정적 판단 제공", "불이익 사실 누락", "오인 유발"]
+      impact: ["921"]
+    - id: vulnerable_unprotected
+      triggers: ["고령 고객 식별 후 보호조치 누락", "이해 곤란자 보호조치 누락"]
+      impact: ["920"]
+    - id: missing_disclosure
+      triggers: ["상품명 미고지", "연회비 미고지", "이자율 미고지", "위험 미고지"]
+      impact: ["919"]
+    - id: missing_withdrawal_right
+      triggers: ["청약철회권 미안내", "이해도 확인 누락"]
+      impact: ["922"]
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Frontend 노드 매핑 (lib/pipeline.ts SHINHAN_DEPT_NODE_IDS 정합)
+# ---------------------------------------------------------------------------
+dept_evaluation:
+  - node_id: comp_unfair_sale_check
+    label: "부당권유 / 설명의무 통합 점검"
+    score: 30
+    items:
+      - "설명의무 이행 (상품명 / 연회비 / 이자율 / 혜택 / 위험)"
+      - "취약계층 식별 및 보호 조치 (고령 / 이해곤란)"
+      - "부당권유 금지 (허위 / 과장 / 단정 / 불이익 누락)"
+      - "청약철회·이해도 확인"
+
+# ---------------------------------------------------------------------------
+# Intent 분류 — 준법 메타 점검 도메인
+# ---------------------------------------------------------------------------
+supported_intents:
+  - 불완전판매점검
+  - 취약계층확인
+  - 약관설명
+  - 청약철회권안내
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 (부서특화 항목만)
+# ---------------------------------------------------------------------------
+segment_strategy:
+  "919": agent_long_blocks_with_rag    # 설명의무: 상담사 장문 발화 + RAG 6대 항목 cross-check
+  "920": vulnerable_pattern_scan       # 취약계층: 고령/반복질문/이해 곤란 패턴 전체 스캔
+  "921": refusal_or_overstate_scan     # 부당권유: 거절/단정/과장 패턴 전체 스캔
+  "922": confirm_intent_window         # 청약철회·이해도: 가입 확정 직전·직후 윈도우
+
+# ---------------------------------------------------------------------------
+# RAG 설정 — 부서 매뉴얼 chunk 인덱싱
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["919"]        # #919 설명의무 ★ 는 BK RAG 필수
+    fallback_mode: "unevaluable"
+
+# ---------------------------------------------------------------------------
+# 언어 / UI
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

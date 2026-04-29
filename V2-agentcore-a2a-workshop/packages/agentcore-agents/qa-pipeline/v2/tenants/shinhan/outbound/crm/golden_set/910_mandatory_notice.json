@@ -1,0 +1,117 @@
+{
+  "item_number": 910,
+  "item_name": "필수 안내 이행",
+  "category": "shinhan_crm_accuracy",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "TM상품권유",
+    "카드교체발급",
+    "부가서비스가입"
+  ],
+  "version": "shinhan_crm_v1",
+  "examples": [
+    {
+      "example_id": "GS-910-FULL-shinhan-crm-001",
+      "item_number": 910,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 안녕하십니까 신한카드 CRM부 김상담입니다 본 통화는 신한 디오 신용카드 상품 안내를 위한 통화이며 상담 품질 향상을 위해 녹취되고 있습니다 잠시 통화 가능하실까요\n고객: 네 가능합니다\n상담사: 감사합니다 진행 전에 안내드릴 사항 있습니다 첫째 본 카드 가입 시 14일 이내 청약철회권 행사가 가능하시며 둘째 가입을 위해 성함 생년월일 휴대폰 번호 등 개인정보를 활용하게 되며 동의하지 않으시면 가입은 어려우십니다 동의하시는지요\n고객: 네 동의합니다\n상담사: 감사합니다 그럼 상품 안내 이어가겠습니다",
+      "rationale": "[필수 안내] 4대 의무 항목 (전화목적 / 녹취고지 / 청약철회권 / 개인정보 동의) 모두 도입부에서 명시적으로 이행 → 만점\n - 상담사: \"본 통화는 신한 디오 신용카드 상품 안내를 위한 통화\" (전화목적)\n - 상담사: \"상담 품질 향상을 위해 녹취되고 있습니다\" (녹취고지)\n - 상담사: \"14일 이내 청약철회권 행사가 가능하시며\" (청약철회권)\n - 상담사: \"성함 생년월일 휴대폰 번호 등 개인정보를 활용하게 되며 동의하지 않으시면 가입은 어려우십니다 동의하시는지요\" (개인정보 활용 동의 + 명시적 동의 획득)",
+      "rationale_tags": [
+        "item_910",
+        "full_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_004",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-910-PARTIAL-shinhan-crm-002",
+      "item_number": 910,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "카드교체발급",
+      "segment_text": "상담사: 신한카드 박상담입니다 본 통화 녹취되고 있습니다 카드 교체 발급 안내드리려 연락드렸어요\n고객: 네\n상담사: 기존 카드 만료가 다가와서 신규 카드를 보내드릴 예정인데요 동의하시면 발송 진행하겠습니다\n고객: 네 알겠어요\n상담사: 그럼 발송 진행하겠습니다 도착하시면 14일 이내 사용 시작 부탁드립니다",
+      "rationale": "[필수 안내] 전화목적/녹취고지는 이행했으나 청약철회권 명시 누락 + 개인정보 활용 동의 절차 부재 → 부분 감점\n - 상담사: \"본 통화 녹취되고 있습니다\" (녹취고지 이행)\n - 상담사: \"카드 교체 발급 안내드리려 연락드렸어요\" (전화목적 이행)\n - 청약철회권 발화 부재 (\"14일 이내 사용 시작\"은 사용 안내일 뿐 철회권 안내 아님)\n - 개인정보 활용 동의 절차 부재",
+      "rationale_tags": [
+        "item_910",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_005",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-910-ZERO-shinhan-crm-003",
+      "item_number": 910,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "TM상품권유",
+      "segment_text": "상담사: 안녕하세요 카드 상품 안내드릴게요\n고객: 어디서 전화하신 거예요\n상담사: 좋은 상품 있어서 전화드렸어요 한번 들어보시면 분명 마음에 드실 거예요\n고객: 그래요 어떤 상품인데요\n상담사: 신용카드인데 혜택 진짜 좋고 가입하시면 후회 안 하실 거예요 신청하시겠어요\n고객: 음 일단 더 들어볼게요",
+      "rationale": "[필수 안내] 4대 의무 항목 모두 미고지 → 0점\n - 신한카드 소속 미고지 (출처 회피)\n - 통화 목적 모호 (\"좋은 상품\" 만 언급, 구체 상품/안내 목적 미명시)\n - 녹취고지 발화 부재\n - 청약철회권 발화 부재\n - 개인정보 활용 동의 절차 부재",
+      "rationale_tags": [
+        "item_910",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_crm_v1",
+        "sample_id": "synthetic_006",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

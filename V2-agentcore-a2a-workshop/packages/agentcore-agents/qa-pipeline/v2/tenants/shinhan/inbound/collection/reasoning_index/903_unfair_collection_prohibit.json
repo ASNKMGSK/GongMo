@@ -1,0 +1,37 @@
+{
+  "item_number": 903,
+  "item_name": "불공정 채권추심 금지",
+  "version": "shinhan_collection_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_903_synthetic_coll_021",
+      "score": 5,
+      "rationale": "[불공정 추심 금지 · 만점] 위협/공포/수치심 유발 발화 전무. 가족 통보 / 야간 연락 우려에 채권추심법 근거 명시 + 절차적 안심 멘트로 응대.\n - 상담사#2: \"불편하셨다면 정말 죄송합니다 채권추심은 정해진 절차에 따라서만 진행되고요\"\n - 상담사#4: \"가족분께 연체 사실을 알리거나 압박 목적으로 연락드리는 일은 없습니다 그건 채권추심법에서 금지된 사항이고요\"\n - 상담사#6: \"강요하거나 재촉하는 일 없으니 마음 편히 말씀해 주셔도 됩니다\"",
+      "quote_example": "상담사: 가족분께 연체 사실을 알리거나 압박 목적으로 연락드리는 일은 없습니다 그건 채권추심법에서 금지된 사항이고요",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_903", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_021"
+    },
+    {
+      "record_id": "r_903_synthetic_coll_022",
+      "score": 3,
+      "rationale": "[불공정 추심 금지 · 부분점수 3점] 명시적 위협/모욕 발화는 없으나 \"빨리 처리 안 하시면\" / \"어떻게든 마련해서\" 표현으로 부담 가중. 채권추심법 근거 미언급.\n - 상담사#4: \"빨리 처리 안 하시면 신용도 떨어지고 추후에 대출도 어려워질 수 있으세요\"\n - 상담사#6: \"네 사정은 이해하는데 그래도 어떻게든 마련해서 납부 부탁드립니다\"\n - 상담사#8: \"그건 저희가 따로 연락드리지는 않습니다\"",
+      "quote_example": "상담사: 빨리 처리 안 하시면 신용도 떨어지고 추후에 대출도 어려워질 수 있으세요",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_903", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_022"
+    },
+    {
+      "record_id": "r_903_synthetic_coll_023",
+      "score": 0,
+      "rationale": "[불공정 추심 금지 · 0점] 채권추심법 제9조 명시적 위반. 위협(법적 절차/직장 연락) + 수치심 유발(\"부끄럽지 않으세요\") + 모욕성 발화. critical_violation 트리거.\n - 상담사#2: \"그건 핑계고요 다 그렇게 말씀하시면 카드사가 어떻게 운영을 합니까\"\n - 상담사#4: \"가족분이나 직장으로 연락 갈 수도 있고요 법적 절차도 진행될 수 있습니다\"\n - 상담사#6: \"본인이 자초하신 거잖아요 부끄럽지 않으세요\"",
+      "quote_example": "상담사: 본인이 자초하신 거잖아요 부끄럽지 않으세요",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_903", "zero_compliance", "critical_violation"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_023"
+    }
+  ]
+}

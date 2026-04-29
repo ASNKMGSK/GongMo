@@ -1,0 +1,50 @@
+{
+  "item_number": 919,
+  "item_name": "설명의무 이행 ★",
+  "version": "shinhan_compliance_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_919_synthetic_101",
+      "score": 15,
+      "rationale": "[설명의무 이행] 금소법 제19조 6대 항목 모두 명시적·구체적 고지 → 만점\n - 상담사: \"본 상품은 신용카드입니다\" (상품명·종류)\n - 상담사: \"연회비는 1만 원이며 전월 30만 원 이상 사용하시면 면제\" (연회비)\n - 상담사: \"할부 이자율은 최저 5.9 퍼센트에서 최대 19.9 퍼센트\" (이자율)\n - 상담사: \"현금서비스 수수료는 별도 4.5 퍼센트\" (수수료)\n - 상담사: \"대형마트 5 퍼센트 청구할인 월 한도 1만 원\" (혜택)\n - 상담사: \"연체 시 신용평점 하락 / 거래정지 / 추가 수수료\" (위험)",
+      "quote_example": "상담사: 신용카드 사용 시 발생할 수 있는 위험 안내드립니다 연체 시 신용평점 하락 / 거래정지 / 추가 수수료가 발생할 수 있으며",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_919",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_101"
+    },
+    {
+      "record_id": "r_919_synthetic_102",
+      "score": 10,
+      "rationale": "[설명의무 이행] 6대 항목 중 상품명/연회비/혜택 충족 / 이자율 모호 + 수수료·위험 미고지 → 부분 감점\n - 상담사: \"신한 트래블 신용카드 안내드릴게요\" (상품명)\n - 상담사: \"연회비 2만 원이고 첫해 면제\" (연회비)\n - 상담사: \"해외 가맹점 1.5 퍼센트 적립\" (혜택)\n - 상담사: \"가입 후 안내드리겠습니다\" (이자율 모호 — 가입 전 고지 의무 미이행)\n - 수수료 / 위험 발화 부재",
+      "quote_example": "상담사: 일시불은 무이자고 할부 이자율은 신용평점 기준이라 가입 후 안내드리겠습니다",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_919",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_102"
+    },
+    {
+      "record_id": "r_919_synthetic_103",
+      "score": 0,
+      "rationale": "[설명의무 이행] 6대 항목 모두 미고지 또는 회피 + 위험 무시 발언 → 0점\n - 상담사: \"좋은 카드 있어서 안내드려요\" (상품명·종류 모호)\n - 상담사: \"약관에 다 적혀 있으니까 일단 가입하시고 보세요\" (연회비/이자율/수수료 회피)\n - 상담사: \"신용카드는 다들 쓰시는 거니까 위험 같은 거 신경 안 쓰셔도 돼요\" (위험 적극 회피)\n - 70세 고령 고객 대상 → #920 동시 위반",
+      "quote_example": "상담사: 신용카드는 다들 쓰시는 거니까 위험 같은 거 신경 안 쓰셔도 돼요",
+      "evaluator_id": "shinhan_compliance_v1_senior",
+      "tags": [
+        "item_919",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_103"
+    }
+  ]
+}

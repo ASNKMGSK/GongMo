@@ -1,0 +1,52 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 10,
+      "rationale": "항목별 구조화 설명 + 숫자/조건 명시 + 애매 표현 없음 만점",
+      "quote_example": "첫째 신청 조건은 ○○ 이고 둘째 처리 기간은 3영업일 입니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_clarity", "structured"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 7,
+      "rationale": "핵심 정보 있으나 '정도' 완화어 사용 — 중간 7점",
+      "quote_example": "처리 기간은 3일 정도 걸리실 것 같고요",
+      "evaluator_id": "senior_b",
+      "tags": ["mitigated_expression", "mid_clarity"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "실질 정보 부족, 회피성 답변 섞임 — 3점",
+      "quote_example": "그건 상황에 따라 다르고요 홈페이지 확인 부탁드려요",
+      "evaluator_id": "senior_c",
+      "tags": ["evasive", "partial_low"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "설명 전무, '모르겠네요' 업무회피 0점",
+      "quote_example": "그건 저도 잘 모르겠어요",
+      "evaluator_id": "senior_a",
+      "tags": ["work_avoidance", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 7,
+      "rationale": "1개 세부 조건 미명시, 나머지는 명확 — reconciler 판정 7점",
+      "quote_example": "신청 절차는 ○○ 이고요 (기한 조건 누락)",
+      "evaluator_id": "senior_b",
+      "tags": ["missing_detail", "reconciler_mid"],
+      "stub_seed": true
+    }
+  ]
+}

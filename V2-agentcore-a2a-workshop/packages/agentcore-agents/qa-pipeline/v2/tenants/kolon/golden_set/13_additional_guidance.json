@@ -1,0 +1,540 @@
+{
+  "item_number": 13,
+  "item_name": "부연 설명 및 추가 안내",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "주문배송",
+    "환불취소"
+  ],
+  "version": "kolon_v4_fixed",
+  "examples": [
+    {
+      "example_id": "GS-13-FULL-668437",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 고객님\n고객: 그게 신 신세계요 근데 그 좀 비치는 거 같애서 그걸 아이보리 색으로 좀 바꿀까 하거든요\n상담사: 아 그런가요고 있니\n고객: 예\n상담사: 아 알겠습니다 몇 가지만 확인해보고요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\n고객: 네 네\n...\n상담사: 예 그럼 이 상품 외부 착용이나 세탁 아니면은 텍 제거하 수도 있을까요 고객님\n고객: 아니요 텍 같은 거 다 있어요 근데 비닐이 좀 없는데\n상담사: 아 그\n...\n상담사: 어 네 알겠습니다 고객님\n고객: 그럼 어떻게 해야 되죠 절차가\n상담사: 예 오늘 접수되면요 영업일 기준 이틀에서 삼 일 내로요 택배기사가 방문해서요",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#4: \"그게 신 신세계요 근데 그 좀 비치는 거 같애서 그걸 아이보리 색으로 좀 바꿀까 하거든요\"\n - 고객#24: \"아니요 텍 같은 거 다 있어요 근데 비닐이 좀 없는데\"\n - 고객#40: \"그럼 어떻게 해야 되죠 절차가\"\n - 상담사#7: \"아 알겠습니다 몇 가지만 확인해보고요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 4
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 24
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 40
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668437",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668451",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 안녕하세요\n고객: 네 제가 그 언제지 날짜는 여기 지금 조회 지금 들어와서 볼까요\n상담사: \n...\n상담사: 네\n고객: 근데 하나가 마에 그 사이즈가 안 맞아 작다고\n상담사: 네\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 지금 주문서 확인해보니까는 일자 기준으로 사 월 칠 일이 가장 빠른데요 코오롱 스포츠 코오롱 공식 온라인 토어에서 주문한 주문서 확인되고 있어요\n고객: 네\n...\n상담사: 그래서 오늘 이후\n고객: 그럼 내일 네\n상담사: 맞아요 오늘 이후부터데요 내일은 토요일이다 보니까는 토요일날 운영을 하는 제 기사님들은 토요일 날 방문 가능하고요 그렇지 않으면은 월요일날 방문할 거예요",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#4: \"네 제가 그 언제지 날짜는 여기 지금 조회 지금 들어와서 볼까요\"\n - 고객#12: \"근데 하나가 마에 그 사이즈가 안 맞아 작다고\"\n - 고객#52: \"그럼 내일 네\"\n - 상담사#25: \"네 소중한 정보 확인 감사합니다 지금 주문서 확인해보니까는 일자 기준으로 사 월 칠 일이 가장 빠른데요 코오롱 스포츠 코오롱 공식 온라인 토어에서 주문한 주문서 확인되고 있어요\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 4
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 12
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 52
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668451",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-668464",
+      "item_number": 13,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 그거를 반품을 할려고 하는데 이게 여기 뭐 따로 신청을 해야 되나 봐요 이쪽으로 전화하라 그러던데요\n상담사: 아 네 그러면 제가 빠르게 확인하고 반품 접수 도와드리겠습니다 고객님 저 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드립니다\n고객: 네 ***\n...\n상담사: 네\n고객: 어 그냥 비닐에다가 담아가지고 그냥 보내봤어요 근데 이게 선물할려도 너무 지저분스러운 게\n고객: 비닐 포장한 것도 그냥 스티커를 몇 번을 사용하고 썼고 했는지 모르겠지만 두 세 줄이 그냥 끈끈한 게 막 붙어있고\n고객: 그래서 아 이걸 어떻게 제가 선물을 할 수 있겠어요 적어도 그래도 박스 거면은 박스 종이 케이스라도 있었으면 하고서\n고객: 어 그런 용도로 선물 준비할려고 한 건데 비닐로는 좀 그렇잖아요 그럴 바에는 선물을 안 하고 말아야지\n...\n상담사: 포장이 불량이어가지고요\n고객: 그럼 뭐라 그래요 단순 변심이 아니죠 이거는 선물할 용도로 산 건데\n상담사: 네",
+      "rationale": "[부연설명] 고객 재문의 5회 발생 → 선제 안내 부족 → 3점\n - 고객#20: \"어 그냥 비닐에다가 담아가지고 그냥 보내봤어요 근데 이게 선물할려도 너무 지저분스러운 게\"\n - 고객#22: \"그래서 아 이걸 어떻게 제가 선물을 할 수 있겠어요 적어도 그래도 박스 거면은 박스 종이 케이스라도 있었으면 하고서\"\n - 고객#28: \"그럼 뭐라 그래요 단순 변심이 아니죠 이거는 선물할 용도로 산 건데\"\n - 상담사#5: \"아 네 그러면 제가 빠르게 확인하고 반품 접수 도와드리겠습니다 고객님 저 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드립니다\"",
+      "rationale_tags": [
+        "item_13",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 20
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 22
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 28
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668464",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-668481",
+      "item_number": 13,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 아니 그 바지를 시켰는데 그게 또 없습니까\n상담사: 아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 아 무심터이다\n...\n상담사: \n고객: 아 다른 데는 다 물건을 시키잖아요 배송을 딱 거리 가잖아요 그러면 매장 배송 매장 배송 없으면 없다 바로바로 해요 근데 왜 코오롱 그건 왜 그게 안돼요\n상담사: 고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\n...\n상담사: 불편드린 점은 죄송합니다 고객님 어제 주문을 해주셨구요 저희가 현재 재고 확인 중에 있습니다 고객님 조금 빠르게\n고객: 아니 그 재고 확인하는 게 제거려요 도대체 그라고 뜨면은 뭘 주문하면 무조건 그냥 재고 확인한다 그는데 그럼 무조건 제가 기다려야 되는 거예요 아 참 짜증나잖아 진짜요 이거 할 때마다라니까\n상담사: 죄송합니다 저희는 출고 일정이 영업일 기준 삼 일에서 오 일 정도 소요가 되세요\n고객: 똑같애요 다른 데도 똑같애 마찬가지요 근데 이렇게 안 해요\n상담사: 그 점은 불편드려 죄송합니다",
+      "rationale": "[부연설명] 고객 재문의 7회 발생 → 선제 안내 부족 → 3점\n - 고객#14: \"아 다른 데는 다 물건을 시키잖아요 배송을 딱 거리 가잖아요 그러면 매장 배송 매장 배송 없으면 없다 바로바로 해요 근데 왜 코오롱 그건 왜 그게 안돼요\"\n - 고객#25: \"아니 그 재고 확인하는 게 제거려요 도대체 그라고 뜨면은 뭘 주문하면 무조건 그냥 재고 확인한다 그는데 그럼 무조건 제가 기다려야 되는 거예요 아 참 짜증나잖아 진짜요 이거 할 때마다라니까\"\n - 고객#27: \"똑같애요 다른 데도 똑같애 마찬가지요 근데 이렇게 안 해요\"\n - 상담사#3: \"아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"",
+      "rationale_tags": [
+        "item_13",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 14
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 25
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 27
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668481",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668488",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 좀 교환이 될지 한번 여쭤보고 싶어서요\n상담사: 교환이 될지라고 해주셨는데요 그러면 제가 주문 건 먼저 확인 후에 안내 도와드려도 괜찮으실까요\n고객: 네 음 네\n상담사: 교환 관련으로 많이 궁금하실 텐데요 고객님 연락처와 성함 말씀 부탁드리겠습니다\n고객: * * * *\n...\n상담사: 주름이 없다\n고객: 근데 이제 제가 다른 제품은 온 온다고 표현을 해야 되나 이게 쪼금 쪼글주글해야 돼서요 목 밴드가\n상담사: 잠시만 기다려 주세요 고객님",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#28: \"근데 이제 제가 다른 제품은 온 온다고 표현을 해야 되나 이게 쪼금 쪼글주글해야 돼서요 목 밴드가\"\n - 상담사#5: \"교환이 될지라고 해주셨는데요 그러면 제가 주문 건 먼저 확인 후에 안내 도와드려도 괜찮으실까요\"\n - 상담사#7: \"교환 관련으로 많이 궁금하실 텐데요 고객님 연락처와 성함 말씀 부탁드리겠습니다\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 28
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668488",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668507",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네네네\n상담사: 소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\n고객: 네 네 네\n...\n고객: 네네네네\n상담사: 오 그러시면 저희 배송이요 고객님 배송이 된 게 사 월 육 일이었어요 그래서 취소하고 그 고객님께서 보관하시는 걸로 진행하는데\n고객: 네 네\n...\n상담사: 그 점 참고만 해주시면 좋을 거 같애요\n고객: 아니 근데 이 이 색깔이\n상담사: 에\n...\n상담사: 네\n고객: 어 근데 아 조금 조금 여유가 있더라도 크림색이 마음에 들어갖고 그러고 있으니까 입을 수밖에 없을 거 같애요\n상담사: 네 아이고 네 아직게 드려 너무 죄송해요 상품이 품절이라서 어 만약에라도 그",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#40: \"아니 근데 이 이 색깔이\"\n - 고객#87: \"어 근데 아 조금 조금 여유가 있더라도 크림색이 마음에 들어갖고 그러고 있으니까 입을 수밖에 없을 거 같애요\"\n - 상담사#25: \"소중한 정보 확인 감사드리구요 말씀해주신 주문 건 한번 확인해보겠습니다 잠시만 기다려 주시겠습니까\"\n - 상담사#33: \"오 그러시면 저희 배송이요 고객님 배송이 된 게 사 월 육 일이었어요 그래서 취소하고 그 고객님께서 보관하시는 걸로 진행하는데\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 33
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 40
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 87
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668507",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668526",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네\n상담사: 네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\n고객: 이거 이엠비 시트 티셔셔츠하구요\n...\n고객: 가야 되겠네\n상담사: 음 아 네 십 일만 천 이백 원 구매했던 그 회색 그레이 색상 티 맞으실까요\n고객: 네 네네 네\n...\n상담사: 네 잠시만요 네 고객님 저희 부분 반품 이천 오백 원이 발생되시는데요 반품비 저희 환불금액에서 차감해도 될까요 고객님\n고객: 근데 이거\n상담사: 네",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#40: \"근데 이거\"\n - 상담사#9: \"네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\"\n - 상담사#21: \"음 아 네 십 일만 천 이백 원 구매했던 그 회색 그레이 색상 티 맞으실까요\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 21
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 40
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668526",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668542",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 일 칠 팔 일 일 칠 구 팔 오\n상담사: 사 월 오 일 날 주문했던 지금 포켓 셔츠 엘 사이즈 보여주고 있는데요 이 상품 반품 필요하신 걸까요\n고객: 저 난방 와사스 같은 난방 회색깔지 테크\n...\n고객: 야 네이비\n상담사: 예 확인해보겠습니다 지금 주문서 확인해보니까는 사 월 칠 일 주문 건으로 페라로멜라도에서 주문했던\n상담사: 캐주얼 슬랙스 네이비 구십 이 사이즈 확인되었습니다",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 상담사#23: \"사 월 오 일 날 주문했던 지금 포켓 셔츠 엘 사이즈 보여주고 있는데요 이 상품 반품 필요하신 걸까요\"\n - 상담사#35: \"예 확인해보겠습니다 지금 주문서 확인해보니까는 사 월 칠 일 주문 건으로 페라로멜라도에서 주문했던\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 23
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 35
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668542",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668605",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 예예 예예 그렇습니다\n상담사: 네 제가 우선 주문번호가 두 건이있실 때는 각각 따로 접수 진행을 해야 돼서 제가 교환 접수\n고객: 아니요 주문번호는 하나입니다\n...\n고객: 제가 지금 어 물건이 두 갠데 흰색의 빨간 거를 인제 이거는 반품을 하고 어 그린에 된 거를 하나만 사이즈 교환을 하는 경우\n고객: 그러면\n상담사: 네\n...\n상담사: 네 반품비 오천 원으로만 차감 환불 진행되시구요 교환비는 따로 발생이 되시는 건 없으십니다\n고객: 네 아 그래요 음 아니요 그냥 지금 두 개 다 그러면 교환을 해도 마찬가지인 거죠\n상담사: 예 맞습니다\n고객: 아 예 그러면 두 개 다로 일단은 교환을 할게요\n상담사: 예 잠시만요",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#36: \"그러면\"\n - 고객#50: \"네 아 그래요 음 아니요 그냥 지금 두 개 다 그러면 교환을 해도 마찬가지인 거죠\"\n - 고객#52: \"아 예 그러면 두 개 다로 일단은 교환을 할게요\"\n - 상담사#20: \"네 제가 우선 주문번호가 두 건이있실 때는 각각 따로 접수 진행을 해야 돼서 제가 교환 접수\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 20
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 36
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 50
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 52
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668605",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668610",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 고객님\n고객: 네 어떻게 되는 겁니까\n상담사: 네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\n고객: 언택 * * * * * * * * * * *\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\n고객: 네\n...\n상담사: 아 그거는 저희 자사 오리지널 브랜드에 관해서 혜택을 제공해드리고 있구요 이천 사 년 그 혜택은 제외입니다\n고객: 네 알겠습니다 그럼 반품할게요\n상담사: 네 알겠습니다 저희 그러면은 그 반품 사유가 고객님 그 사이즈로 말씀해주셨는데 맞으신 걸까요",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#6: \"네 어떻게 되는 겁니까\"\n - 고객#43: \"네 알겠습니다 그럼 반품할게요\"\n - 상담사#7: \"네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\"\n - 상담사#11: \"네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 6
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 43
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668610",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-668675",
+      "item_number": 13,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "고객: 네네\n상담사: 여기 몇 가지만 확인해보구요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\n고객: 네네 네\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 고객님 일단 고객님 확인되시는데요 지금 주문 내역이 확인이 안 되시네요\n고객: 어 뭘 불러드려야 될까요 운송장 번호 있고\n...\n상담사: 음 예 그러신 좋으실 거 아니에요\n고객: 네네네 그러면 그렇게 한번 해볼게요\n상담사: 예 그 만약에 무신사에서 해결이 안 되시면요 이게",
+      "rationale": "[부연설명] 고객 재문의 1회 발생 → 선제 안내 부족 → 3점\n - 고객#53: \"네네네 그러면 그렇게 한번 해볼게요\"\n - 상담사#9: \"여기 몇 가지만 확인해보구요 최대한 빠르게 도와드릴 수 있도록 할게요 고객님\"\n - 상담사#23: \"네 소중한 정보 확인 감사합니다 고객님 일단 고객님 확인되시는데요 지금 주문 내역이 확인이 안 되시네요\"",
+      "rationale_tags": [
+        "item_13",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 23
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 53
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668675",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-PARTIAL-668697",
+      "item_number": 13,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 같이 나오 같이 이렇게 연결해서 나오는 거라고 얘기를 하던데\n상담사: 아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***\n...\n고객: 네네\n상담사: 네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\n고객: 그 로지\n...\n상담사: 네\n고객: 아 근데 할 수 없죠 뭐\n상담사: 네 이 부분은 그 저희가 교환이 가능한지 한 번 확인하고 연락 한번 드리겠습니다 고객님\n고객: 네 언제쯤 연락 주신대요\n상담사: 네 오늘 중으로 확인하고 연락드릴게요 고객님",
+      "rationale": "[부연설명] 고객 재문의 2회 발생 → 선제 안내 부족 → 3점\n - 고객#58: \"아 근데 할 수 없죠 뭐\"\n - 고객#60: \"네 언제쯤 연락 주신대요\"\n - 상담사#7: \"아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#15: \"네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\"",
+      "rationale_tags": [
+        "item_13",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 58
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 60
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668697",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668736",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 예 예 맞아요\n상담사: 네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\n고객: 미래가 안 어졌는데요\n...\n상담사: 별도로 전화 연락을 주시지는 않으셔도 되세요\n고객: 그러면 제가 지금\n상담사: 예\n...\n상담사: 아 추글거리지 않은 제품으로요\n고객: 예 예 예 또 만약에 그러면 제가\n상담사: 아 예 그러면 제가\n...\n상담사: 거기에도 약간 주글거리게 보이시거든요 고객님 이게 약간 평평하게 표지는 스타일은 아니신 거 같아요 약간 울 불가한 면이 있으세요\n고객: 근데 뒷면은 또 괜찮하거든요\n상담사: 네",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#34: \"그러면 제가 지금\"\n - 고객#56: \"예 예 예 또 만약에 그러면 제가\"\n - 고객#80: \"근데 뒷면은 또 괜찮하거든요\"\n - 상담사#17: \"네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 34
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 56
+        },
+        {
+          "speaker": "고객",
+          "turn_id": 80
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668736",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-13-FULL-668771",
+      "item_number": 13,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\n고객: 가 네 그 저 혹시 반품은 언제 되는지 여쭤보려고 전화했거든요\n상담사: 반품 신청하셨어요 고객님\n고객: 네 물건도 보냈어요\n상담사: 네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***구요\n고객: * * * * * * * * * * * 이여\n상담사: 아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\n고객: 네 네",
+      "rationale": "[부연설명] 예상 질문까지 선제 안내로 원스톱 처리 → 만점\n - 고객#2: \"가 네 그 저 혹시 반품은 언제 되는지 여쭤보려고 전화했거든요\"\n - 상담사#5: \"네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#9: \"아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\"",
+      "rationale_tags": [
+        "item_13",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "고객",
+          "turn_id": 2
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668771",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

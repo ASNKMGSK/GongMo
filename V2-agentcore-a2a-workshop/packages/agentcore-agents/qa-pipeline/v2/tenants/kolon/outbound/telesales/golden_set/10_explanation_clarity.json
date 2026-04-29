@@ -1,0 +1,59 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성 (상품 프로모션)",
+  "category": "설명력 및 전달력",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 5, 0],
+  "intents": ["프로모션안내", "상품안내"],
+  "dialog_stages": ["main"],
+  "version": "kolon_outbound_telesales_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "long_utterance_block",
+    "details": "상담사 장문 발화(50자 이상) 블록 전체. 아웃바운드는 상품 설명 blocks 이 연속되므로 block 단위로 추출.",
+    "min_utterance_length_chars": 50
+  },
+  "examples": [
+    {
+      "example_id": "GS-10-TS-FULL-001",
+      "item_number": 10,
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "프로모션안내",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 이번 봄 프로모션 내용을 말씀드리면요 첫째 멤버십 고객님 한정으로 전 상품 이십오 퍼센트 할인 적용되시고요 둘째 구매 금액 십만 원 이상이실 경우 사은품으로 골프 장갑 증정 가능하십니다 셋째 기간은 사월 삼십일 일까지 유효하시고요 마지막으로 중복 할인 쿠폰과 함께 사용은 불가하다는 점 안내드립니다",
+      "rationale": "[설명 명확성] 혜택(할인·사은품) + 조건(금액·기간) + 제약(중복 불가) 까지 4요소 완결 → 만점\n - 번호화된 단계 구조\n - 수치 구체성 (25%·10만원·4월30일)\n - 제약조건 자발 고지 — 오안내 리스크 차단",
+      "rationale_tags": ["item_10", "full_compliance", "structured", "constraints_disclosed", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 6}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_011","variant":"full_promotion","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-10-TS-PARTIAL-001",
+      "item_number": 10,
+      "score": 7,
+      "score_bucket": "partial",
+      "intent": "프로모션안내",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 이번에 할인 행사 엄청 크게 해요 할인 많이 되시고요 지금 구매하시면 사은품도 드리거든요 기간 얼마 안 남았으니까 빨리 결정하시는 게 좋으세요",
+      "rationale": "[설명 명확성] 혜택은 언급되나 구체 수치/조건 부재 → 7점\n - 할인율 미명시 (\"엄청 크게\")\n - 사은품 품목 미특정\n - 기간 구체 날짜 없음 — 판단 근거 부족\n - 긴급 압박 어휘만 강화",
+      "rationale_tags": ["item_10", "partial_compliance", "vague_numbers", "urgency_without_details", "telesales"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 6}],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_012","variant":"vague_promotion","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-10-TS-ZERO-001",
+      "item_number": 10,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "상품안내",
+      "dialog_stage": "main",
+      "segment_text": "고객: 그 상품은 어떤 거예요\n상담사: 아 엄청 좋은 거예요 저희 자랑 상품이고요 사시면 후회 안 하세요\n고객: 기능이나 소재 이런 건요\n상담사: 그런 건 사이트에서 한번 보시면 될 것 같아요",
+      "rationale": "[설명 명확성] 상품 정보 제로 → 0점\n - \"엄청 좋은 거\" 외 어떠한 fact 도 전달 없음\n - 고객 재질의에 \"사이트 보세요\" 로 회피\n - 아웃바운드 영업 목적임에도 상품 설명 부재 — 영업 실패",
+      "rationale_tags": ["item_10", "no_info", "deflection", "telesales"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4},
+        {"speaker": "상담사", "turn_id": 8}
+      ],
+      "rater_meta": {"rater_type":"synthetic_telesales","source":"kolon_outbound_telesales_bootstrap_2026-04-24","sample_id":"ts_sample_013","variant":"deflection","human_score_verified":false}
+    }
+  ]
+}

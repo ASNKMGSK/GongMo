@@ -1,0 +1,62 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어 활용",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "refusal-gated — 재고 부족/교환비 발생/반품 조건 거절 등 거절·양해 상황 전제에서 판정.",
+  "examples": [
+    {
+      "example_id": "GS-07-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 번거로우시겠지만 본인확인을 위해 성함과 연락처 한 번 더 말씀 부탁드리겠습니다.",
+      "rationale": "요청 상황에서 쿠션어('번거로우시겠지만') 사용.",
+      "rationale_tags": ["쿠션어 적절"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-07-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 부득이하게 라지 사이즈는 재고가 소량이라 품절 시 반품 환불로 전환되실 수 있는 점 참고 부탁드리겠습니다.",
+      "rationale": "재고 부족 거절 상황에서 쿠션어('부득이하게', '참고 부탁드리겠습니다') 2회 사용.",
+      "rationale_tags": ["거절 상황 쿠션어"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 교환비 없이 해주세요. 상담사: 그건 안 됩니다. 자사 상품이 아니라서 교환비 5천원 발생해요.",
+      "rationale": "거절 상황인데 쿠션어 전무. 내용은 정확하여 3점.",
+      "rationale_tags": ["거절 상황 쿠션어 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-07-PARTIAL-02",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "고객: 오늘 안에 배송 가능한가요. 상담사: 그건 안 되고요, 영업일 기준 이틀에서 삼 일 걸립니다.",
+      "rationale": "거절 상황 쿠션어 누락. 정보 정확하여 3점.",
+      "rationale_tags": ["쿠션어 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-07-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "고객: 당장 전액 환불 해주세요. 상담사: 안 되는데요. 그건 그냥 안 돼요.",
+      "rationale": "거절 반복 + 쿠션어/양해 전무 + 건조한 응대 톤.",
+      "rationale_tags": ["거절 반복 쿠션어 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

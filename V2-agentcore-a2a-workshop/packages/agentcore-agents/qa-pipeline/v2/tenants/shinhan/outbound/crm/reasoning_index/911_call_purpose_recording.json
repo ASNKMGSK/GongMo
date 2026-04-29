@@ -1,0 +1,50 @@
+{
+  "item_number": 911,
+  "item_name": "전화 목적·녹취 고지",
+  "version": "shinhan_crm_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_911_synthetic_007",
+      "score": 5,
+      "rationale": "[전화 목적·녹취 고지] 통신판매 도입 의무 5요소 (회사명 / 부서명 / 상담사명 / 통화 목적 / 녹취 고지) 모두 시작 첫 발화에서 이행 → 만점\n - 상담사: \"신한카드 CRM부 김상담입니다\" (회사+부서+상담사명)\n - 상담사: \"신한 디오 신용카드 상품 안내를 위한 outbound 마케팅 통화\" (구체 통화 목적)\n - 상담사: \"상담 품질 향상과 분쟁 예방을 위해 통화 내용은 녹취되고 있음\" (녹취 고지)",
+      "quote_example": "상담사: 안녕하십니까 신한카드 CRM부 김상담입니다",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_911",
+        "full_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_007"
+    },
+    {
+      "record_id": "r_911_synthetic_008",
+      "score": 3,
+      "rationale": "[전화 목적·녹취 고지] 회사명/상담사명 이행 / 부서명 누락 + 녹취 고지가 도입 외에서 후행 → 부분 감점\n - 상담사: \"신한카드 박상담입니다\" (회사+상담사명, 부서명 누락)\n - 상담사: \"신상품 안내드리려 연락드렸어요\" (목적 모호)\n - 상담사: \"본 통화는 녹취되고 있습니다\" (녹취고지 후행)",
+      "quote_example": "상담사: 신한카드 박상담입니다 신상품 안내드리려 연락드렸어요",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_911",
+        "partial_compliance",
+        "synthetic"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_008"
+    },
+    {
+      "record_id": "r_911_synthetic_009",
+      "score": 0,
+      "rationale": "[전화 목적·녹취 고지] 통신판매 도입 의무 모두 미이행 + 회사명 적극 회피 → 0점\n - 상담사: \"카드 회사인데요\" (회사명 미고지)\n - 상담사: \"좋은 상품 있어서\" (구체 통화 목적 미고지)\n - 부서명/상담사명/녹취 고지 발화 부재",
+      "quote_example": "상담사: 일단 들어보시고 마음에 드시면 그때 말씀드릴게요",
+      "evaluator_id": "shinhan_crm_v1_senior",
+      "tags": [
+        "item_911",
+        "zero_compliance",
+        "synthetic",
+        "critical_violation"
+      ],
+      "stub_seed": false,
+      "sample_id": "synthetic_009"
+    }
+  ]
+}

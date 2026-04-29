@@ -1,0 +1,37 @@
+{
+  "name": "chatbot-ui-next",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0 --port 3000",
+    "dev:local": "next dev",
+    "build": "next build",
+    "start": "next start --hostname 0.0.0.0 --port 3000",
+    "lint": "eslint"
+  },
+  "dependencies": {
+    "@swc/helpers": "0.5.15",
+    "@xyflow/react": "^12.10.2",
+    "dagre": "^0.8.5",
+    "dompurify": "^3.4.1",
+    "elkjs": "^0.11.1",
+    "exceljs": "^4.4.0",
+    "framer-motion": "^12.38.0",
+    "marked": "^18.0.2",
+    "next": "16.2.4",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/dagre": "^0.7.54",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.2.4",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

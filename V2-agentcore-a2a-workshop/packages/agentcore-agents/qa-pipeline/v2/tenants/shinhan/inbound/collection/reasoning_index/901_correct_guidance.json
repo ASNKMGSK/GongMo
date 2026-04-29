@@ -1,0 +1,37 @@
+{
+  "item_number": 901,
+  "item_name": "정확한 안내 ★",
+  "version": "shinhan_collection_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_901_synthetic_coll_001",
+      "score": 15,
+      "rationale": "[정확 안내 · 만점] 연체경과(18일) / 원금(42.3만) / 연체이자(7,400) / 총납부(43.04만) / 납부기한(5/2) / 결제계좌(신한은행) 5요소 전부 명확 안내 + 신용평점 영향 사전 고지.\n - 상담사#4: \"사 월 십 일 결제일 기준으로 십팔 일 경과되어 있고요\"\n - 상담사#6: \"원금 사십이만 삼천 원 연체이자 칠천 사백 원 합산해서 총 납부 금액이 사십삼만 사백 원입니다\"\n - 상담사#8: \"납부기한은 오 월 이 일까지 부탁드리고요 결제계좌는 등록되어 있는 신한은행 *** 계좌로 자동출금 예정입니다\"",
+      "quote_example": "상담사: 원금 사십이만 삼천 원 연체이자 칠천 사백 원 합산해서 총 납부 금액이 사십삼만 사백 원입니다",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_901", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_001"
+    },
+    {
+      "record_id": "r_901_synthetic_coll_002",
+      "score": 5,
+      "rationale": "[정확 안내 · 부분점수 5점] 5요소 중 일부 누락 또는 불명확. 원금/이자 분리 안내 누락 (\"한 사십삼만 원 정도\"), 납부기한 모호 (\"오 월 초 정도\"), 결제계좌 은행명 미언급. 고객 재질문 발생.\n - 상담사#4: \"지금 연체 금액이 한 사십삼만 원 정도 됩니다\"\n - 고객#5: \"정확히 얼마예요 그 안에 이자도 포함이에요\"\n - 상담사#8: \"곧 오 월 초 정도까지 납부 부탁드리겠습니다\"",
+      "quote_example": "고객: 정확히 얼마예요 그 안에 이자도 포함이에요",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_901", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_002"
+    },
+    {
+      "record_id": "r_901_synthetic_coll_003",
+      "score": 0,
+      "rationale": "[정확 안내 · 0점] 5요소 전부 누락 또는 부정확. 연체경과/원금·이자 분리/총납부/납부기한/결제계좌 모두 회피 응답. \"아마 사십만 원대\" 추정 안내 + 위협성 톤.\n - 상담사#2: \"그 일단 빨리 입금해 주세요\"\n - 상담사#6: \"한 사십만 원대일 거예요 아마\"\n - 상담사#8: \"그 빨리 내시면 되고요 안 그러면 거래정지될 수도 있어요\"",
+      "quote_example": "상담사: 한 사십만 원대일 거예요 아마",
+      "evaluator_id": "shinhan_collection_v1_senior",
+      "tags": ["item_901", "zero_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_coll_003"
+    }
+  ]
+}

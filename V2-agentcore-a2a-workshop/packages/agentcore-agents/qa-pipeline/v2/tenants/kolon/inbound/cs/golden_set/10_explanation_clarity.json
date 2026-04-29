@@ -1,0 +1,56 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성",
+  "category": "설명력 및 전달력",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 5, 0],
+  "intents": ["상품문의", "환불취소", "배송문의"],
+  "dialog_stages": ["main"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "long_utterance_block",
+    "details": "상담사 장문 발화(50자 이상) 블록 전체 추출 (PDF §7.4)",
+    "min_utterance_length_chars": 50
+  },
+  "examples": [
+    {
+      "example_id": "GS-10-CS-FULL-001",
+      "item_number": 10,
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 네 고객님 환불 진행 절차를 안내드리면요 첫째 반품 신청 후 택배사가 방문 수거를 해가시고요 둘째 저희 물류센터에 입고되면 검수 후 하자 여부를 확인합니다 셋째 검수 완료 시점부터 영업일 기준 삼 일 이내에 결제 수단으로 환급 처리되시고요 마지막으로 환급 완료되면 문자와 이메일로 안내드립니다",
+      "rationale": "[설명 명확성] 단계 번호화 + 조건·기간·소통 채널 모두 명시 → 만점\n - 첫째/둘째/셋째/마지막 4단계 구조화\n - 각 단계 주체(택배사/물류센터/자사)·기간·결과물 명확\n - 마지막에 알림 채널(문자·이메일) 안내 — 고객이 다음 접점 예측 가능",
+      "rationale_tags": ["item_10", "full_compliance", "structured_steps", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 14}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_061","variant":"numbered_steps","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-10-CS-PARTIAL-001",
+      "item_number": 10,
+      "score": 7,
+      "score_bucket": "partial",
+      "intent": "배송문의",
+      "dialog_stage": "main",
+      "segment_text": "상담사: 배송은 주문하시고 영업일 기준 이삼 일 정도 걸리시고 택배사에서 문자 발송되면 그 때 받으실 수 있고 수령 못하실 경우 재배송 신청도 가능하시니 참고 부탁드립니다",
+      "rationale": "[설명 명확성] 핵심 정보는 담겼으나 구조화 부족 → 7점\n - 리드타임·알림·대안(재배송) 모두 포함\n - 그러나 단일 긴 문장 (구두점 없이 한 숨에 끝) → 가독성/청취 부하\n - 번호나 순서 마커 부재",
+      "rationale_tags": ["item_10", "partial_compliance", "low_structure", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_062","variant":"run_on","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-10-CS-ZERO-001",
+      "item_number": 10,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "상품문의",
+      "dialog_stage": "main",
+      "segment_text": "고객: 이 제품 세탁은 어떻게 해야 돼요\n상담사: 뭐 그냥 세탁하시면 돼요 알아서 하시면 돼요",
+      "rationale": "[설명 명확성] 정보 제공 거의 없음 → 0점\n - \"그냥\" / \"알아서\" 비명시 표현만 사용\n - 라벨 기준·수세미·드라이클리닝 여부 등 어떤 구체 정보도 전달 안 함\n - 핵심 질문에 대한 실질 답변 부재",
+      "rationale_tags": ["item_10", "no_info", "vague", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 4}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_063","variant":"vague_response","human_score_verified":false}
+    }
+  ]
+}

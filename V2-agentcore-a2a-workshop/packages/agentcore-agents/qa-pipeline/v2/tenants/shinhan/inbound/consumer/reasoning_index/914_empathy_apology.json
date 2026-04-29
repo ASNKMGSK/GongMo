@@ -1,0 +1,37 @@
+{
+  "item_number": 914,
+  "item_name": "공감·사과 표현 및 감정 관리",
+  "version": "shinhan_consumer_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_914_synthetic_cons_011",
+      "score": 5,
+      "rationale": "[공감·사과 · 만점] 감정 라벨링(\"놀라셨겠어요\" / \"당황스럽고 속상하실\") + 사과 발화 + 책임 인정 + 진정 멘트 + 시간 배려까지 4단계 모두 자연스럽게 수행.\n - 상담사#2: \"정말 놀라셨겠어요 이중으로 출금까지 되셨다면 충분히 당황스럽고 속상하실 만한 상황입니다 죄송한 말씀 먼저 드립니다\"\n - 상담사#4: \"이런 일이 생긴 자체가 저희 잘못이고요\"\n - 상담사#6: \"네 천천히 말씀해 주세요 시간 충분히 드리겠습니다\"",
+      "quote_example": "상담사: 정말 놀라셨겠어요 이중으로 출금까지 되셨다면 충분히 당황스럽고 속상하실 만한 상황입니다 죄송한 말씀 먼저 드립니다",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_914", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_011"
+    },
+    {
+      "record_id": "r_914_synthetic_cons_012",
+      "score": 3,
+      "rationale": "[공감·사과 · 부분점수 3점] 사과 발화는 있으나 짧고 형식적 (\"네 죄송합니다\"). 감정 라벨링 부재, 진정 멘트 없이 절차로 바로 이동. 고객 정서 케어 부족.\n - 상담사#2: \"네 죄송합니다 그러면 원인 확인 진행하겠습니다\"\n - 상담사#4: \"네 그건 저희가 처리해 드릴 수 있고요\"\n - 상담사#6: \"네 차분히 진행하시죠 결제 정보부터 알려주세요\"",
+      "quote_example": "상담사: 네 죄송합니다 그러면 원인 확인 진행하겠습니다",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_914", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_012"
+    },
+    {
+      "record_id": "r_914_synthetic_cons_013",
+      "score": 0,
+      "rationale": "[공감·사과 · 0점] 사과 / 공감 / 감정 인지 발화 전무. 오히려 고객을 재촉(\"빨리\" 반복) + 다른 고객 대기를 압박 도구로 사용 + 통화 종료 권유로 회피. 정서적 지지 의무 미이행.\n - 상담사#2: \"네 알겠고요 결제 정보부터 빨리 알려주세요\"\n - 상담사#4: \"시간이 좀 그러시면 나중에 다시 전화 주세요\"\n - 상담사#6: \"다음 분도 기다리시는데 빨리 진행하실 수 있을까요\"",
+      "quote_example": "상담사: 다음 분도 기다리시는데 빨리 진행하실 수 있을까요",
+      "evaluator_id": "shinhan_consumer_v1_senior",
+      "tags": ["item_914", "zero_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_cons_013"
+    }
+  ]
+}

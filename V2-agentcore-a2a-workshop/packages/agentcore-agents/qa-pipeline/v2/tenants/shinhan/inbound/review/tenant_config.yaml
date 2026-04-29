@@ -1,0 +1,106 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — shinhan/inbound/review 부서 config
+# 사이트 공통 설정은 ../../tenant_config.yaml 에서 상속.
+# 본 파일은 심사발급부 부서특화 평가 항목 (#905-#908) 만 정의한다.
+
+tenant_id: shinhan_review
+team_id: review
+channel: inbound
+department: review
+domain: card_issuance
+description: >
+  신한카드 심사발급부 인바운드 — 카드 심사 및 발급 관련 콜 평가
+  (카드수령지 / 배송 안내 / 약관 / 신용정보 조회 동의 / 부가서비스 자동가입 /
+  배우자·가족카드 동의 절차). 약관규제법 / 여신금융 감독규정 준수 영역 포함.
+
+version:
+  schema: "v2.0.0"
+  rubric: "shinhan_review_v1"
+  golden_set: "shinhan_review_v1"
+  last_updated: "2026-04-28"
+
+# ---------------------------------------------------------------------------
+# 부서특화 평가 항목 (site 공통 #1~#18 외 추가)
+# ---------------------------------------------------------------------------
+scoring_policy:
+  allowed_steps:
+    "905": [15, 10, 5, 0]   # 정확한 안내 ★ (카드수령지/배송예정일/연회비/이자율/발급조건)
+    "906": [5, 3, 0]        # 필수 안내 이행 (연회비/결제일/이용한도/심사절차/배송일정)
+    "907": [5, 3, 0]        # 약관 설명 및 동의 절차 [약관규제법]
+    "908": [5, 3, 0]        # 가족카드·배우자 기준 동의 확인 [여신금융 감독규정]
+
+  force_t3_items: [907, 908]
+
+  critical_violations:
+    - id: terms_consent_missing
+      triggers: ["약관 미고지", "동의 절차 누락", "신용정보 조회 무단"]
+      impact: ["907"]
+    - id: misinformation_uncorrected
+      triggers: ["허위 안내 미정정", "연회비 오안내", "발급조건 오안내"]
+      impact: ["905"]
+  infra_fallback_tags: ["LLM 실패", "규칙 폴백", "ThrottlingException"]
+
+# ---------------------------------------------------------------------------
+# Frontend 노드 매핑 (lib/pipeline.ts SHINHAN_DEPT_NODE_IDS 정합)
+# ---------------------------------------------------------------------------
+dept_evaluation:
+  - node_id: iss_accuracy
+    label: "업무 정확도"
+    score: 20
+    items:
+      - "정확한 안내 (카드수령지 / 배송예정일 / 연회비 / 이자율 / 발급조건)"
+      - "필수 안내 이행 (연회비 / 결제일 / 이용한도 / 심사절차 / 배송일정)"
+  - node_id: iss_terms_compliance
+    label: "약관 고지 준수"
+    score: 10
+    items:
+      - "약관 설명 및 동의 절차 (신용정보 조회 / 부가서비스 자동가입)"
+      - "가족카드·배우자 기준 동의 확인"
+
+# ---------------------------------------------------------------------------
+# Intent 분류 — 심사발급 도메인 특화
+# ---------------------------------------------------------------------------
+supported_intents:
+  - 카드발급
+  - 약관문의
+  - 배송문의
+  - 한도조정
+  - 부가서비스문의
+  - 가족카드발급
+  - 일반문의
+
+# ---------------------------------------------------------------------------
+# Segment 추출 전략 (부서특화 항목만)
+# ---------------------------------------------------------------------------
+segment_strategy:
+  "905": qa_pair_with_rag                         # 정확한 안내: 고객 질의 + 답변 + RAG 약관/상품 대조
+  "906": intent_cross_check                       # 필수 안내: intent 기반 5요소 cross-check
+  "907": consent_windows + terms_keyword_scan     # 약관/동의: 동의 마커 근처 + 약관 키워드 스캔
+  "908": consent_windows + spouse_keyword_scan    # 배우자 동의: 배우자/가족 키워드 근처 동의 절차
+
+# ---------------------------------------------------------------------------
+# RAG 설정
+# ---------------------------------------------------------------------------
+rag:
+  golden_set:
+    path: "golden_set/"
+    top_k: 5
+    index_type: "memory"
+  reasoning:
+    source: "golden_set"
+    top_k: 10
+    stdev_window: 20
+  business_knowledge:
+    path: "business_knowledge/"
+    top_k: 3
+    required_items: ["905"]        # #905 정확한 안내 ★ 는 BK RAG 필수
+    fallback_mode: "unevaluable"
+
+# ---------------------------------------------------------------------------
+# 언어 / UI
+# ---------------------------------------------------------------------------
+language:
+  primary: ko
+  report_language: ko

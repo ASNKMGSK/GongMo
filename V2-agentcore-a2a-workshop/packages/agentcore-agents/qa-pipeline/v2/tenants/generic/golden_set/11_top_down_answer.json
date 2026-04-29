@@ -1,0 +1,41 @@
+{
+  "item_number": 11,
+  "item_name": "두괄식 답변",
+  "category": "설명력 및 전달력",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "examples": [
+    {
+      "example_id": "GS-11-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "general_inquiry",
+      "segment_text": "고객: 처리 얼마나 걸려요? 상담사: 3 영업일 소요됩니다. 자세히 설명드리면, 서류 검토 1일 + 승인 1일 + 통보 1일로 구성됩니다.",
+      "rationale": "결론(3 영업일) 먼저 + 세부 설명 뒤. 두괄식 구조.",
+      "rationale_tags": ["두괄식 구조"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-11-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "general_inquiry",
+      "segment_text": "고객: 처리 얼마나 걸려요? 상담사: 먼저 서류 검토가 있고 그 다음 승인이 있고 마지막에 통보가 되는데요. 합치면 3 영업일 정도 됩니다.",
+      "rationale": "세부 설명 먼저 + 결론 맨 뒤. 두괄식 미준수.",
+      "rationale_tags": ["미괄식"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-11-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "general_inquiry",
+      "segment_text": "고객: 처리 얼마나 걸려요? 상담사: 어... 음... 뭐 상황에 따라 다르긴 한데...",
+      "rationale": "결론 없이 불명확한 회피성 답변.",
+      "rationale_tags": ["결론 부재"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

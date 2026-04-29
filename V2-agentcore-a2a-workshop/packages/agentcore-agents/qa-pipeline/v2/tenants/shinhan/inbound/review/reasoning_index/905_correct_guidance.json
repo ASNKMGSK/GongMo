@@ -1,0 +1,37 @@
+{
+  "item_number": 905,
+  "item_name": "정확한 안내 ★",
+  "version": "shinhan_review_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_905_synthetic_rev_001",
+      "score": 15,
+      "rationale": "[정확 안내 · 만점] 카드수령지(주소 마스킹) / 배송예정일(4/29 등기) / 연회비(국내1.5만/해외2만) / 이자율(2.9~19.9%) / 발급조건(신용/소득/재직 + 한도 300만) 5요소 전부 명확 안내.\n - 상담사#4: \"신한카드 Deep Dream 카드 사 월 이십칠 일 자 심사 통과되어 발급 완료되셨습니다\"\n - 상담사#6: \"카드수령지는 신청 시 등록하신 댁 주소 *** 마포구 *** 동 *** 호로 발송 예정이고요 배송예정일은 영업일 기준 사 월 이십구 일 도착 예정입니다\"\n - 상담사#8: \"연회비는 국내전용 일만 오천 원 / 해외겸용 이만 원이시고요\"",
+      "quote_example": "상담사: 카드수령지는 신청 시 등록하신 댁 주소 *** 마포구 *** 동 *** 호로 발송 예정이고요 배송예정일은 영업일 기준 사 월 이십구 일 도착 예정입니다",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_905", "full_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_001"
+    },
+    {
+      "record_id": "r_905_synthetic_rev_002",
+      "score": 10,
+      "rationale": "[정확 안내 · 부분점수 10점] 발급 사실 / 배송 / 연회비는 안내됨. 그러나 배송예정일 정확한 일자 미언급(\"한 이삼 일 정도\"), 이자율 구체 구간 미고지(\"보통 십몇 퍼센트\"), 카드수령지 주소 미확인.\n - 상담사#4: \"신청하신 카드 발급되셨고요 등록 주소로 보내드릴 거예요\"\n - 상담사#6: \"영업일 기준으로 한 이삼 일 정도 보시면 됩니다\"\n - 상담사#10: \"그건 카드 사용하시면서 안내드릴 텐데 보통 십몇 퍼센트 정도예요\"",
+      "quote_example": "상담사: 영업일 기준으로 한 이삼 일 정도 보시면 됩니다",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_905", "partial_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_002"
+    },
+    {
+      "record_id": "r_905_synthetic_rev_003",
+      "score": 0,
+      "rationale": "[정확 안내 · 0점] 5요소 전부 누락. 카드수령지/배송예정일/연회비/이자율/발급조건 모두 외부 채널(문자/홈페이지/배송업체)로 떠넘김. 상담사 자체 안내 의무 회피.\n - 상담사#2: \"그건 시스템에서 자동 처리되는 거라서요 결과 나오면 문자로 갈 겁니다\"\n - 상담사#6: \"그건 약관 보시면 다 나와 있어요 홈페이지에서 확인하실 수 있고요\"\n - 상담사#8: \"통과 안 됐으면 문자 갔을 거예요 안 갔으면 됐다는 뜻이고요\"",
+      "quote_example": "상담사: 그건 약관 보시면 다 나와 있어요 홈페이지에서 확인하실 수 있고요",
+      "evaluator_id": "shinhan_review_v1_senior",
+      "tags": ["item_905", "zero_compliance"],
+      "stub_seed": false,
+      "sample_id": "synthetic_rev_003"
+    }
+  ]
+}

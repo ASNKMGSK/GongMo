@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<title>QA Pipeline Flowchart</title>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/reactflow@11.11.4/dist/umd/index.js" crossorigin></script>
+<link rel="stylesheet" href="https://unpkg.com/reactflow@11.11.4/dist/style.css" />
+<script src="https://unpkg.com/dagre@0.8.5/dist/dagre.min.js"></script>
+<style>
+  html, body, #root { margin: 0; padding: 0; width: 100%; height: 100%; background: #fdfcf7; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif; }
+  .pipeline-node {
+    background: #fff; border: 1px solid #e7e3d4; border-radius: 12px;
+    padding: 10px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    position: relative; transition: all 0.18s ease;
+  }
+  .pipeline-node .label { font-size: 13px; font-weight: 600; color: #14110d; line-height: 1.25; }
+  .pipeline-node .sub { font-size: 10.5px; color: #7a7567; line-height: 1.35; margin-top: 3px; }
+  .pipeline-node .score { position: absolute; top: 6px; right: 8px; font-size: 10px; font-weight: 700; color: #c96442; }
+  .pipeline-node .dot { position: absolute; top: 8px; left: 8px; width: 6px; height: 6px; border-radius: 50%; background: #cdc8b8; }
+  .pipeline-node.eval { background: #ffffff; }
+  .pipeline-node.data { background: #faf6e8; border-color: #e2d5b3; }
+  .pipeline-node.junction { width: 10px; height: 10px; border-radius: 50%; padding: 0; background: transparent; border: none; box-shadow: none; }
+  .pipeline-node.disabled { opacity: 0.55; }
+  .phase-group {
+    background: rgba(247,245,237,0.5);
+    border: 1px solid #d9d5c5;
+    border-radius: 14px;
+    pointer-events: none;
+  }
+  .phase-group .pg-label {
+    position: absolute; top: 6px; left: 14px;
+    font-size: 11px; font-weight: 700; color: #6b6b6b;
+    letter-spacing: 0.04em; text-transform: uppercase;
+  }
+  .phase-group .pg-sub {
+    position: absolute; top: 6px; left: 96px;
+    font-size: 11px; color: #8a8a8a; font-weight: 500;
+  }
+  .react-flow__handle { opacity: 0; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const { useMemo } = React;
+const RF = window.ReactFlow;
+const ReactFlow = RF.ReactFlow || RF.default;
+const Background = RF.Background;
+const Controls = RF.Controls;
+const MiniMap = RF.MiniMap;
+const Handle = RF.Handle;
+const Position = RF.Position;
+const BaseEdge = RF.BaseEdge;
+
+/* NODE_DEFS — V2 reference */
+const NODE_DEFS = {
+  input_data:       { label: "Input STT",              sub: "상담 전사 · stt_metadata",           type: "data",     w: 200, h: 72 },
+  tenant_config:    { label: "Tenant",                  sub: "rubric · golden_set · scripts · PII", type: "data",   w: 220, h: 78 },
+  layer1:           { label: "Layer 1 · Preprocessing", sub: "quality · segments · PII · rule_pre_verdicts", type: "agent", w: 300, h: 86 },
+  greeting:         { label: "인사 예절",               sub: "L2 · Group A · #1·#2",                type: "eval",   w: 200, h: 96, score: "10" },
+  listening_comm:   { label: "경청 및 소통",            sub: "L2 · Group A · #4·#5",                type: "eval",   w: 220, h: 96, score: "10" },
+  language:         { label: "언어 표현",               sub: "L2 · Group A · #6·#7",                type: "eval",   w: 200, h: 96, score: "10" },
+  needs:            { label: "니즈 파악",               sub: "L2 · Group A · #8·#9",                type: "eval",   w: 220, h: 96, score: "10" },
+  explanation:      { label: "설명력 및 전달력",        sub: "L2 · Group B · #10·#11",              type: "eval",   w: 220, h: 96, score: "15" },
+  proactiveness:    { label: "적극성",                  sub: "L2 · Group B · #12·#13·#14",          type: "eval",   w: 210, h: 96, score: "15" },
+  work_accuracy:    { label: "업무 정확도",             sub: "L2 · Group B · #15·#16",              type: "eval",   w: 260, h: 96, score: "20" },
+  privacy:          { label: "개인정보 보호",           sub: "L2 · Group B · #17·#18",              type: "eval",   w: 275, h: 96, score: "10" },
+  layer2_barrier:   { label: "",                        sub: "",                                    type: "junction", w: 10, h: 10 },
+  orchestrator_v2:  { label: "Layer 3 · Orchestrator V2", sub: "aggregator · override · consistency · grader", type: "agent", w: 320, h: 86 },
+  confidence:       { label: "Confidence 4-Signal",     sub: "LLM self · Rule-LLM · RAG stdev · Evidence", type: "agent", w: 255, h: 86 },
+  tier_router:      { label: "Tier Router (비활성)",    sub: "T0/T1/T2/T3 — 비활성", type: "agent", w: 280, h: 86, disabled: true },
+  evidence_refiner: { label: "Evidence Refiner",        sub: "evidence 품질 판정 · quote trim", type: "agent", w: 220, h: 82 },
+  report_generator: { label: "Layer 4 · Report Generator V2", sub: "QAOutputV2 직렬화", type: "agent", w: 290, h: 82 },
+  gt_comparison:    { label: "수기 QA 정답 비교",       sub: "AI vs 수기 QA · MAE", type: "agent", w: 290, h: 86 },
+  gt_evidence_comparison: { label: "수기 QA 근거 비교", sub: "사람 비고 vs AI evidence", type: "agent", w: 320, h: 86 },
+  qa_output:        { label: "QAOutputV2 JSON",         sub: "consultation_id · evaluation · summary", type: "data", w: 290, h: 100 },
+};
+
+/* EDGES — V2 reference */
+const EDGES = [
+  { from: "input_data",    to: "layer1", label: "STT" },
+  { from: "tenant_config", to: "layer1", label: "rubric·PII·intent", dashed: true },
+  { from: "layer1", to: "greeting" },
+  { from: "layer1", to: "listening_comm" },
+  { from: "layer1", to: "language" },
+  { from: "layer1", to: "needs" },
+  { from: "layer1", to: "explanation" },
+  { from: "layer1", to: "proactiveness" },
+  { from: "layer1", to: "work_accuracy" },
+  { from: "layer1", to: "privacy" },
+  { from: "greeting",       to: "layer2_barrier", busIn: true },
+  { from: "listening_comm", to: "layer2_barrier", busIn: true },
+  { from: "language",       to: "layer2_barrier", busIn: true },
+  { from: "needs",          to: "layer2_barrier", busIn: true },
+  { from: "explanation",    to: "layer2_barrier", busIn: true },
+  { from: "proactiveness",  to: "layer2_barrier", busIn: true },
+  { from: "work_accuracy",  to: "layer2_barrier", busIn: true },
+  { from: "privacy",        to: "layer2_barrier", busIn: true },
+  { from: "layer2_barrier", to: "orchestrator_v2" },
+  { from: "orchestrator_v2", to: "confidence" },
+  { from: "confidence",      to: "tier_router" },
+  { from: "tier_router",     to: "evidence_refiner" },
+  { from: "evidence_refiner", to: "report_generator" },
+  { from: "layer1", to: "report_generator", dashed: true },
+  { from: "report_generator", to: "gt_comparison" },
+  { from: "gt_comparison", to: "gt_evidence_comparison" },
+  { from: "gt_evidence_comparison", to: "qa_output" },
+];
+
+const LAYER1_NODES   = ["layer1"];
+const LAYER2_GROUP_A = ["greeting", "listening_comm", "language", "needs"];
+const LAYER2_GROUP_B = ["explanation", "proactiveness", "work_accuracy", "privacy"];
+const LAYER3_NODES   = ["orchestrator_v2"];
+const LAYER4_NODES   = ["confidence", "tier_router", "evidence_refiner", "report_generator", "gt_comparison", "gt_evidence_comparison"];
+
+const PHASE_GROUPS = [
+  { id: '__layer1', members: LAYER1_NODES, label: 'Layer 1', sublabel: '전처리' },
+  { id: '__layer2_a', members: LAYER2_GROUP_A, label: 'Layer 2 · A', sublabel: '4 Sub Agent · 병렬' },
+  { id: '__layer2_b', members: LAYER2_GROUP_B, label: 'Layer 2 · B', sublabel: '4 Sub Agent · 병렬' },
+  { id: '__layer3', members: LAYER3_NODES, label: 'Layer 3', sublabel: 'Orchestrator V2' },
+  { id: '__layer4', members: LAYER4_NODES, label: 'Layer 4', sublabel: 'Post · Confidence→Report' },
+];
+
+/* BusEdge — V2 reference */
+const TRUNK_OFFSET = 45;
+const BEND_RADIUS = 10;
+function BusEdge(props) {
+  const { id, sourceX, sourceY, targetX, targetY, markerEnd, style, data } = props;
+  const busIn = !!(data && data.busIn);
+  const trunkX = busIn ? (targetX - TRUNK_OFFSET) : (sourceX + TRUNK_OFFSET);
+  const dy = targetY - sourceY;
+  let path;
+  if (Math.abs(dy) < 1) {
+    path = `M ${sourceX},${sourceY} L ${targetX},${targetY}`;
+  } else {
+    const segRoom = busIn
+      ? Math.max(0, trunkX - sourceX) / 2
+      : Math.max(0, targetX - trunkX) / 2;
+    const r = Math.min(BEND_RADIUS, Math.abs(dy) / 2, TRUNK_OFFSET / 2, segRoom);
+    const dir = dy > 0 ? 1 : -1;
+    const sweep = dir > 0 ? 1 : 0;
+    path = [
+      `M ${sourceX},${sourceY}`,
+      `L ${trunkX - r},${sourceY}`,
+      `A ${r},${r} 0 0 ${sweep} ${trunkX},${sourceY + r * dir}`,
+      `L ${trunkX},${targetY - r * dir}`,
+      `A ${r},${r} 0 0 ${sweep === 1 ? 0 : 1} ${trunkX + r},${targetY}`,
+      `L ${targetX},${targetY}`,
+    ].join(' ');
+  }
+  return React.createElement(BaseEdge, { id, path, markerEnd, style });
+}
+const edgeTypes = { bus: BusEdge };
+
+/* Custom node */
+function PipelineNode({ data }) {
+  const def = data.def;
+  const cls = `pipeline-node ${def.type || 'agent'}${def.disabled ? ' disabled' : ''}`;
+  const children = [
+    React.createElement(Handle, { key: 'tl', type: 'target', position: Position.Left }),
+    React.createElement(Handle, { key: 'tt', type: 'target', id: 'top', position: Position.Top }),
+  ];
+  if (def.type !== 'junction') {
+    children.push(React.createElement('span', { key: 'dot', className: 'dot' }));
+    if (def.score) children.push(React.createElement('span', { key: 'sc', className: 'score' }, def.score + '점'));
+    if (def.label) children.push(React.createElement('div', { key: 'lb', className: 'label', style: { paddingLeft: 8 } }, def.label));
+    if (def.sub) children.push(React.createElement('div', { key: 'sb', className: 'sub', style: { paddingLeft: 8 } }, def.sub));
+  }
+  children.push(React.createElement(Handle, { key: 'sr', type: 'source', position: Position.Right }));
+  children.push(React.createElement(Handle, { key: 'sb2', type: 'source', id: 'bottom', position: Position.Bottom }));
+  return React.createElement('div', {
+    className: cls,
+    style: { width: def.w, height: def.h, display: 'flex', flexDirection: 'column', gap: 3, justifyContent: 'center' },
+  }, children);
+}
+function PhaseGroupNode({ data }) {
+  return React.createElement('div', {
+    className: 'phase-group',
+    style: { width: data.width, height: data.height, position: 'relative' },
+  },
+    React.createElement('div', { key: 'lb', className: 'pg-label' }, data.label),
+    React.createElement('div', { key: 'sb', className: 'pg-sub' }, '· ' + data.sublabel),
+  );
+}
+const nodeTypes = { pipeline: PipelineNode, phaseGroup: PhaseGroupNode };
+
+/* dagre layout */
+function getLayoutedElements(nodes, edges) {
+  const dagre = window.dagre;
+  const g = new dagre.graphlib.Graph();
+  g.setDefaultEdgeLabel(() => ({}));
+  g.setGraph({ rankdir: 'LR', ranksep: 120, nodesep: 32, edgesep: 10, marginx: 72, marginy: 72, ranker: 'tight-tree' });
+  nodes.forEach((n) => {
+    if (n.type === 'phaseGroup') return;
+    const def = NODE_DEFS[n.id];
+    g.setNode(n.id, { width: (def && def.w) || 170, height: (def && def.h) || 60 });
+  });
+  edges.forEach((e) => {
+    if (NODE_DEFS[e.source] && NODE_DEFS[e.target]) g.setEdge(e.source, e.target);
+  });
+  dagre.layout(g);
+  return nodes.map((n) => {
+    if (n.type === 'phaseGroup') return n;
+    const pos = g.node(n.id);
+    if (!pos) return n;
+    const def = NODE_DEFS[n.id];
+    const w = (def && def.w) || 170;
+    const h = (def && def.h) || 60;
+    return Object.assign({}, n, { position: { x: pos.x - w / 2, y: pos.y - h / 2 } });
+  });
+}
+function computeGroupBounds(memberIds, nodesWithPos, padding, labelSpace) {
+  if (padding === undefined) padding = 28;
+  if (labelSpace === undefined) labelSpace = 22;
+  const members = nodesWithPos.filter((n) => memberIds.indexOf(n.id) !== -1);
+  if (members.length === 0) return null;
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  members.forEach((n) => {
+    const def = NODE_DEFS[n.id];
+    const w = (def && def.w) || 170;
+    const h = (def && def.h) || 60;
+    minX = Math.min(minX, n.position.x);
+    minY = Math.min(minY, n.position.y);
+    maxX = Math.max(maxX, n.position.x + w);
+    maxY = Math.max(maxY, n.position.y + h);
+  });
+  return { x: minX - padding, y: minY - padding - labelSpace, width: (maxX - minX) + padding * 2, height: (maxY - minY) + padding * 2 + labelSpace };
+}
+
+function App() {
+  const data = useMemo(() => {
+    const baseNodes = Object.keys(NODE_DEFS).map((id) => ({
+      id, type: 'pipeline', position: { x: 0, y: 0 }, data: { def: NODE_DEFS[id] }, draggable: false, selectable: false,
+    }));
+    const baseEdges = EDGES.map((e, idx) => {
+      const isFanOut = e.from === 'layer1' && (LAYER2_GROUP_A.indexOf(e.to) !== -1 || LAYER2_GROUP_B.indexOf(e.to) !== -1);
+      const isFanIn = !!e.busIn;
+      const useBus = isFanOut || isFanIn;
+      const isShortCircuit = e.from === 'layer1' && e.to === 'report_generator';
+      return {
+        id: 'e' + idx + '_' + e.from + '-' + e.to,
+        source: e.from,
+        target: e.to,
+        sourceHandle: isShortCircuit ? 'bottom' : undefined,
+        targetHandle: isShortCircuit ? 'top' : undefined,
+        type: useBus ? 'bus' : 'smoothstep',
+        animated: false,
+        data: useBus ? { busIn: isFanIn } : undefined,
+        style: {
+          stroke: '#7a7567',
+          strokeWidth: 1.6,
+          strokeDasharray: e.dashed ? '5 4' : undefined,
+          opacity: e.dashed ? 0.7 : 1,
+        },
+      };
+    });
+    const laidOut = getLayoutedElements(baseNodes, baseEdges);
+    const groupNodes = PHASE_GROUPS.map((g) => {
+      const b = computeGroupBounds(g.members, laidOut);
+      if (!b) return null;
+      return {
+        id: g.id, type: 'phaseGroup', position: { x: b.x, y: b.y },
+        data: { width: b.width, height: b.height, label: g.label, sublabel: g.sublabel },
+        draggable: false, selectable: false, zIndex: 0,
+      };
+    }).filter(Boolean);
+    return { nodes: [...groupNodes, ...laidOut], edges: baseEdges };
+  }, []);
+
+  return React.createElement(ReactFlow, {
+    nodes: data.nodes,
+    edges: data.edges,
+    nodeTypes, edgeTypes,
+    fitView: true,
+    fitViewOptions: { padding: 0.15 },
+    minZoom: 0.2, maxZoom: 2.0,
+    nodesDraggable: false, nodesConnectable: false, elementsSelectable: false,
+    proOptions: { hideAttribution: true },
+  },
+    React.createElement(Background, { key: 'bg', gap: 28, size: 1.2, color: '#e7e3d4' }),
+    React.createElement(Controls, { key: 'ctl', showInteractive: false }),
+    React.createElement(MiniMap, { key: 'mm', style: { width: 140, height: 90 }, maskColor: 'rgba(232,229,217,0.4)' }),
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
+</script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_04_shinhan_001",
+      "score": 5,
+      "rationale": "[공감] 고객 감정 인정 + 사과 + 안심 멘트 3요소 충족 → 만점\n - 상담사#2: \"아 네 고객님 정말 많이 놀라셨겠어요 분실 신고 후에 부정 사용 발생하신 점 진심으로 죄송합니다\"\n - 상담사#6: \"불편 끼쳐드려서 정말 죄송합니다 신한카드 측에서 책임지고 처리해드릴 테니 안심하셔도 됩니다\"",
+      "quote_example": "상담사: 아 네 고객님 정말 많이 놀라셨겠어요 분실 신고 후에 부정 사용 발생하신 점 진심으로 죄송합니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_4", "full_compliance", "empathy_apology"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_04_shinhan_002",
+      "score": 3,
+      "rationale": "[공감] '그러시군요' 단순 호응만 있고 깊은 감정 인정 / 사과 부재 → 부분점수\n - 상담사#2: \"네 그러시군요 결제 유예 가능한지 확인해드릴게요\" — 형식적 호응",
+      "quote_example": "상담사: 네 그러시군요 결제 유예 가능한지 확인해드릴게요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_4", "partial_compliance", "shallow_response"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_04_shinhan_003",
+      "score": 0,
+      "rationale": "[공감] 고객 감정 무시 + 약관 책임 전가 + 단정적 태도 → 0점\n - 상담사#2: \"그건 약관에 다 나와있어요 가입하실 때 동의하신 부분이에요\" — 공감 없는 책임 전가\n - 상담사#4: \"시스템상으로는 동의하신 걸로 되어 있습니다\" — 사과 / 양해 부재",
+      "quote_example": "상담사: 그건 약관에 다 나와있어요 가입하실 때 동의하신 부분이에요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_4", "non_compliance", "no_empathy"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

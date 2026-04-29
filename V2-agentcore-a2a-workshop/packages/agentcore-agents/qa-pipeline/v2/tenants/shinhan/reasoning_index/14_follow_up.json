@@ -1,0 +1,37 @@
+{
+  "item_number": 14,
+  "item_name": "사후 안내",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_14_shinhan_001",
+      "score": 5,
+      "rationale": "[사후 안내] 처리 결과 + 다음 절차 (배송 일정 / 사용 등록) + 추가 알림 (SMS / 알림톡) + 비상 안내 모두 충족 → 만점\n - 상담사#1: \"신규 카드는 영업일 기준 삼 일에서 오 일 이내에 등록 주소로 배송될 예정이시구요 배송 완료 시 SMS와 알림톡으로 통보됩니다\"\n - 상담사#3: \"카드 수령 후에는 카드 뒷면 서명란에 서명 후 카드사 앱 또는 ARS 통해서 사용 등록해주시면 사용 가능하시구요\"\n - 상담사#5: \"안내 내용 알림톡으로도 발송해드렸습니다\"",
+      "quote_example": "상담사: 신규 카드는 영업일 기준 삼 일에서 오 일 이내에 등록 주소로 배송될 예정이시구요 배송 완료 시 SMS와 알림톡으로 통보됩니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_14", "full_compliance", "complete_followup"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_14_shinhan_002",
+      "score": 3,
+      "rationale": "[사후 안내] 결과 + 적용 시점은 안내했으나 SMS / 알림톡 발송 여부 / 추가 절차 미안내 → 부분점수\n - 상담사#1: \"결제일 변경 처리되었습니다\"\n - 상담사#3: \"다음 청구분부터 적용됩니다\" — SMS / 알림톡 안내 부재",
+      "quote_example": "상담사: 다음 청구분부터 적용됩니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_14", "partial_compliance", "missing_notification"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_14_shinhan_003",
+      "score": 0,
+      "rationale": "[사후 안내] 처리 결과 안내 부재 + 다음 절차 / 알림 방식 누락 + 안내 회피 → 0점\n - 상담사#1: \"신청 들어갔어요\" — 처리 후속 안내 없음\n - 상담사#3: \"알아서 보세요\" — 안내 회피",
+      "quote_example": "상담사: 알아서 보세요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_14", "non_compliance", "no_followup"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "item_number": 6,
+  "item_name": "정중한 표현",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "부적절 표현 1회 이상 발견 시 즉시 0점. 중간 점수 없음.",
+  "examples": [
+    {
+      "example_id": "GS-06-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "general_inquiry",
+      "segment_text": "상담사: 고객님, 말씀 주신 부분 확인해 드리겠습니다. 잠시만 기다려 주시겠어요?",
+      "rationale": "전 발화 존댓말 + 고객님 호칭. 부적절 표현 전무.",
+      "rationale_tags": ["존댓말 유지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-06-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "상담사: 아 그거는 원래 그런 거예요. 그냥 직접 하세요.",
+      "rationale": "업무 회피 + 반말 투 — 즉시 0점 요인.",
+      "rationale_tags": ["업무 회피", "부적절 표현"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-06-ZERO-02",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "상담사: 아 씨 자꾸 똑같은 말 하시네요.",
+      "rationale": "비속어 + 고객 비하 — 즉시 0점.",
+      "rationale_tags": ["비속어"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

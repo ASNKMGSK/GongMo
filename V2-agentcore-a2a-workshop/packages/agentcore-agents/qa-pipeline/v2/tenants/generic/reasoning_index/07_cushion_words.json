@@ -1,0 +1,43 @@
+{
+  "item_number": 7,
+  "item_name": "쿠션어 활용",
+  "version": "0.1.0-stub",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "거절 상황에서 쿠션어 '번거로우시겠지만' 사용, 만점",
+      "quote_example": "번거로우시겠지만 본인확인 절차를 먼저 진행해드리겠습니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_cushion", "refusal_context"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 3,
+      "rationale": "거절 상황인데 쿠션어 누락, 내용은 정확 — 3점",
+      "quote_example": "그건 규정상 불가능합니다",
+      "evaluator_id": "senior_b",
+      "tags": ["missing_cushion", "direct_refusal"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 0,
+      "rationale": "거절 반복 + 쿠션어 전무 + 건조한 톤 0점",
+      "quote_example": "안 됩니다 그건 안 되고요 네 안 돼요",
+      "evaluator_id": "senior_c",
+      "tags": ["repeated_refusal", "no_cushion", "cold_tone"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 5,
+      "rationale": "refusal-gated — 거절/양해 상황 자체가 없음, skipped 만점",
+      "quote_example": "(거절 상황 부재)",
+      "evaluator_id": "senior_a",
+      "tags": ["skipped", "refusal_gated"],
+      "stub_seed": true
+    }
+  ]
+}

@@ -1,0 +1,508 @@
+{
+  "item_number": 11,
+  "item_name": "두괄식 답변",
+  "category": "설명력 및 전달력",
+  "max_score": 5,
+  "allowed_steps": [
+    5,
+    3,
+    0
+  ],
+  "intents": [
+    "주문배송",
+    "환불취소"
+  ],
+  "version": "kolon_v4_fixed",
+  "examples": [
+    {
+      "example_id": "GS-11-FULL-668437",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네 네\n상담사: 네 그러면은 고객님 성함이랑 연락 연락처 어떻게 되실까요\n고객: 배만 근\n...\n고객: 예예예\n상담사: 예 소중한 정보 확인 감사합니다 고객님 고객님 확인되었구요\n고객: 네\n...\n고객: 아이보리를 좀 바꿔으면 해가지고\n상담사: 예 그럼 이 상품 외부 착용이나 세탁 아니면은 텍 제거하 수도 있을까요 고객님\n고객: 아니요 텍 같은 거 다 있어요 근데 비닐이 좀 없는데",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#9: \"네 그러면은 고객님 성함이랑 연락 연락처 어떻게 되실까요\"\n - 상담사#17: \"예 소중한 정보 확인 감사합니다 고객님 고객님 확인되었구요\"\n - 상담사#23: \"예 그럼 이 상품 외부 착용이나 세탁 아니면은 텍 제거하 수도 있을까요 고객님\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 23
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668437",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668451",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 할려고 그러는데 고게 지금 안 되더라고요 하나만\n상담사: 아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\n고객: 네\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 지금 주문서 확인해보니까는 일자 기준으로 사 월 칠 일이 가장 빠른데요 코오롱 스포츠 코오롱 공식 온라인 토어에서 주문한 주문서 확인되고 있어요\n고객: 네\n...\n고객: 네 에그라이트 스테드넥 재킷\n상담사: 네 그러면 요청해 주셔서 반품 접수 도와드릴 텐데요 저희 사유 여쭤보고 있어요 반품 사이는 어떻게 되실까요\n고객: 사이즈하고 뭐 색상 뭐 이런 게 작고 뭐 이렇게 타이트하고 뭐 이렇",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#17: \"아 네 그럼 제가 빠르게 확인해보구요 저희 반품 접수 도와드리겠습니다\"\n - 상담사#25: \"네 소중한 정보 확인 감사합니다 지금 주문서 확인해보니까는 일자 기준으로 사 월 칠 일이 가장 빠른데요 코오롱 스포츠 코오롱 공식 온라인 토어에서 주문한 주문서 확인되고 있어요\"\n - 상담사#31: \"네 그러면 요청해 주셔서 반품 접수 도와드릴 텐데요 저희 사유 여쭤보고 있어요 반품 사이는 어떻게 되실까요\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 25
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 31
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668451",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-PARTIAL-668464",
+      "item_number": 11,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 제가 어 스카프를 샀는데요\n고객: 그거를 반품을 할려고 하는데 이게 여기 뭐 따로 신청을 해야 되나 봐요 이쪽으로 전화하라 그러던데요\n상담사: 아 네 그러면 제가 빠르게 확인하고 반품 접수 도와드리겠습니다 고객님 저 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드립니다\n고객: 네 ***\n...\n고객: 네\n상담사: 네 소중한 정보인 감사합니다 지금 주문서 확인해보니까는 사 월 팔 일 자가 제일 빠른 주문서인데요 지금 코오롱 브랜드의 스카프 구십 확인되고 있는데 맞으실까요\n고객: 뭐 어 두 갠데요 두 개 중에",
+      "rationale": "[두괄식] 장황하거나 결론 후행 (결론선행✗) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#5: \"아 네 그러면 제가 빠르게 확인하고 반품 접수 도와드리겠습니다 고객님 저 정보 확인 요청드릴 텐데 성함과 휴대폰 번호 말씀 부탁드립니다\"\n - 상담사#11: \"네 소중한 정보인 감사합니다 지금 주문서 확인해보니까는 사 월 팔 일 자가 제일 빠른 주문서인데요 지금 코오롱 브랜드의 스카프 구십 확인되고 있는데 맞으실까요\"",
+      "rationale_tags": [
+        "item_11",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668464",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-PARTIAL-668481",
+      "item_number": 11,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아니 그 바지를 시켰는데 그게 또 없습니까\n상담사: 아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 아 무심터이다\n...\n고객: 아 다른 데는 다 물건을 시키잖아요 배송을 딱 거리 가잖아요 그러면 매장 배송 매장 배송 없으면 없다 바로바로 해요 근데 왜 코오롱 그건 왜 그게 안돼요\n상담사: 고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\n고객: 뭐 재고 수급한다고 매장 재고 수습한다고 떠 있던데 그게 무슨 말인데요 또",
+      "rationale": "[두괄식] 장황하거나 결론 후행 (결론선행✗) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#3: \"아 예 고객님 제가 한번 확인해보겠습니다 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"\n - 상담사#15: \"고객님 죄송합니다만 바지가 없다는 말씀은 어떤 말씀***요 코오롱 스포츠 제품 고객님께서 사 월 구 일 날 주문하신 상품을 말씀하시는 걸까요\"",
+      "rationale_tags": [
+        "item_11",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 3
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668481",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668488",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 신청상이 아 예 그래서 이걸로 교환이 될지\n상담사: 네 음 신상이 좀 심하다 보니깐 상품에 문제가 있다라는 느낌이신 거죠\n고객: 예 제가 봤을 때는 그렇게 느껴지거든요 예\n...\n고객: 예 아 네네네\n상담사: 예 그래서 우선은 이 상품이 지금 문제가 있는지는 정확히 알 수가 없기 때문에 저희가 그러면\n고객: 예\n...\n고객: 네네 네네\n상담사: 네 변화 없고 처리 진행을 해드릴 거구요 그러면 고객님께서 느끼시기에는 상품 불량이라고 말씀을 해주셨어요\n고객: 네",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#39: \"네 음 신상이 좀 심하다 보니깐 상품에 문제가 있다라는 느낌이신 거죠\"\n - 상담사#47: \"예 그래서 우선은 이 상품이 지금 문제가 있는지는 정확히 알 수가 없기 때문에 저희가 그러면\"\n - 상담사#53: \"네 변화 없고 처리 진행을 해드릴 거구요 그러면 고객님께서 느끼시기에는 상품 불량이라고 말씀을 해주셨어요\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 39
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 47
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 53
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668488",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668507",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네네네네\n상담사: 아 네 그러면 그대로 구십 오 사이즈 착용 원하시는 거 맞으실까요\n고객: 네네네네\n...\n고객: 어 근데 아 조금 조금 여유가 있더라도 크림색이 마음에 들어갖고 그러고 있으니까 입을 수밖에 없을 거 같애요\n상담사: 네 아이고 네 아직게 드려 너무 죄송해요 상품이 품절이라서 어 만약에라도 그\n고객: 아 아 아 네 아이 네네네\n...\n고객: 네 네네 아 네 알겠습니다 이거는 이거는 일단 교환 취소는 어 이거는 취소 좀 해주세요 그냥\n상담사: 네 처리 진행해드릴 거구요 저희가 자사 상품이기 때문에 그\n고객: 어 네 네",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#31: \"아 네 그러면 그대로 구십 오 사이즈 착용 원하시는 거 맞으실까요\"\n - 상담사#88: \"네 아이고 네 아직게 드려 너무 죄송해요 상품이 품절이라서 어 만약에라도 그\"\n - 상담사#98: \"네 처리 진행해드릴 거구요 저희가 자사 상품이기 때문에 그\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 31
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 88
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 98
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668507",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668526",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요\n고객: 아 이거 부분 반품할려고 하는데요 이거 하나 취소돼서 못 온다고 해서 부분 반품할려구요\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\n고객: 이거 이엠비 시트 티셔셔츠하구요\n...\n고객: 아 네이비 아 네이비인데 이거 다 네이비였는데 잠깐만\n상담사: 네이비가 지금 금액이 십 이만 이천 사백 원 팬츠 세미 와이드 팬츠\n고객: 네 네 트이 네",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무릴까요\"\n - 상담사#9: \"네 소중한 정보 확인 감사드립니다 네 부분 반품하시는 상품은 어떤 걸까요 고객님\"\n - 상담사#29: \"네이비가 지금 금액이 십 이만 이천 사백 원 팬츠 세미 와이드 팬츠\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 29
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668526",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668542",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 반품 환불 문의 좀 할라고요\n상담사: 아 네 알겠습니다 저희 그러면은 본인 확인 좀 될 텐데요\n고객: 환불 환불\n...\n고객: 예예\n상담사: 네 소중한 정보 감사합니다 고객님 어떤 상품 반품 신청하신 걸까요\n고객: 예 저 주문번호가요\n...\n고객: 야 네이비\n상담사: 예 확인해보겠습니다 지금 주문서 확인해보니까는 사 월 칠 일 주문 건으로 페라로멜라도에서 주문했던\n상담사: 캐주얼 슬랙스 네이비 구십 이 사이즈 확인되었습니다",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#11: \"아 네 알겠습니다 저희 그러면은 본인 확인 좀 될 텐데요\"\n - 상담사#17: \"네 소중한 정보 감사합니다 고객님 어떤 상품 반품 신청하신 걸까요\"\n - 상담사#35: \"예 확인해보겠습니다 지금 주문서 확인해보니까는 사 월 칠 일 주문 건으로 페라로멜라도에서 주문했던\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 35
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668542",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668605",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 아 네 수고하십니다 어 저기 반품 땜에 그러는데요\n...\n고객: 예 * * * * * * * *\n상담사: 예 소중한 정보 확인 감사합니다 *** 고객님 본인 맞으실까요\n고객: 예 맞아요 저기 와크 셔츠가 두 가지가 있습니다\n...\n고객: 예예 예예 그렇습니다\n상담사: 네 제가 우선 주문번호가 두 건이있실 때는 각각 따로 접수 진행을 해야 돼서 제가 교환 접수\n고객: 아니요 주문번호는 하나입니다",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#7: \"예 소중한 정보 확인 감사합니다 *** 고객님 본인 맞으실까요\"\n - 상담사#20: \"네 제가 우선 주문번호가 두 건이있실 때는 각각 따로 접수 진행을 해야 돼서 제가 교환 접수\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 20
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668605",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668610",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 네 어떻게 되는 겁니까\n상담사: 네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\n고객: 언택 * * * * * * * * * * *\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\n고객: 네\n상담사: 아 네 기다려 감사합니다 지금 주문서 확인해보니깐 사 월 팔 일 주문 건으로 저희 입점사 빠니깔레 상품으로 셔츠 엠 사이즈 보여주고 있는데 맞으실까요\n고객: 네",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#7: \"네 그럼 확인해보고 안내드릴 텐데요 저희 정보 확인 요청 드리겠습니다 성함과 휴대폰 번호 말씀 부탁드리겠습니다\"\n - 상담사#11: \"네 소중한 정보 확인 감사합니다 주문서 확인해볼 텐데 잠시만 기다려주시겠습니까\"\n - 상담사#13: \"아 네 기다려 감사합니다 지금 주문서 확인해보니깐 사 월 팔 일 주문 건으로 저희 입점사 빠니깔레 상품으로 셔츠 엠 사이즈 보여주고 있는데 맞으실까요\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 13
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668610",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668675",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "주문배송",
+      "segment_text": "고객: 네네 네\n상담사: 네 그럼 고객님 성함이랑 연락 연락처 어떻게 되실까요\n고객: 네 ***구요\n...\n고객: 네\n상담사: 네 소중한 정보 확인 감사합니다 고객님 일단 고객님 확인되시는데요 지금 주문 내역이 확인이 안 되시네요\n고객: 어 뭘 불러드려야 될까요 운송장 번호 있고\n...\n고객: 네네\n상담사: 예 구매처 측에다 문의해 문의를 해보시는 게 좋으을실 것 같애요 고객님\n고객: 아 무신사에다가 전화를 해야 될까요 그면 그쪽에서 고객센터에다가요",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#11: \"네 그럼 고객님 성함이랑 연락 연락처 어떻게 되실까요\"\n - 상담사#23: \"네 소중한 정보 확인 감사합니다 고객님 일단 고객님 확인되시는데요 지금 주문 내역이 확인이 안 되시네요\"\n - 상담사#50: \"예 구매처 측에다 문의해 문의를 해보시는 게 좋으을실 것 같애요 고객님\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 11
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 23
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 50
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668675",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-PARTIAL-668697",
+      "item_number": 11,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\n고객: 네 제가 코오롱몰에서 가방을 두 개를 구매를 했는데요\n...\n고객: 같이 나오 같이 이렇게 연결해서 나오는 거라고 얘기를 하던데\n상담사: 아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***\n...\n고객: 네네\n상담사: 네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\n고객: 그 로지",
+      "rationale": "[두괄식] 장황하거나 결론 후행 (결론선행✗) → 3점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 무엇일까요\"\n - 상담사#7: \"아 네 한 번 확인해보겠습니다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#15: \"네 소중한 정보 확인 감사드립니다 네 아 고객님 그러면은 저희 지금 어 어느 가방 말씀이실까요 저희 인제 주문 건이\"",
+      "rationale_tags": [
+        "item_11",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 7
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 15
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668697",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-PARTIAL-668736",
+      "item_number": 11,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\n고객: 네 수고하십니다 주문한 거 오늘 핸드백을 받았는데요\n...\n고객: 그 나무로 한 거 그거 있잖아요 그거 그 핸드백인데 우글글해요\n상담사: 고객님 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\n고객: 벗겨던 이름이 *** 요\n...\n고객: 예 예 맞아요\n상담사: 네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\n고객: 미래가 안 어졌는데요",
+      "rationale": "[두괄식] 장황하거나 결론 후행 (결론선행✗) → 3점\n - 상담사#1: \"반갑습니다 코오롱 고객센터 *** 입니다 무엇을 도와드릴까요\"\n - 상담사#9: \"고객님 먼저 연락 주신 고객님의 성함과 휴대폰 번호를 말씀해 주시겠습니까\"\n - 상담사#17: \"네 소중한 정보 확인 감사합니다 고객님 그러면 제품은 혹시 물에 적지는 않으셨을까요\"",
+      "rationale_tags": [
+        "item_11",
+        "partial_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 17
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668736",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-11-FULL-668771",
+      "item_number": 11,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\n고객: 가 네 그 저 혹시 반품은 언제 되는지 여쭤보려고 전화했거든요\n고객: 네 물건도 보냈어요\n상담사: 네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\n고객: ***구요\n고객: * * * * * * * * * * * 이여\n상담사: 아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\n고객: 네 네",
+      "rationale": "[두괄식] 결론 선행 후 근거 구조 확인 (3건) → 만점\n - 상담사#1: \"네 반갑습니다 코오롱 고객센터 *** 입니다 뭐어릴까요\"\n - 상담사#5: \"네 아 어 그래요 고객님 확인해보겠다 고객님 성함이랑 핸드폰 번호 어떻게 되실까요\"\n - 상담사#9: \"아 네 주문자님 본인 맞으시구요 네 소중한 정보 확인 감사드립니다 어 고객님 삼 월 십 일 일 것 자로 해서 저희 반품 신청되어 있으신데 이 제품 맞으실까요 고객님\"",
+      "rationale_tags": [
+        "item_11",
+        "full_compliance",
+        "aggregated"
+      ],
+      "evidence_refs": [
+        {
+          "speaker": "상담사",
+          "turn_id": 1
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 5
+        },
+        {
+          "speaker": "상담사",
+          "turn_id": 9
+        }
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "kolon_v4_fixed",
+        "sample_id": "668771",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

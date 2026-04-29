@@ -1,0 +1,52 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 5,
+      "rationale": "상품 불량 느낌에 대한 고객 불편에 사과 + 공감 표현 + 호응 모두 포함 만점",
+      "quote_example": "상담사: 어 어떤 말씀인지 알 거 같애요 불편하셨겠어요 죄송합니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_empathy", "apology_included"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 5,
+      "rationale": "사이즈 불일치로 인한 반품 요청에 고객 심정 읽고 정중 응대, 적극적 호응 포함",
+      "quote_example": "상담사: 아 사이즈가 안 맞으셨군요 많이 아쉬우셨겠어요 바로 도와드릴게요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_empathy", "responsive"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 3,
+      "rationale": "기계적 '네' 호응만 반복, 공감 표현 부족 3점",
+      "quote_example": "상담사: 네 네네 네",
+      "evaluator_id": "senior_c",
+      "tags": ["mechanical_response", "weak_empathy"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 3,
+      "rationale": "호응은 있으나 고객 불만 감정에 대한 공감 멘트 누락 3점",
+      "quote_example": "상담사: 네 알겠습니다 처리해드릴게요",
+      "evaluator_id": "senior_a",
+      "tags": ["missing_empathy_phrase"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 0,
+      "rationale": "고객 불편 호소에 무반응, 업무 진행만 통지 — 공감 전무 0점",
+      "quote_example": "상담사: 접수할게요 잠시만요",
+      "evaluator_id": "senior_b",
+      "tags": ["no_empathy", "transactional_only"],
+      "stub_seed": true
+    }
+  ]
+}

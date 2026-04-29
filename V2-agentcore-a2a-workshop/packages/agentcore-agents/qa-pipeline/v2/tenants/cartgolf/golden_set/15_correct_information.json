@@ -1,0 +1,67 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내",
+  "category": "업무 정확도",
+  "max_score": 10,
+  "allowed_steps": [10, 5, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "업무지식 RAG (business_knowledge/) 필수. RAG 부재 시 unevaluable 반환. 스텝 [10, 5, 0].",
+  "examples": [
+    {
+      "example_id": "GS-15-FULL-01",
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 자사 상품의 경우 1회 무상 교환 가능하시고요. 회수 기사 영업일 기준 2~3일 방문 예정이고, 반송장은 교환 완료 시까지 보관 부탁드립니다.",
+      "rationale": "매뉴얼 BK-KOLON-001 (1회 무상 교환 / 회수 기사 / 반송장 보관) 사실 일치.",
+      "rationale_tags": ["RAG 일치", "사실 정확"],
+      "evidence_refs": ["BK-KOLON-001"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-15-FULL-02",
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 교환비는 자사 상품 무료이고, 타사 상품은 5천원 발생합니다. 합포장 반송 시 한 건만 반품비 적용되고 다른 한 건은 배송비 조정 가능합니다.",
+      "rationale": "매뉴얼 BK-KOLON-002 (교환비 정책 / 합포장) 사실 일치.",
+      "rationale_tags": ["RAG 일치"],
+      "evidence_refs": ["BK-KOLON-002"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-15-PARTIAL-01",
+      "score": 5,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "상담사: 교환비는 그냥 무료에요. 반송장은 버리셔도 돼요.",
+      "rationale": "교환비 정책 부분 일치 (자사 한정) 이나 반송장 보관 의무 누락/오안내. 부분 오안내.",
+      "rationale_tags": ["부분 오안내"],
+      "evidence_refs": ["BK-KOLON-001", "BK-KOLON-002"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-15-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 반품비는 어차피 저희가 다 내드리니까 반송장도 그냥 버리시면 됩니다.",
+      "rationale": "매뉴얼 BK-KOLON-001/002 에 반하는 허위 안내. 정정 없음 → 0점.",
+      "rationale_tags": ["허위 안내"],
+      "evidence_refs": ["BK-KOLON-001", "BK-KOLON-002"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-15-UNEVAL-01",
+      "score": null,
+      "score_bucket": "unevaluable",
+      "intent": "상품문의",
+      "segment_text": "상담사: 신상품 코오롱스포츠 한정판은 재고 한정이고 가격이 월 얼마 정도 이벤트 중이에요.",
+      "rationale": "매뉴얼에 해당 신상품 chunk 없음 — 업무지식 RAG 부재. unevaluable 분기.",
+      "rationale_tags": ["RAG 부재"],
+      "evidence_refs": [],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

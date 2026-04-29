@@ -1,0 +1,42 @@
+{
+  "item_number": 16,
+  "item_name": "필수 안내 이행",
+  "category": "업무 정확도",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "intent 별 mandatory_scripts/intent_to_script.yaml 과 cross-check. required=true 항목 누락 시 감점.",
+  "examples": [
+    {
+      "example_id": "GS-16-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "cancellation",
+      "segment_text": "상담사: 해지 의사 재확인 드립니다. 해지 시 잔여 기간 환불 규정은 사용 일수 공제 방식입니다. 철회 가능 기간은 해지일로부터 7일 이내입니다.",
+      "rationale": "intent=cancellation 의 MAND-CAN-01,02,03 모두 이행.",
+      "rationale_tags": ["필수 안내 완수"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-16-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "cancellation",
+      "segment_text": "상담사: 해지 맞으시죠? 처리해 드리겠습니다.",
+      "rationale": "해지 재확인은 있으나 환불/철회 기간 안내 누락.",
+      "rationale_tags": ["필수 안내 일부 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-16-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "상담사: 아 그거 저희가 처리 못해요. 다음에 연락 주세요.",
+      "rationale": "intent=complaint 의 MAND-CMP-01 (사과/공감) 누락 → required=true 감점 정책에 따라 0점.",
+      "rationale_tags": ["사과 누락"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

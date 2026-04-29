@@ -1,0 +1,17 @@
+_analyst_*.py
+_analyst_*.txt
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+.env
+.env.*
+*.md
+graph_visualization.html
+qa_pipeline_*.html
+.pytest_cache/
+.git/
+.DS_Store
+*.log
+test_outputs/
+raw/

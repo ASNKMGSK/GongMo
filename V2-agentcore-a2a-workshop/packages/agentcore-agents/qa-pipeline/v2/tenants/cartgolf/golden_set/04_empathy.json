@@ -1,0 +1,61 @@
+{
+  "item_number": 4,
+  "item_name": "호응 및 공감",
+  "category": "경청 및 소통",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "examples": [
+    {
+      "example_id": "GS-04-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "고객: 상품이 불량이라 짜증 나요. 상담사: 불편 드려 정말 죄송합니다. 상품 수령 후 문제 느끼셔서 많이 속상하셨을 텐데, 교환 처리로 바로 도와드리겠습니다.",
+      "rationale": "사과 + 감정 인정(많이 속상하셨을 텐데) + 해결 의지 — 다양한 공감 표현.",
+      "rationale_tags": ["다양한 공감 표현"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-04-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "고객: 사이즈가 너무 안 맞아서 고민이에요. 상담사: 사이즈가 맞지 않아 많이 고민되셨겠어요. 제가 라지 사이즈 재고부터 확인해 드릴게요.",
+      "rationale": "감정 인정 + 선제 조치 제안.",
+      "rationale_tags": ["공감 + 선제 조치"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-04-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "환불취소",
+      "segment_text": "고객: 패딩에 자꾸 문제가 생겨서 속상해요. 상담사: 네. 네 그러세요.",
+      "rationale": "단순 '네' 호응만. 공감/감정 인정 없음 → 3점.",
+      "rationale_tags": ["단순 호응"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-04-PARTIAL-02",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "고객: 배송이 늦어서 급한데 어떻게 해요. 상담사: 네 알겠습니다. 확인해 보겠습니다.",
+      "rationale": "확인 의지 있으나 감정 인정/사과 멘트 없음.",
+      "rationale_tags": ["공감 약함"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-04-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "고객: 제가 진짜 화가 나서 전화한 거예요. 상담사: 네, 그래서 뭐 어떻게 하실 건지 말씀해 주세요.",
+      "rationale": "감정 호소에 무반응 + 건조한 응대. 부적절 반응.",
+      "rationale_tags": ["공감 없음"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

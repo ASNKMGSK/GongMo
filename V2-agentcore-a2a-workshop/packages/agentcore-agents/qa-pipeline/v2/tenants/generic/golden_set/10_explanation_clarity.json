@@ -1,0 +1,52 @@
+{
+  "item_number": 10,
+  "item_name": "설명 명확성",
+  "category": "설명력 및 전달력",
+  "max_score": 10,
+  "allowed_steps": [10, 7, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "notes": "iter03_clean: 장황 감점 조항 삭제 + reconciler 로 중간점수(7) 허용.",
+  "examples": [
+    {
+      "example_id": "GS-10-FULL-01",
+      "score": 10,
+      "score_bucket": "full",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 요금제는 월 3만 9천원 고정이고, 데이터는 월 10기가 제공됩니다. 초과 시 100메가 당 1천원 추가 과금됩니다. 약정은 12개월입니다.",
+      "rationale": "항목별 정보 구조화 + 숫자 명시 + 조건 명확.",
+      "rationale_tags": ["구조 명확"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-10-MID-01",
+      "score": 7,
+      "score_bucket": "partial",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 그 요금제는 3만 9천원 정도 되고 데이터는 10기가 정도 제공됩니다. 초과하시면 추가 과금이 있어요.",
+      "rationale": "핵심 정보는 있으나 '정도' 완화어 사용 + 초과 과금액 미명시.",
+      "rationale_tags": ["정보 부분 명확"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-10-LOW-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 그 요금제는 다른 거랑 비슷해요. 자세한 건 홈페이지 참고해 주세요.",
+      "rationale": "실질적 정보 전달 실패. 회피성 답변.",
+      "rationale_tags": ["정보 빈약"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-10-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "product_inquiry",
+      "segment_text": "상담사: 음 그거는 저도 잘 모르겠네요. 그냥 알아서 보세요.",
+      "rationale": "설명 전무 + 업무회피.",
+      "rationale_tags": ["설명 전무"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}

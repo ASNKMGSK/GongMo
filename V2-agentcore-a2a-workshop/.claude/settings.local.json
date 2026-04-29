@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__query-docs",
+      "PowerShell(& \"$env:USERPROFILE\\\\.conda\\\\envs\\\\py313\\\\python.exe\" -c \"import boto3; sts = boto3.client\\('sts'\\); print\\(sts.get_caller_identity\\(\\)\\)\")",
+      "PowerShell(New-Item *)",
+      "PowerShell($ok = $false; for \\($i=1; $i -le 30; $i++\\) { try { $r = Invoke-WebRequest -Uri \"http://localhost:8080/health\" -UseBasicParsing -TimeoutSec 3; if \\($r.StatusCode -eq 200\\) { \"attempt=$i status=$\\($r.StatusCode\\) body=$\\($r.Content\\)\"; $ok = $true; break } } catch { Start-Sleep -Seconds 2 } }; if \\(-not $ok\\) { \"HEALTH_FAILED after 30 attempts\"; Get-Content \"C:\\\\Users\\\\META M\\\\Desktop\\\\프롬프트 튜닝\\\\_server_logs\\\\server_v2_20260419_100711.stderr.log\" -ErrorAction SilentlyContinue | Select-Object -Last 40 })",
+      "PowerShell($ok = $false; for \\($i=1; $i -le 30; $i++\\) { try { $r = Invoke-WebRequest -Uri \"http://localhost:8080/health\" -UseBasicParsing -TimeoutSec 3; if \\($r.StatusCode -eq 200\\) { Write-Output \"attempt=$i status=$\\($r.StatusCode\\) body=$\\($r.Content\\)\"; $ok = $true; break } } catch { Start-Sleep -Seconds 2 } }; if \\(-not $ok\\) { Write-Output \"HEALTH_FAILED after 30 attempts\"; Get-Content \"C:\\\\Users\\\\META M\\\\Desktop\\\\프롬프트 튜닝\\\\_server_logs\\\\server_v2_20260419_100711.stderr.log\" -ErrorAction SilentlyContinue | Select-Object -Last 40 | ForEach-Object { Write-Output $_ } })",
+      "PowerShell(try { $r = Invoke-WebRequest -Uri \"http://localhost:8100/health\" -UseBasicParsing -TimeoutSec 5; Write-Output \"status=$\\($r.StatusCode\\) body=$\\($r.Content\\)\" } catch { Write-Output \"err=$_\" })",
+      "PowerShell(Tee-Object *)",
+      "PowerShell(Stop-Process *)",
+      "PowerShell(Get-Process python -ErrorAction SilentlyContinue | Where-Object { $_.Id -ne $PID -and $_.StartTime -gt \\(Get-Date\\).AddHours\\(-2\\) } | Select-Object Id, StartTime, CPU, WS | Format-Table)",
+      "PowerShell(Get-Process -Name python -ErrorAction SilentlyContinue | ForEach-Object { \"$\\($_.Id\\) CPU=$\\($_.CPU\\) WS=$\\($_.WS\\)\" })",
+      "PowerShell($procs = Get-Process python -ErrorAction SilentlyContinue; if \\($procs\\) { $procs | ForEach-Object { Write-Output \\(\"pid=\" + $_.Id\\) } } else { Write-Output \"no_python\" })",
+      "PowerShell($procs = Get-Process pwsh,powershell -ErrorAction SilentlyContinue; if \\($procs\\) { $procs | ForEach-Object { Write-Output \\(\"pid=\" + $_.Id + \" name=\" + $_.ProcessName + \" CPU=\" + $_.CPU\\) } } else { Write-Output \"none\" })",
+      "PowerShell(netstat *)",
+      "PowerShell(Get-Process python | Where-Object { $_.StartTime -gt \\(Get-Date\\).AddMinutes\\(-20\\) } | Select-Object Id, StartTime, CPU | Format-Table)"
+    ]
+  }
+}

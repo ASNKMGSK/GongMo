@@ -1,0 +1,66 @@
+# 텔레세일즈 Intent → 필수 고지 스크립트 매핑
+# 아웃바운드 공통 고지 (영업 목적 + 녹취) 가 모든 intent 에 강제.
+# 생성일: 2026-04-24
+
+tenant_id: kolon-outbound-telesales
+version: "kolon_outbound_telesales_v1_2026-04-24"
+
+# 전 intent 공통 강제 고지 — 본인확인 후 본론 진입 전에 이행
+universal_required:
+  - id: "purpose_of_call"
+    description: "영업 목적 고지"
+    any_of:
+      - "영업 목적"
+      - "마케팅 목적"
+      - "프로모션 안내"
+      - "상품 안내"
+    weight: 0.4
+  - id: "recording_notice"
+    description: "통화 녹취 고지"
+    any_of:
+      - "녹음"
+      - "녹취"
+      - "서비스 품질 향상"
+    weight: 0.4
+  - id: "consent_check"
+    description: "진행 동의 확인"
+    any_of:
+      - "괜찮으실까요"
+      - "시간 괜찮으"
+      - "잠시 통화 가능"
+    weight: 0.2
+
+intents:
+  프로모션안내:
+    additional_required:
+      - id: "promotion_validity"
+        description: "프로모션 유효기간 명시"
+        any_of:
+          - "사월 삼십일"
+          - "사월 30일"
+          - "기간 한정"
+        weight: 1.0
+
+  만기안내:
+    additional_required:
+      - id: "expiry_date"
+        description: "만기 구체 일자 고지"
+        any_of:
+          - "만기"
+          - "종료 예정"
+          - "갱신 기한"
+        weight: 1.0
+
+  재예약유도:
+    additional_required: []
+
+  회원갱신:
+    additional_required:
+      - id: "annual_fee_disclosure"
+        description: "갱신 연회비 명시"
+        any_of:
+          - "연회비"
+          - "삼만 원"
+          - "육만 원"
+          - "십이만 원"
+        weight: 1.0

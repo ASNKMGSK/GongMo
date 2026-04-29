@@ -1,0 +1,84 @@
+{
+  "item_number": 6,
+  "item_name": "정중한 표현",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": [
+    "연체상담",
+    "카드발급",
+    "청구문의",
+    "한도조정",
+    "분실신고",
+    "결제일변경",
+    "부가서비스",
+    "민원",
+    "카드심사",
+    "일반문의"
+  ],
+  "version": "shinhan_v1",
+  "examples": [
+    {
+      "example_id": "GS-06-FULL-shinhan-001",
+      "item_number": 6,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "결제일변경",
+      "segment_text": "고객: 결제일 좀 십오 일로 바꾸고 싶어요\n상담사: 네 고객님 결제일 변경 도와드리겠습니다 십오 일로 변경 시 다음 청구분부터 적용되시는데 진행해드려도 괜찮으실까요\n고객: 네 부탁드려요\n상담사: 네 알겠습니다 변경 처리 완료해드렸습니다 안내 내용 알림톡으로 발송됩니다",
+      "rationale": "[정중] '고객님' 호칭 일관 + 존댓말 + 사물존칭 / 반말 부재 → 만점\n - 상담사#2: \"네 고객님 결제일 변경 도와드리겠습니다 ... 진행해드려도 괜찮으실까요\" — '도와드리겠습니다' / '괜찮으실까요'\n - 상담사#4: \"변경 처리 완료해드렸습니다 안내 내용 알림톡으로 발송됩니다\" — 사물존칭 없이 명확",
+      "rationale_tags": ["item_6", "full_compliance", "courteous"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_001",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-06-PARTIAL-shinhan-002",
+      "item_number": 6,
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "청구문의",
+      "segment_text": "고객: 청구서가 좀 이상하던데\n상담사: 어떤 부분이 이상하신가요 고객님\n고객: 이번 달이 평소보다 많아요\n상담사: 아 네 사월 청구 보면 할부 이용분이 추가 청구되시겠습니다\n고객: 그래요 알겠어요\n상담사: 다른 건 더 도와드릴까요",
+      "rationale": "[정중] '고객님' 호칭은 있으나 '청구되시겠습니다' 사물존칭 1회 발생 → 부분점수\n - 상담사#4: \"아 네 사월 청구 보면 할부 이용분이 추가 청구되시겠습니다\" — '청구되시겠습니다' 사물존칭",
+      "rationale_tags": ["item_6", "partial_compliance", "honorific_misuse"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_002",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    },
+    {
+      "example_id": "GS-06-ZERO-shinhan-003",
+      "item_number": 6,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "민원",
+      "segment_text": "고객: 아니 한도가 갑자기 줄었다고요 누가 그러래요\n상담사: 그건 본사 정책이에요 알겠어요\n고객: 알겠어요가 뭐예요\n상담사: 됐고 일단 안 돼요 본인이 잘못한 거예요\n고객: 뭐라고요",
+      "rationale": "[정중] 반말 + 비하 표현 다수 발생 → 0점\n - 상담사#2: \"알겠어요\" — 반말\n - 상담사#4: \"됐고 일단 안 돼요 본인이 잘못한 거예요\" — '됐고' / '본인이 잘못한 거예요' 비하 / 반말",
+      "rationale_tags": ["item_6", "non_compliance", "informal_blaming"],
+      "evidence_refs": [
+        {"speaker": "상담사", "turn_id": 2},
+        {"speaker": "상담사", "turn_id": 4}
+      ],
+      "rater_meta": {
+        "rater_type": "senior_consensus",
+        "source": "shinhan_v1",
+        "sample_id": "synthetic_003",
+        "variant": "aggregated",
+        "human_score_verified": true
+      }
+    }
+  ]
+}

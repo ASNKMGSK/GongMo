@@ -1,0 +1,32 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+
+# LangGraph / LangChain
+langgraph>=0.4.0
+langchain-core>=0.3.0
+langchain-aws>=0.2.0
+
+# AWS
+boto3>=1.35.0
+
+# FastAPI server
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.0.0
+sse-starlette>=2.0.0
+
+# Multi-tenant: JWT decoding (Cognito AccessToken)
+# PyJWT[crypto] 로 설치하면 RS256 서명 검증용 cryptography 도 포함.
+pyjwt[crypto]>=2.8.0
+
+# PDF 추출 (wiki upload)
+pymupdf>=1.24.0
+
+# Pentagon 비교 / xlsx
+python-multipart>=0.0.9
+
+# AG2 (formerly AutoGen) — Phase 2 qa-debate 인프로세스 통합용.
+# `ag2` 는 `autogen` / `pyautogen` 과 동일 PyPI 패키지 (v0.9.7 확인 — Context7).
+# extras 선택: [anthropic] (Anthropic Messages API), [bedrock] (AWS Bedrock Converse).
+# 운영은 Bedrock 사용하나, 개발 환경에서 Anthropic 직접 호출도 필요 → 둘 다 포함.
+ag2[anthropic,bedrock]>=0.9.7

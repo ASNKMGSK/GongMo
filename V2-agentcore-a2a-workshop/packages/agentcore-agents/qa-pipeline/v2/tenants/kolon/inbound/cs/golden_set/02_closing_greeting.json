@@ -1,0 +1,57 @@
+{
+  "item_number": 2,
+  "item_name": "끝인사",
+  "category": "인사 예절",
+  "max_score": 5,
+  "allowed_steps": [5, 0],
+  "intents": ["상품문의", "환불취소", "배송문의", "클레임", "일반문의"],
+  "dialog_stages": ["outro"],
+  "version": "kolon_inbound_cs_v1_2026-04-24",
+  "segment_extraction_strategy": {
+    "type": "fixed_window",
+    "details": "상담 종료 3~5발화 고정 구간 — 동적 RAG 불필요 (PDF §7.4)",
+    "window_size_turns": 5,
+    "anchor": "dialog_end"
+  },
+  "examples": [
+    {
+      "example_id": "GS-02-CS-FULL-001",
+      "item_number": 2,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "dialog_stage": "outro",
+      "segment_text": "상담사: 네 고객님 다른 궁금하신 점 없으실까요\n고객: 네 없어요\n상담사: 네 그러면 오늘 상담 마무리하겠습니다 바쁘신 중에 시간 내어 주셔서 감사드리며 좋은 하루 보내시기 바랍니다 코오롱 고객센터 김지원이었습니다",
+      "rationale": "[끝인사] 2요소 모두 충족 → 만점\n - 감사 인사: \"시간 내어 주셔서 감사드리며\"\n - 마무리 덕담 + 본인 재소개: \"좋은 하루 보내시기 바랍니다 코오롱 고객센터 김지원이었습니다\"",
+      "rationale_tags": ["item_2", "full_compliance", "outro_full", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 48}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_006","variant":"standard_outro","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-02-CS-ZERO-001",
+      "item_number": 2,
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "클레임",
+      "dialog_stage": "outro",
+      "segment_text": "고객: 네 알겠어요\n상담사: 네 끊을게요",
+      "rationale": "[끝인사] 감사 인사·덕담·본인 재소개 모두 누락 → 0점\n - \"끊을게요\" 단독 발화\n - 존칭은 유지되나 2요소 중 어느 것도 충족 못함",
+      "rationale_tags": ["item_2", "missing_thanks", "missing_closing", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 52}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_007","variant":"abrupt_close","human_score_verified":false}
+    },
+    {
+      "example_id": "GS-02-CS-FULL-002",
+      "item_number": 2,
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "배송문의",
+      "dialog_stage": "outro",
+      "segment_text": "상담사: 네 고객님 배송 관련해서 추가로 문의사항 있으시면 다시 연락 부탁드리겠습니다 오늘도 좋은 하루 되시고요 감사합니다 상담사 박민지였습니다",
+      "rationale": "[끝인사] 후속 연락 안내 + 덕담 + 감사 + 본인 재소개 모두 포함 → 만점",
+      "rationale_tags": ["item_2", "full_compliance", "with_followup_invite", "cs"],
+      "evidence_refs": [{"speaker": "상담사", "turn_id": 32}],
+      "rater_meta": {"rater_type":"synthetic_cs","source":"kolon_inbound_cs_bootstrap_2026-04-24","sample_id":"cs_sample_008","variant":"with_followup","human_score_verified":false}
+    }
+  ]
+}

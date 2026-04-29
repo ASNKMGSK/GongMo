@@ -1,0 +1,37 @@
+{
+  "item_number": 8,
+  "item_name": "문의 파악 및 재확인",
+  "version": "shinhan_v1",
+  "reasoning_records": [
+    {
+      "record_id": "r_08_shinhan_001",
+      "score": 5,
+      "rationale": "[니즈 파악] 고객 모호 발언을 정확히 두 절차 (분실 신고 + 재발급) 로 복창 + 재확인 → 만점\n - 상담사#2: \"카드 분실 신고 도와드리겠습니다 잠시만요 정확히 말씀드리면 분실 신고 진행과 함께 신규 카드 재발급도 동시에 도와드리면 될까요\"\n - 상담사#4: \"네 분실 신고 + 재발급 두 가지 진행으로 알겠습니다\"",
+      "quote_example": "상담사: 카드 분실 신고 도와드리겠습니다 잠시만요 정확히 말씀드리면 분실 신고 진행과 함께 신규 카드 재발급도 동시에 도와드리면 될까요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_8", "full_compliance", "explicit_repeat"],
+      "stub_seed": false,
+      "sample_id": "synthetic_001"
+    },
+    {
+      "record_id": "r_08_shinhan_002",
+      "score": 3,
+      "rationale": "[니즈 파악] '한도 관련' 으로 광범위하게만 응대 + 증액 / 감액 / 조회 어떤 건지 복창 부재 → 부분점수\n - 상담사#2: \"네 한도 관련해서 도와드리겠습니다\" — 의도 세분화 없이 일반 응대",
+      "quote_example": "상담사: 네 한도 관련해서 도와드리겠습니다",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_8", "partial_compliance", "vague_response"],
+      "stub_seed": false,
+      "sample_id": "synthetic_002"
+    },
+    {
+      "record_id": "r_08_shinhan_003",
+      "score": 0,
+      "rationale": "[니즈 파악] 고객의 두 가지 문의 (청구 + 한도) 모두 무시 + 의도 복창 부재 + 재촉 → 0점\n - 상담사#2: \"카드번호 부탁드릴게요\" — 의도 파악 없이 정보 요청\n - 상담사#4: \"네 빨리 부탁드려요\" — 재촉",
+      "quote_example": "상담사: 네 빨리 부탁드려요",
+      "evaluator_id": "shinhan_v1_senior",
+      "tags": ["item_8", "non_compliance", "ignore_intent"],
+      "stub_seed": false,
+      "sample_id": "synthetic_003"
+    }
+  ]
+}

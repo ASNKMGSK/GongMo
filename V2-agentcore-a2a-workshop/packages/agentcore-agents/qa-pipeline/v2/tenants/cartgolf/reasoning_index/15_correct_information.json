@@ -1,0 +1,52 @@
+{
+  "item_number": 15,
+  "item_name": "정확한 안내",
+  "version": "0.1.0-kolon",
+  "reasoning_records": [
+    {
+      "record_id": "r_001",
+      "score": 10,
+      "rationale": "자사 상품 1회 무상 교환 정책 정확 고지, 반품 배송비 2,500원 수치도 매뉴얼 일치 만점",
+      "quote_example": "상담사: 자사 상품이기 때문에 1회 무상 교환 가능하시고 반품 시에는 배송비 2,500원 차감됩니다",
+      "evaluator_id": "senior_a",
+      "tags": ["full_accuracy", "policy_aligned"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_002",
+      "score": 10,
+      "rationale": "회수 기사 2-3 영업일 방문 + 입고 후 검수 2-3 영업일 소요 매뉴얼 수치 정확",
+      "quote_example": "상담사: 영업일 기준 2-3일 내 회수 기사 방문, 입고 후 검수도 2-3 영업일 소요됩니다",
+      "evaluator_id": "senior_b",
+      "tags": ["full_accuracy", "sla_correct"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_003",
+      "score": 5,
+      "rationale": "핵심 정책 맞으나 교환 vs 반품 비용 구분 설명 모호 5점",
+      "quote_example": "상담사: 뭐 비용 발생은 그때 가봐야 알 수 있어요",
+      "evaluator_id": "senior_c",
+      "tags": ["partial_mismatch", "ambiguous"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_004",
+      "score": 0,
+      "rationale": "허위 안내 미정정 — 실제 유료인데 무료라고 안내, critical 위반",
+      "quote_example": "상담사: 반품 배송비 없고요 무료로 회수됩니다 (실제 2,500원 발생)",
+      "evaluator_id": "senior_a",
+      "tags": ["false_info", "uncorrected", "critical"],
+      "stub_seed": true
+    },
+    {
+      "record_id": "r_005",
+      "score": 10,
+      "rationale": "헨리코튼 교환 시 상품 상세 조건(사이즈/색상 동일 여부) 매뉴얼대로 정확 확인",
+      "quote_example": "상담사: 헨리코튼 셔츠 95 사이즈 동일 색상으로 교환 맞으실까요 확인 후 진행해드릴게요",
+      "evaluator_id": "senior_b",
+      "tags": ["full_accuracy", "detail_confirmed"],
+      "stub_seed": true
+    }
+  ]
+}

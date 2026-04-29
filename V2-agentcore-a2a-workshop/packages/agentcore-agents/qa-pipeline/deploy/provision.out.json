@@ -1,0 +1,13 @@
+{
+  "region": "us-east-1",
+  "account_id": "919359878144",
+  "instance_id": "i-01e0ee91f3c5f8bb4",
+  "public_ip": "98.86.146.113",
+  "security_group": "sg-08991042f76c4fff7",
+  "vpc": "vpc-0fcce945a2e1027c4",
+  "subnet": "subnet-08a96ee861d1634ee",
+  "s3_bucket": "qa-deploy-919359878144-us-east-1",
+  "iam_role": "qa-pipeline-v3-role",
+  "instance_profile": "qa-pipeline-v3-instance-profile",
+  "ami_id": "ami-05e86b3611c60b0b4"
+}

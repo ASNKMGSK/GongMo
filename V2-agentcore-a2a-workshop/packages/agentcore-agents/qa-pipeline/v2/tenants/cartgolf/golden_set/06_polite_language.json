@@ -1,0 +1,62 @@
+{
+  "item_number": 6,
+  "item_name": "정중한 표현",
+  "category": "언어 표현",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "kolon_v1",
+  "notes": "반말/사물존칭(되시겠습니다/나오시겠습니다) 1회 이상 시 감점. 3점은 사물존칭 1회 등 경미.",
+  "examples": [
+    {
+      "example_id": "GS-06-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "환불취소",
+      "segment_text": "상담사: 고객님 말씀 주신 교환 건 바로 확인해 드리겠습니다. 잠시만 기다려 주시겠어요?",
+      "rationale": "전 발화 존댓말 + 고객님 호칭 + 사물존칭 없음.",
+      "rationale_tags": ["존댓말 유지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-06-FULL-02",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "상품문의",
+      "segment_text": "상담사: 넥스 경량 패딩 문의해 주셨는데요, 사이즈별 재고 안내 도와드리겠습니다.",
+      "rationale": "고객님 호칭 생략되었으나 전 발화 존댓말 유지 + 부적절 표현 전무.",
+      "rationale_tags": ["존댓말 유지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-06-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "주문배송",
+      "segment_text": "상담사: 주문 확인되시겠습니다. 배송은 오늘 출고되시겠습니다.",
+      "rationale": "사물존칭 2회(확인되시겠습니다 / 출고되시겠습니다). 경미한 부적절.",
+      "rationale_tags": ["사물존칭"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-06-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 아 그거는 원래 그런 거예요. 그냥 직접 하세요.",
+      "rationale": "업무 회피 + 반말 투 — 즉시 0점 요인.",
+      "rationale_tags": ["업무 회피", "부적절 표현"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    },
+    {
+      "example_id": "GS-06-ZERO-02",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "환불취소",
+      "segment_text": "상담사: 아 씨 자꾸 똑같은 말씀 하시네요. 반품 못 해드려요.",
+      "rationale": "비속어 + 업무 거부 + 단정 — 즉시 0점.",
+      "rationale_tags": ["비속어"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "kolon_pilot" }
+    }
+  ]
+}

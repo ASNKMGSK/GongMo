@@ -1,0 +1,53 @@
+# 예약팀 Intent → 필수 고지 스크립트 매핑
+# 예약 확정 전 취소 수수료 + 날씨 정책 고지 강제
+# 생성일: 2026-04-24
+
+tenant_id: cartgolf-inbound-reservation
+version: "cartgolf_inbound_reservation_v1_2026-04-24"
+
+intents:
+  예약신청:
+    required_phrases:
+      - id: "cancellation_policy"
+        description: "취소 수수료 정책 고지"
+        any_of:
+          - "취소 수수료"
+          - "칠 일 전"
+          - "당일 취소"
+          - "단계별 수수료"
+        weight: 0.5
+      - id: "weather_policy"
+        description: "우천/악천후 환불 정책 고지"
+        any_of:
+          - "우천"
+          - "악천후"
+          - "날씨"
+          - "홀 수 환불"
+        weight: 0.5
+    partial_threshold: 0.5
+
+  예약변경:
+    required_phrases:
+      - id: "change_window"
+        description: "변경 가능 기간 고지"
+        any_of:
+          - "변경 가능"
+          - "사 일 이내"
+          - "같은 주 내"
+        weight: 1.0
+    partial_threshold: 0.0
+
+  예약취소:
+    required_phrases:
+      - id: "cancellation_fee_tier"
+        description: "취소 수수료 단계별 기준 고지"
+        any_of:
+          - "칠 일 전"
+          - "오 십 퍼센트"
+          - "칠 십 퍼센트"
+          - "당일 백 퍼센트"
+        weight: 1.0
+    partial_threshold: 0.0
+
+  가용문의:
+    required_phrases: []

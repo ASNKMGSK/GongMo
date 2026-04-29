@@ -1,0 +1,171 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: Apache-2.0
+#
+# V2 QA Pipeline — 필수 안내 스크립트 매핑 (Generic tenant)
+#
+# 각 intent 별로 상담사가 반드시 수행해야 하는 안내 항목 리스트.
+# Sub Agent #16 (필수 안내 이행) 이 transcript 와 cross-check 하여 점수 산출.
+#
+# 포맷:
+#   <intent_key>:
+#     name: 한국어 표기
+#     description: 상담 맥락 설명
+#     scripts:
+#       - id: MAND-<intent>-<NN>
+#         text: 필수 안내 문구 샘플 (정확 매칭 아님, 의미 일치 확인용)
+#         required: true|false          # false 이면 가점 요소
+#         match_phrases:                # transcript 에서 검사할 표현 (OR)
+#           - "..."
+#         penalty_if_missed:            # 누락 시 감점 정책
+#           item: "16"
+#           from: 5
+#           to: 3|0
+#
+# 출처: V1 nodes/sample_data.py 의 _SUPPLEMENTARY_RULES SUP-001~003, SUP-010~012, SUP-015
+
+general_inquiry:
+  name: "일반 문의"
+  description: "특정 상품/계약과 무관한 일반 정보 문의"
+  scripts:
+    - id: MAND-GEN-01
+      text: "상담 녹취 안내"
+      required: true
+      match_phrases: ["녹취", "녹음"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-GEN-02
+      text: "추가 문의 확인"
+      required: true
+      match_phrases: ["더 궁금", "다른 문의", "추가 문의", "더 도움"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+complaint:
+  name: "불만 / 민원"
+  description: "고객 불만 또는 민원 접수"
+  scripts:
+    - id: MAND-CMP-01
+      text: "사과 + 공감 표현"
+      required: true
+      match_phrases: ["죄송", "불편을", "이해"]
+      penalty_if_missed: { item: "16", from: 5, to: 0 }
+    - id: MAND-CMP-02
+      text: "처리 일정 / 후속 안내"
+      required: true
+      match_phrases: ["처리", "연락", "일정"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-CMP-03
+      text: "에스컬레이션 / 팀장 연결 안내 (필요 시)"
+      required: false
+      match_phrases: ["팀장", "수퍼바이저", "책임자"]
+
+info_change:
+  name: "정보 변경"
+  description: "고객 기본정보, 연락처, 계좌 등 변경 요청"
+  scripts:
+    - id: MAND-INF-01
+      text: "본인확인 절차 완료"
+      required: true
+      match_phrases: ["본인확인", "성함", "생년월일"]
+      penalty_if_missed: { item: "16", from: 5, to: 0 }
+    - id: MAND-INF-02
+      text: "변경 후 확인 문구"
+      required: true
+      match_phrases: ["확인되었", "변경되었", "처리되었"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+cancellation:
+  name: "해지 / 취소"
+  description: "서비스/계약 해지·취소 요청"
+  scripts:
+    - id: MAND-CAN-01
+      text: "해지 의사 재확인"
+      required: true
+      match_phrases: ["해지", "해약", "취소"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-CAN-02
+      text: "해지 시 불이익 / 환급금 안내"
+      required: true
+      match_phrases: ["환급", "불이익", "손해", "수수료"]
+      penalty_if_missed: { item: "16", from: 5, to: 0 }
+    - id: MAND-CAN-03
+      text: "철회 가능 기간 / 재가입 안내"
+      required: false
+      match_phrases: ["철회", "재가입"]
+
+claim:
+  name: "보험금 / 환불 청구"
+  description: "보험금, 환불, 포인트 등 금전 청구"
+  scripts:
+    - id: MAND-CLM-01
+      text: "청구 사유 / 발생일 확인"
+      required: true
+      match_phrases: ["사유", "발생일", "언제"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-CLM-02
+      text: "필요 서류 안내"
+      required: true
+      match_phrases: ["서류", "진단서", "영수증"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-CLM-03
+      text: "처리 예상 소요일"
+      required: true
+      match_phrases: ["영업일", "이내", "처리기간"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+product_inquiry:
+  name: "상품 / 요금제 문의"
+  description: "상품, 요금제, 서비스 문의"
+  scripts:
+    - id: MAND-PRD-01
+      text: "상품 기본 정보 정확 안내"
+      required: true
+      match_phrases: ["보장", "요금", "혜택", "기간"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-PRD-02
+      text: "고객 니즈 확인 (적합성)"
+      required: true
+      match_phrases: ["필요하신", "원하시는", "어떤 부분"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+technical_support:
+  name: "IT / 장애 지원"
+  description: "시스템 장애, 접속 오류, 기능 문의"
+  scripts:
+    - id: MAND-IT-01
+      text: "장애 현상 상세 확인"
+      required: true
+      match_phrases: ["어떤", "언제부터", "에러 메시지", "증상"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-IT-02
+      text: "긴급도 / 영향 범위 파악"
+      required: false
+      match_phrases: ["다른 분", "전체", "혼자"]
+    - id: MAND-IT-03
+      text: "예상 처리 시간 / 접수 번호 안내"
+      required: true
+      match_phrases: ["접수 번호", "예상", "처리", "안내"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+billing:
+  name: "청구 / 결제"
+  description: "요금 청구, 결제, 미납 관련 문의"
+  scripts:
+    - id: MAND-BIL-01
+      text: "청구 상세 안내 (금액/기간)"
+      required: true
+      match_phrases: ["원", "금액", "기간", "청구월"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+    - id: MAND-BIL-02
+      text: "결제 방법 / 다음 일정 안내"
+      required: true
+      match_phrases: ["결제", "자동이체", "납부"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }
+
+other:
+  name: "기타"
+  description: "위 분류에 해당하지 않는 상담"
+  scripts:
+    - id: MAND-OTH-01
+      text: "추가 문의 확인"
+      required: true
+      match_phrases: ["더 궁금", "다른 문의"]
+      penalty_if_missed: { item: "16", from: 5, to: 3 }

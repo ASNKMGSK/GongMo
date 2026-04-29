@@ -1,0 +1,41 @@
+{
+  "item_number": 12,
+  "item_name": "문제 해결 의지",
+  "category": "적극성",
+  "max_score": 5,
+  "allowed_steps": [5, 3, 0],
+  "intents": ["*"],
+  "version": "0.1.0-stub",
+  "examples": [
+    {
+      "example_id": "GS-12-FULL-01",
+      "score": 5,
+      "score_bucket": "full",
+      "intent": "complaint",
+      "segment_text": "상담사: 지금 바로 확인해 드리고, 안 되면 담당팀에 직접 이관하겠습니다. 번거로우시면 제가 확인 후 콜백 드려도 될까요?",
+      "rationale": "즉시 확인 + 이관 + 콜백 제안 — 다층 해결책 제시.",
+      "rationale_tags": ["다층 해결 의지"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-12-PARTIAL-01",
+      "score": 3,
+      "score_bucket": "partial",
+      "intent": "complaint",
+      "segment_text": "상담사: 네 저희가 해결책을 찾아보겠습니다.",
+      "rationale": "해결 의지는 있으나 구체적 제안 없음.",
+      "rationale_tags": ["구체성 부족"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    },
+    {
+      "example_id": "GS-12-ZERO-01",
+      "score": 0,
+      "score_bucket": "zero",
+      "intent": "complaint",
+      "segment_text": "상담사: 그건 저희 파트가 아니에요. 다른 데로 다시 전화해 주세요.",
+      "rationale": "업무 회피 — 이관 노력 전무.",
+      "rationale_tags": ["업무 회피"],
+      "rater_meta": { "rater_type": "senior_consensus", "source": "stub" }
+    }
+  ]
+}
