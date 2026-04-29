@@ -29,7 +29,7 @@ flowchart TD
         PB2[Phase B2 직렬 1<br/>work_accuracy<br/>또는 부서특화 *_accuracy]
         PA --> PB1 --> PB2
     end
-    L2 -->|spread ≥ threshold| Debate
+    L2 -->|item ∉ 1·2·16·17·18| Debate
     L2 --> L4
 
     subgraph Debate[AG2 토론 + 판사]
@@ -158,8 +158,9 @@ return base_8  # 코오롱 / 그 외 전부
 
 ## 🎭 AG2 토론 + HITL 판사
 
-**Phase 2 (2026-04-23)** — 3-페르소나 round_robin 그룹채팅으로 의견 충돌 합의:
-- **발동 조건** — 평가자 점수 spread ≥ threshold 항목
+3-페르소나 round_robin 그룹채팅으로 의견 합의 도출:
+- **발동 조건** — **무조건 토론** (2026-04-27 사용자 정책, `v2/debate/node.py:246,425` `threshold=0`)
+- **제외 항목** — `DEBATE_EXCLUDED_ITEMS = {1, 2, 16, 17, 18}` (인사/끝인사/필수안내/정보확인/정보보호 — 룰베이스로 충분) + `evaluation_mode ∈ {compliance_based, structural_only, skipped, unevaluable}` 항목
 - **페르소나** — strict (엄격) / neutral (중립) / loose (관대)
 - **post-debate 판사** — 토론 transcript + HITL 사례 cosine 검색 결과 종합 판정
 - **HITL Step 0** — 강한 신호(cos≥0.7) 채택 / 약한 신호(0.5≤cos<0.7) 참조 / 사례 없음 시 일반 평가
