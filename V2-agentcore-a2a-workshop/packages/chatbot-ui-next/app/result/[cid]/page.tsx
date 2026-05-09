@@ -10,11 +10,14 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import DebateRecordCard from "@/components/DebateRecord";
 import { extractTurnsFromPreprocessing } from "@/components/PostRunReviewModal";
 import { HumanAiComparison } from "@/components/results/HumanAiComparison";
+import { ResultsTab } from "@/components/results/ResultsTab";
 import ReviewItemCard from "@/components/ReviewItemCard";
+import { useAppDispatch } from "@/lib/AppStateContext";
 import { fetchResultFull, fetchReviewQueue } from "@/lib/api";
 import type {
   CategoryItem,
   DebateRecord,
+  EvaluationResult,
   GtComparison,
   GtEvidenceComparison,
   Report,
@@ -71,6 +74,9 @@ export default function ResultDetailPage() {
   const params = useParams<{ cid: string }>();
   const cid = decodeURIComponent(params?.cid || "");
 
+  // ★ 2026-05-07: ResultsTab 렌더링 위해 AppState 에 결과 주입.
+  // /evaluate 탭에서 평가한 직후와 동일한 화면을 검토 큐 상세에서도 보이게 함.
+  const appDispatch = useAppDispatch();
   const [full, setFull] = useState<FullState>(INITIAL_FULL);
   const [hitlRows, setHitlRows] = useState<ReviewItem[]>([]);
   const [toast, setToast] = useState<{
@@ -120,6 +126,13 @@ export default function ResultDetailPage() {
           (data as { preprocessing?: unknown }).preprocessing,
         ),
       });
+      // ★ 2026-05-07: AppState 에 평가 결과 주입 — ResultsTab 이 lastResult 에서 읽음.
+      // /evaluate 에서 평가한 직후와 동일한 화면을 보이게 함.
+      appDispatch({
+        type: "SET_RESULT",
+        payload: data as unknown as EvaluationResult,
+      });
+      appDispatch({ type: "SET_CONSULTATION_ID", payload: cid });
     } catch (err: unknown) {
       setFull({
         loading: false,
@@ -386,6 +399,27 @@ export default function ResultDetailPage() {
         >
           풀 결과 로드 실패: {full.error}
         </div>
+      )}
+
+      {/* ★ 2026-05-07: 평가 결과 화면 — /evaluate 탭의 ResultsTab 을 그대로 이식.
+          ItemProcessTimeline / DebateScoreHistory / PersonaEvidenceSection / AgentGroupCard 등
+          모든 풍부한 UI 가 동일하게 표시됨. 아래 "📋 항목별 평가 상세 · 사람 검수 입력" 섹션은
+          기존 HITL 검수 입력 UX 가 익숙한 사용자를 위해 유지. */}
+      {!full.loading && full.report && (
+        <section
+          style={{
+            marginBottom: 24,
+            padding: 16,
+            background: "#fff",
+            border: "1px solid var(--border, #e6e2d5)",
+            borderRadius: 12,
+          }}
+        >
+          <h2 style={{ margin: "0 0 12px", fontSize: 16, fontWeight: 700, color: "var(--ink-display, #1f1d18)" }}>
+            평가 결과 (전체 화면)
+          </h2>
+          <ResultsTab />
+        </section>
       )}
 
       {!full.loading && (

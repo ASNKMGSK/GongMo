@@ -2,15 +2,15 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Source_Serif_4 } from "next/font/google";
+import { Geist_Mono, Sofia_Sans } from "next/font/google";
 
 import { AppShell } from "@/components/AppShell";
 import { AppStateProvider } from "@/lib/AppStateContext";
 import { ToastProvider } from "@/lib/toast";
 import "./globals.css";
 
-// Geist Sans = Vercel OSS, Anthropic 의 Söhne / Styrene B 와 가장 가까운 humanist sans
-const geistSans = Geist({
+// Sofia Sans = Mastercard 공식 fallback. 본문/UI 의 weight 범위 (450/500/700) 담당.
+const sofiaSans = Sofia_Sans({
   variable: "--font-sans",
   subsets: ["latin"],
   display: "swap",
@@ -23,20 +23,15 @@ const geistMono = Geist_Mono({
   display: "swap",
 });
 
-// Source Serif 4 = Anthropic 의 Tiempos Headline 대체 (display 헤딩용)
-const sourceSerif = Source_Serif_4({
-  variable: "--font-serif",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "600", "700"],
-  style: ["normal", "italic"],
-});
-
 export const metadata: Metadata = {
   title: "QA Pipeline V3 Dashboard",
   description:
     "QA Pipeline V3 — 파이프라인 시각화 · 평가 실행 · HITL 검토 · Claude Docs 톤",
 };
+
+// 전 페이지에서 useSearchParams / SSE / 동적 데이터 사용 → 정적 prerender 자체를 비활성화.
+// Next.js 16 의 missing-suspense-with-csr-bailout 빌드 실패 회피.
+export const dynamic = "force-dynamic";
 
 export default function RootLayout({
   children,
@@ -46,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="ko"
-      className={`${geistSans.variable} ${geistMono.variable} ${sourceSerif.variable} h-full antialiased`}
+      className={`${sofiaSans.variable} ${geistMono.variable} h-full antialiased`}
       suppressHydrationWarning
     >
       <head>

@@ -118,6 +118,36 @@ CREATE INDEX IF NOT EXISTS idx_golden_candidates_tenant3
 ON golden_set_candidates (site_id, channel, department)
 """
 
+# ★ 2026-05-07: 평가 결과 풀 페이로드 — JSON1 컬럼.
+# 평가 결과 탭에 보이는 모든 정보 (report + debates + persona_details + gt_comparison +
+# gt_evidence_comparison + preprocessing + transcript + kms_evaluation + orchestrator) 를
+# 한 행에 통째로 저장. 검토 큐 상세 화면 (/v2/result/full/{cid}) 가 이 테이블에서 SELECT.
+# JSON 파일 (~/Desktop/QA평가결과/JSON/{cid}.json) 도 같이 저장 (백업/이중화).
+_SCHEMA_RESULT_PAYLOADS = """
+CREATE TABLE IF NOT EXISTS result_payloads (
+    consultation_id TEXT PRIMARY KEY,
+    payload TEXT NOT NULL,                    -- JSON 문자열 (json_extract 로 nested 조회 가능)
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    site_id TEXT,
+    channel TEXT,
+    department TEXT,
+    model_id TEXT,
+    grade TEXT,                                -- json_extract($.report.final_score.grade) 캐시
+    raw_total REAL                             -- json_extract($.report.final_score.raw_total) 캐시
+)
+"""
+
+_SCHEMA_RESULT_PAYLOADS_TENANT3 = """
+CREATE INDEX IF NOT EXISTS idx_result_payloads_tenant3
+ON result_payloads (site_id, channel, department)
+"""
+
+_SCHEMA_RESULT_PAYLOADS_CREATED = """
+CREATE INDEX IF NOT EXISTS idx_result_payloads_created
+ON result_payloads (created_at DESC)
+"""
+
 
 def _ensure_column(
     conn: sqlite3.Connection, table: str, column: str, col_def: str
@@ -139,6 +169,10 @@ def init_db() -> None:
         conn.execute(_SCHEMA_HUMAN_REVIEWS_STATUS)
         conn.execute(_SCHEMA_GOLDEN_CANDIDATES)
         conn.execute(_SCHEMA_GOLDEN_STATUS)
+        # ★ 2026-05-07: 풀 페이로드 테이블
+        conn.execute(_SCHEMA_RESULT_PAYLOADS)
+        conn.execute(_SCHEMA_RESULT_PAYLOADS_TENANT3)
+        conn.execute(_SCHEMA_RESULT_PAYLOADS_CREATED)
 
         # 구 스키마 레코드 호환 — ALTER TABLE 로 site_id / channel / department 추가.
         # 기존 행은 NULL 로 유지되며 필요 시 백필 스크립트로 채울 수 있다.
@@ -146,6 +180,13 @@ def init_db() -> None:
             _ensure_column(conn, table, "site_id", "TEXT")
             _ensure_column(conn, table, "channel", "TEXT")
             _ensure_column(conn, table, "department", "TEXT")
+
+        # ★ 2026-05-07: 평가 시 사용된 Bedrock model ID 추적 (예: us.anthropic.claude-sonnet-4-6).
+        # 모델 비교 / A/B 테스트 / 비용 분석 / 회귀 추적 목적. 기존 행은 NULL.
+        _ensure_column(conn, "human_reviews", "model_id", "TEXT")
+        # ★ 2026-05-07: GT (정답표 xlsx) 점수 — gt_comparison.items[].gt_score 에서 추출.
+        # 통계 (/v2/drift/stats) 가 |ai_score - gt_score| MAE 산출에 사용. 모든 평가 즉시 집계.
+        _ensure_column(conn, "human_reviews", "gt_score", "REAL")
 
         conn.execute(_SCHEMA_HUMAN_REVIEWS_TENANT3)
         conn.execute(_SCHEMA_GOLDEN_TENANT3)
@@ -192,6 +233,8 @@ def upsert_review(
     site_id: str | None = None,
     channel: str | None = None,
     department: str | None = None,
+    model_id: str | None = None,
+    gt_score: float | None = None,
 ) -> int:
     """(consultation_id, item_number) 기준 INSERT OR REPLACE. 생성된 row id 반환.
 
@@ -209,8 +252,8 @@ def upsert_review(
     INSERT INTO human_reviews (
         consultation_id, item_number, ai_score, human_score, ai_evidence, ai_judgment,
         human_note, ai_confidence, reviewer_id, reviewer_role, status, created_at, force_t3,
-        site_id, channel, department
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        site_id, channel, department, model_id, gt_score
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ON CONFLICT (consultation_id, item_number) DO UPDATE SET
         ai_score = excluded.ai_score,
         human_score = excluded.human_score,
@@ -224,7 +267,9 @@ def upsert_review(
         force_t3 = excluded.force_t3,
         site_id = COALESCE(excluded.site_id, human_reviews.site_id),
         channel = COALESCE(excluded.channel, human_reviews.channel),
-        department = COALESCE(excluded.department, human_reviews.department)
+        department = COALESCE(excluded.department, human_reviews.department),
+        model_id = COALESCE(excluded.model_id, human_reviews.model_id),
+        gt_score = COALESCE(excluded.gt_score, human_reviews.gt_score)
     """
     with get_conn() as conn:
         conn.execute(
@@ -246,6 +291,8 @@ def upsert_review(
                 site_id,
                 channel,
                 department,
+                model_id,
+                gt_score,
             ),
         )
         cur = conn.execute(
@@ -276,6 +323,94 @@ def list_reviews(
     with get_conn() as conn:
         rows = conn.execute(sql, params).fetchall()
         return [d for d in (_row_to_dict(r) for r in rows) if d is not None]
+
+
+# ---------------------------------------------------------------------------
+# ★ 2026-05-07: result_payloads (풀 평가 결과) — JSON1 컬럼 기반.
+# ---------------------------------------------------------------------------
+
+
+def upsert_result_payload(
+    *,
+    consultation_id: str,
+    payload: dict[str, Any],
+    site_id: str | None = None,
+    channel: str | None = None,
+    department: str | None = None,
+    model_id: str | None = None,
+) -> None:
+    """평가 결과 풀 페이로드 INSERT OR REPLACE.
+
+    payload 는 dict (report + debates + persona_details + gt_comparison +
+    gt_evidence_comparison + preprocessing + transcript + kms_evaluation + orchestrator).
+    JSON 직렬화하여 저장. grade / raw_total 은 자주 조회되는 필드라 컬럼화하여 캐시.
+    """
+    try:
+        payload_str = json.dumps(payload, ensure_ascii=False, default=str)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"payload JSON 직렬화 실패: {exc}") from exc
+
+    # grade / raw_total 캐시 컬럼 추출 (없으면 NULL)
+    final = (payload.get("report") or {}).get("final_score") or {}
+    grade = final.get("grade")
+    raw_total: float | None
+    try:
+        raw_total = float(final["raw_total"]) if final.get("raw_total") is not None else None
+    except (TypeError, ValueError):
+        raw_total = None
+
+    now = _now_iso()
+    sql = """
+    INSERT INTO result_payloads (
+        consultation_id, payload, created_at, updated_at,
+        site_id, channel, department, model_id, grade, raw_total
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ON CONFLICT (consultation_id) DO UPDATE SET
+        payload = excluded.payload,
+        updated_at = excluded.updated_at,
+        site_id = COALESCE(excluded.site_id, result_payloads.site_id),
+        channel = COALESCE(excluded.channel, result_payloads.channel),
+        department = COALESCE(excluded.department, result_payloads.department),
+        model_id = COALESCE(excluded.model_id, result_payloads.model_id),
+        grade = COALESCE(excluded.grade, result_payloads.grade),
+        raw_total = COALESCE(excluded.raw_total, result_payloads.raw_total)
+    """
+    with get_conn() as conn:
+        conn.execute(
+            sql,
+            (consultation_id, payload_str, now, now, site_id, channel, department, model_id, grade, raw_total),
+        )
+
+
+def get_result_payload(consultation_id: str) -> dict[str, Any] | None:
+    """평가 결과 풀 페이로드 조회 — JSON 파싱 후 dict 반환. 없으면 None."""
+    with get_conn() as conn:
+        row = conn.execute(
+            "SELECT payload FROM result_payloads WHERE consultation_id = ?",
+            (str(consultation_id),),
+        ).fetchone()
+        if row is None:
+            return None
+        try:
+            return json.loads(row["payload"])
+        except (TypeError, ValueError):
+            return None
+
+
+def list_result_payload_summaries(limit: int = 100) -> list[dict[str, Any]]:
+    """풀 페이로드 메타 list — 페이로드 자체는 제외 (가벼운 목록 조회용)."""
+    with get_conn() as conn:
+        rows = conn.execute(
+            """
+            SELECT consultation_id, created_at, updated_at,
+                   site_id, channel, department, model_id, grade, raw_total
+            FROM result_payloads
+            ORDER BY created_at DESC
+            LIMIT ?
+            """,
+            (int(limit),),
+        ).fetchall()
+        return [dict(r) for r in rows]
 
 
 def get_review(review_id: int) -> dict[str, Any] | None:

@@ -45,6 +45,9 @@ class FewshotExample:
     rationale_tags: list[str] = field(default_factory=list)
     evidence_refs: list[str] = field(default_factory=list)
     rater_meta: dict[str, Any] = field(default_factory=dict)
+    # ★ 2026-05-07: golden_set md 모드에서 indexer 가 적재한 "## 파싱 원문" 본문.
+    # Layer1 가 평가그룹별로 분할한 문맥 — 페르소나 / 프론트 노출용. retrieve 결과에서 보존.
+    parsed_text: str = ""
 
 
 @dataclass
@@ -104,6 +107,9 @@ class KnowledgeChunk:
     tags: list[str]
     source_ref: str
     score: float                   # retrieval 유사도 (0.0 ~ 1.0)
+    # 2026-05-08: rerank() 호출 시점의 provider ("cohere" | "llm") — UI 가 chip 에 표시.
+    # rerank 적용된 chunk 만 set, 미적용 시 None.
+    rerank_provider: Optional[str] = None
 
 
 @dataclass

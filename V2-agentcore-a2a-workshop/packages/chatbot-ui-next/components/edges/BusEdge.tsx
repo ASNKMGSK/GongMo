@@ -99,7 +99,8 @@ function BusEdgeImpl(props: EdgeProps) {
         strokeLinecap="round"
         strokeDasharray={userDash || undefined}
         style={{
-          opacity: animated ? opacity * 0.55 : opacity,
+          // 2026-05-08: animated 시 0.55 배 흐리던 처리 제거 — 박스 traveler 가 흐려 보이는 원인.
+          opacity,
           transition: "stroke 0.3s ease, stroke-width 0.3s ease",
         }}
         markerEnd={markerEnd as string | undefined}

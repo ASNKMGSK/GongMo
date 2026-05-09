@@ -128,7 +128,8 @@ def _install_bedrock_hook() -> None:
 
             _bedrock_call_counter["n"] += 1
             call_id = _bedrock_call_counter["n"]
-            _bedrock_timings[call_id] = time.perf_counter()
+            # ★ 2026-05-07: model_id 도 함께 stash → after-call 에서 record_usage 에 전달.
+            _bedrock_timings[call_id] = (time.perf_counter(), str(model_id))
             # call_id 를 params 에 심어 after-call 에서 매칭
             params["_qa_call_id"] = call_id
             _bedrock_logger.info(
@@ -158,11 +159,17 @@ def _install_bedrock_hook() -> None:
                 pass
             # fallback — latest timing
             call_id = max(_bedrock_timings.keys()) if _bedrock_timings else None
-            elapsed = (
-                time.perf_counter() - _bedrock_timings.pop(call_id, time.perf_counter())
-                if call_id is not None
-                else 0.0
-            )
+            # ★ 2026-05-07: timing 엔트리는 (start_time, model_id) tuple. 호환성 위해 isinstance 체크.
+            timing_entry = _bedrock_timings.pop(call_id, None) if call_id is not None else None
+            if isinstance(timing_entry, tuple):
+                start_time, call_model_id = timing_entry
+                elapsed = time.perf_counter() - start_time
+            elif isinstance(timing_entry, (int, float)):
+                elapsed = time.perf_counter() - timing_entry
+                call_model_id = None
+            else:
+                elapsed = 0.0
+                call_model_id = None
             # 응답 크기 추정
             resp_size = 0
             text_preview = ""
@@ -185,6 +192,14 @@ def _install_bedrock_hook() -> None:
                 usage = parsed.get("usage") or parsed.get("ResponseMetadata", {}).get("usage")
             else:
                 usage = None
+
+            # ★ 2026-05-07: in-memory 메트릭 누적 — /v2/metrics/bedrock endpoint 로 조회 가능.
+            # model_id 도 같이 누적 → 모델별 호출 분포 검증 (사용자가 드롭다운 선택한 모델로 갔는지).
+            try:
+                from v2.serving.bedrock_metrics import record_usage
+                record_usage(usage, op=op, elapsed=elapsed, model_id=call_model_id)
+            except Exception:  # pragma: no cover — 메트릭 실패가 전체 흐름 막으면 안 됨
+                pass
 
             _bedrock_logger.info(
                 "🟢 BEDROCK RESP #%s ← %s · HTTP %s · %.2fs · body=%dB · usage=%s%s",

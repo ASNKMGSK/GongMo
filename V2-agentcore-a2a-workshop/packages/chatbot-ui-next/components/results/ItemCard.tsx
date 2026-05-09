@@ -9,8 +9,17 @@ import JudgePanel from "@/components/JudgePanel";
 import PersonaBarChart from "@/components/PersonaBarChart";
 import { confirmReview, upsertHumanReview } from "@/lib/api";
 import { scoreColor } from "@/lib/items";
+import { isPersona, PERSONA_STYLES } from "@/lib/personas";
 import { useToast } from "@/lib/toast";
-import type { DeductionEntry, EvidenceEntry, PersonaVotes } from "@/lib/types";
+import { navigateToTurn } from "@/lib/transcriptNav";
+import type {
+  DebateRecord,
+  DeductionEntry,
+  EvidenceEntry,
+  PersonaVotes,
+} from "@/lib/types";
+
+import DebateScoreHistory from "./DebateScoreHistory";
 
 /**
  * ItemCard — V2 HTML 5815~6232 이식.
@@ -48,7 +57,15 @@ export interface ItemCardProps {
   personaMergeRule?: string | null;
   personaStepSpread?: number | null;
   judgeReasoning?: string | null;
-  personaDetails?: Record<string, { judgment?: string }> | null;
+  personaDetails?: Record<
+    string,
+    {
+      judgment?: string;
+      deductions?: Array<DeductionEntry | { reason?: string; points?: number; points_lost?: number; evidence?: string } | string>;
+      evidence?: Array<EvidenceEntry | string>;
+      score?: number | null;
+    }
+  > | null;
   personaLabelMap?: Record<string, string> | null;
   /** Post-debate judge LLM (AG2 토론 종료 후 transcript 보고 확정) — 우선 본문 표시. */
   postDebateJudgeScore?: number | null;
@@ -73,6 +90,10 @@ export interface ItemCardProps {
   humanConfirmed?: boolean;
   /** 사람 점수 저장 성공 시 부모가 humanSavedMap 등을 갱신. */
   onHumanSaved?: (itemNumber: number, humanScore: number, confirmed: boolean) => void;
+  /** F5 — "🔍 판단 과정" 헤더 버튼 클릭 시 노드 드로어 열기 callback. */
+  onOpenNodeDrawer?: (itemNumber: number) => void;
+  /** AG2 토론 기록 (있는 경우) — DebateScoreHistory 임베드용. */
+  debateRecord?: DebateRecord | null;
 }
 
 function normalizeEv(ev: EvidenceEntry | string): {
@@ -90,6 +111,38 @@ function normalizeEv(ev: EvidenceEntry | string): {
   const turn = (ev as { turn?: string | number }).turn != null ? String((ev as { turn?: string | number }).turn) : "";
   const speakerLabel = sp === "agent" ? "상담사" : sp === "customer" ? "고객" : isRag ? "📚 업무지식" : sp;
   return { speaker: speakerLabel, quote, turn, isRag };
+}
+
+/**
+ * EvidenceTurnLink — evidence 의 T#N 표시를 클릭 가능한 버튼으로 변환.
+ * 클릭 시 Pipeline 탭의 transcript turn 행으로 점프 + flash highlight.
+ * RAG (업무지식) chunk 는 turn 이 없으므로 disabled 로 받아 일반 span 으로 fallback.
+ */
+function EvidenceTurnLink({
+  turn,
+  disabled,
+}: {
+  turn: string;
+  disabled?: boolean;
+}) {
+  const tid = Number(turn);
+  const valid = Number.isFinite(tid) && tid > 0 && !disabled;
+  if (!valid) {
+    return <span>{`#${turn}`}</span>;
+  }
+  return (
+    <button
+      type="button"
+      className="evidence-turn-link"
+      title={`상담 전사 #${turn} 발화로 이동`}
+      onClick={(e) => {
+        e.stopPropagation();
+        navigateToTurn(tid);
+      }}
+    >
+      {`#${turn}`}
+    </button>
+  );
 }
 
 function ItemCard({
@@ -128,6 +181,8 @@ function ItemCard({
   humanSavedScore,
   humanConfirmed,
   onHumanSaved,
+  onOpenNodeDrawer,
+  debateRecord,
 }: ItemCardProps) {
   const toast = useToast();
   const hasPersona =
@@ -177,7 +232,9 @@ function ItemCard({
     !!error ||
     hasPersona;
 
-  const [open, setOpen] = useState(defaultOpen || !!error);
+  // 사용자 요청 (2026-05-06): 평가 결과 탭의 토글 부분은 처음부터 펼친 상태로 표시.
+  // 명시적 defaultOpen=false 가 들어온 경우는 존중, 그 외엔 모두 열림.
+  const [open, setOpen] = useState(defaultOpen !== false);
   const [judgeOpen, setJudgeOpen] = useState(false);
   // ── HITL 편집 모드 state ─────────────────────────────────
   const [humanScoreInput, setHumanScoreInput] = useState<string>(
@@ -378,17 +435,60 @@ function ItemCard({
               판사 숙고 {judgeOpen ? "▲" : "▼"}
             </button>
           )}
-          {gt && gtScore != null && !gt.excluded && (
-            <span
-              className="badge badge-neutral"
-              title={`사람 QA 점수 ${gtScore}점 · 차이 ${gtDiff === 0 ? "일치" : gtDiff}`}
-              style={{ color: gtColor }}
+          {onOpenNodeDrawer && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenNodeDrawer(num);
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--ink)";
+                e.currentTarget.style.color = "var(--surface)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--surface)";
+                e.currentTarget.style.color = "var(--ink)";
+              }}
+              title="이 항목의 노드별 평가 과정 상세 보기"
+              style={{
+                padding: "2px 10px",
+                fontSize: 11,
+                fontWeight: 600,
+                fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+                background: "var(--surface)",
+                color: "var(--ink)",
+                border: "1.5px solid var(--ink)",
+                borderRadius: "var(--radius-pill)",
+                cursor: "pointer",
+                transition: "background 150ms var(--ease), color 150ms var(--ease)",
+                whiteSpace: "nowrap",
+              }}
             >
-              👤 {gtScore}
-              {gtDiff != null &&
-                gtDiff !== 0 &&
-                ` (${gtDiff > 0 ? "+" : ""}${gtDiff})`}
-            </span>
+              🔍 판단 과정
+            </button>
+          )}
+          {gt && !gt.excluded && (
+            gtScore != null ? (
+              <span
+                className="badge badge-neutral"
+                title={`사람 QA 점수 ${gtScore}점 · 차이 ${gtDiff === 0 ? "일치" : gtDiff}`}
+                style={{ color: gtColor }}
+              >
+                👤 {gtScore}
+                {gtDiff != null &&
+                  gtDiff !== 0 &&
+                  ` (${gtDiff > 0 ? "+" : ""}${gtDiff})`}
+              </span>
+            ) : (
+              <span
+                className="badge badge-neutral"
+                title="이 항목의 사람 QA 점수가 없습니다 (GT xlsx 의 해당 항목 행 누락 또는 시트 매칭 실패)"
+                style={{ color: "var(--ink-muted)", fontStyle: "italic" }}
+              >
+                👤 GT값 없음
+              </span>
+            )
           )}
           <span
             className="tabular-nums"
@@ -568,6 +668,34 @@ function ItemCard({
             borderTop: "1px solid var(--border)",
           }}
         >
+          {/* ★ 2026-05-07: 평가 과정 타임라인 — 페르소나 평가 → 토론 → 판사 → 최종 단계별 가시화. */}
+          <ItemProcessTimeline
+            personaVotes={personaVotes}
+            personaMergePath={personaMergePath}
+            personaMergeRule={personaMergeRule}
+            personaStepSpread={personaStepSpread}
+            debateApplied={!!postDebateJudgeReasoning || personaMergePath === "judge"}
+            debateMergeRule={personaMergeRule}
+            judgeScore={postDebateJudgeScore}
+            finalScore={sc}
+            maxScore={maxScore}
+          />
+          {debateRecord?.rounds && debateRecord.rounds.length > 0 && (
+            <div style={{ paddingTop: 10 }}>
+              <DebateScoreHistory
+                rounds={debateRecord?.rounds || null}
+                initialPositions={debateRecord?.initial_positions || null}
+                finalScore={sc}
+                maxScore={maxScore}
+                judgeScore={postDebateJudgeScore}
+              />
+            </div>
+          )}
+          <PersonaEvidenceSection
+            personaDetails={personaDetails || null}
+            personaLabelMap={personaLabelMap || null}
+            maxScore={maxScore}
+          />
           {isEnsemble && (
             <div style={{ paddingTop: 10 }}>
               <PersonaBarChart
@@ -888,7 +1016,17 @@ function ItemCard({
                           }}
                         >
                           {n.speaker}
-                          {n.turn ? ` · #${n.turn}` : ""}
+                          {n.turn ? (
+                            <>
+                              {" · "}
+                              <EvidenceTurnLink
+                                turn={n.turn}
+                                disabled={n.isRag}
+                              />
+                            </>
+                          ) : (
+                            ""
+                          )}
                         </span>
                       )}
                       <span style={{ color: "var(--ink-soft)" }}>
@@ -979,6 +1117,641 @@ function DetailRow({ color, children }: { color?: string; children: React.ReactN
       }}
     >
       {children}
+    </div>
+  );
+}
+
+// ===========================================================================
+// PersonaEvidenceSection — F1+F2 페르소나별 evidence/감점 분리 + 색상 토큰
+// ===========================================================================
+const PERSONA_DISPLAY_ORDER: Array<"strict" | "neutral" | "loose"> = [
+  "strict",
+  "neutral",
+  "loose",
+];
+const PERSONA_DISPLAY: Record<
+  string,
+  { label: string; emoji: string; color: string; bg: string; border: string }
+> = {
+  strict: {
+    label: "엄격",
+    emoji: "🔴",
+    color: "var(--persona-strict)",
+    bg: "var(--persona-strict-bg)",
+    border: "var(--persona-strict)",
+  },
+  neutral: {
+    label: "중립",
+    emoji: "🔵",
+    color: "var(--persona-neutral)",
+    bg: "var(--persona-neutral-bg)",
+    border: "var(--persona-neutral)",
+  },
+  loose: {
+    label: "관대",
+    emoji: "🟢",
+    color: "var(--persona-loose)",
+    bg: "var(--persona-loose-bg)",
+    border: "var(--persona-loose)",
+  },
+};
+
+interface PersonaDetailFull {
+  judgment?: string;
+  deductions?: Array<
+    | DeductionEntry
+    | { reason?: string; points?: number; points_lost?: number; evidence?: string }
+    | string
+  >;
+  evidence?: Array<EvidenceEntry | string>;
+  score?: number | null;
+}
+
+function PersonaEvidenceSection({
+  personaDetails,
+  personaLabelMap,
+  maxScore,
+}: {
+  personaDetails: Record<string, PersonaDetailFull> | null;
+  personaLabelMap: Record<string, string> | null;
+  maxScore: number;
+}) {
+  if (!personaDetails) return null;
+  const keys = Object.keys(personaDetails).filter((k) => personaDetails[k] != null);
+  if (keys.length === 0) return null;
+  // strict / neutral / loose 순으로 정렬, 그 외 키는 뒤에.
+  const ordered = [
+    ...PERSONA_DISPLAY_ORDER.filter((k) => keys.includes(k)),
+    ...keys.filter((k) => !PERSONA_DISPLAY_ORDER.includes(k as never)),
+  ];
+
+  return (
+    <div style={{ marginTop: 12 }}>
+      <div
+        style={{
+          fontSize: 10,
+          fontWeight: 700,
+          color: "var(--accent-strong)",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          marginBottom: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+        }}
+      >
+        <span
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "var(--accent)",
+            display: "inline-block",
+          }}
+        />
+        페르소나별 평가 근거
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {ordered.map((pkey) => {
+          const detail = personaDetails[pkey];
+          if (!detail) return null;
+          const display =
+            PERSONA_DISPLAY[pkey] ?? {
+              label: personaLabelMap?.[pkey] ?? pkey,
+              emoji: "•",
+              color: "var(--ink)",
+              bg: "var(--surface-muted)",
+              border: "var(--border-strong)",
+            };
+          const personaScore = detail.score;
+          const deductions = Array.isArray(detail.deductions) ? detail.deductions : [];
+          const evidenceArr = Array.isArray(detail.evidence) ? detail.evidence : [];
+          const judgmentText =
+            typeof detail.judgment === "string" ? detail.judgment.trim() : "";
+          // 페르소나 카드가 의미 있는 콘텐츠를 1개 이상 가질 때만 렌더.
+          if (
+            !judgmentText &&
+            deductions.length === 0 &&
+            evidenceArr.length === 0 &&
+            personaScore == null
+          ) {
+            return null;
+          }
+          return (
+            <div
+              key={pkey}
+              style={{
+                background: "var(--surface)",
+                border: `1.5px solid ${display.border}`,
+                borderRadius: "var(--radius-sm)",
+                overflow: "hidden",
+              }}
+            >
+              {/* 페르소나 라벨 + 점수 헤더 */}
+              <div
+                style={{
+                  padding: "8px 12px",
+                  background: display.bg,
+                  borderBottom: `1px solid ${display.border}`,
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: display.color,
+                  fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+                }}
+              >
+                <span style={{ fontSize: 13 }}>{display.emoji}</span>
+                <span>{display.label}</span>
+                {personaLabelMap?.[pkey] && (
+                  <span
+                    style={{
+                      fontSize: 10,
+                      fontWeight: 500,
+                      color: "var(--ink-muted)",
+                    }}
+                  >
+                    ({personaLabelMap[pkey]})
+                  </span>
+                )}
+                <span style={{ marginLeft: "auto", fontVariantNumeric: "tabular-nums" }}>
+                  {personaScore != null
+                    ? `${personaScore}점`
+                    : "—"}
+                  {maxScore ? (
+                    <span
+                      style={{
+                        fontSize: 10,
+                        color: "var(--ink-muted)",
+                        marginLeft: 3,
+                        fontWeight: 500,
+                      }}
+                    >
+                      / {maxScore}
+                    </span>
+                  ) : null}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  padding: "10px 12px",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {/* 긍정 근거 (evidence) — 파란 톤 */}
+                {evidenceArr.length > 0 && (
+                  <div
+                    style={{
+                      padding: "8px 10px",
+                      background: "var(--info-bg)",
+                      border: "1px solid var(--info-border)",
+                      borderLeft: "3px solid var(--info)",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "var(--info)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: 4,
+                        fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+                      }}
+                    >
+                      긍정 근거 · {evidenceArr.length}건
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+                      {evidenceArr.slice(0, 8).map((ev, i) => {
+                        const n = normalizeEv(ev);
+                        if (!n.quote) return null;
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              fontSize: 11.5,
+                              lineHeight: 1.5,
+                              color: "var(--ink-soft)",
+                            }}
+                          >
+                            {(n.speaker || n.turn) && (
+                              <span
+                                style={{
+                                  fontWeight: 700,
+                                  color: "var(--info)",
+                                  marginRight: 6,
+                                }}
+                              >
+                                {n.speaker}
+                                {n.turn ? (
+                                  <>
+                                    {" · "}
+                                    <EvidenceTurnLink
+                                      turn={n.turn}
+                                      disabled={n.isRag}
+                                    />
+                                  </>
+                                ) : (
+                                  ""
+                                )}
+                              </span>
+                            )}
+                            <span>&ldquo;{n.quote}&rdquo;</span>
+                          </div>
+                        );
+                      })}
+                      {evidenceArr.length > 8 && (
+                        <div
+                          style={{
+                            fontSize: 10.5,
+                            color: "var(--ink-subtle)",
+                            fontStyle: "italic",
+                          }}
+                        >
+                          … {evidenceArr.length - 8}건 생략
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* 감점 사유 (deductions) — 빨간 톤 */}
+                {deductions.length > 0 && (
+                  <div
+                    style={{
+                      padding: "8px 10px",
+                      background: "var(--danger-bg)",
+                      border: "1px solid var(--danger-border)",
+                      borderLeft: "3px solid var(--danger)",
+                      borderRadius: "var(--radius-sm)",
+                    }}
+                  >
+                    <div
+                      style={{
+                        fontSize: 10,
+                        fontWeight: 700,
+                        color: "var(--danger)",
+                        textTransform: "uppercase",
+                        letterSpacing: "0.05em",
+                        marginBottom: 4,
+                        fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+                      }}
+                    >
+                      감점 사유 · {deductions.length}건
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 3 }}>
+                      {deductions.map((d, i) => {
+                        const dObj =
+                          typeof d === "string"
+                            ? { reason: d }
+                            : (d as {
+                                reason?: string;
+                                points?: number;
+                                points_lost?: number;
+                              });
+                        const reasonText = dObj.reason || "감점";
+                        const pointsLost =
+                          dObj.points_lost != null
+                            ? dObj.points_lost
+                            : dObj.points != null
+                              ? dObj.points
+                              : null;
+                        return (
+                          <div
+                            key={i}
+                            style={{
+                              fontSize: 11.5,
+                              lineHeight: 1.5,
+                              color: "var(--ink-soft)",
+                            }}
+                          >
+                            <span>{reasonText}</span>
+                            {pointsLost != null && (
+                              <span
+                                style={{
+                                  marginLeft: 6,
+                                  fontWeight: 700,
+                                  color: "var(--danger)",
+                                }}
+                              >
+                                (-{pointsLost}점)
+                              </span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* judgment 한 줄 요약 */}
+                {judgmentText && (
+                  <div
+                    style={{
+                      fontSize: 11.5,
+                      lineHeight: 1.55,
+                      color: "var(--ink-soft)",
+                      padding: "6px 8px",
+                      background: "var(--surface-muted)",
+                      borderRadius: "var(--radius-sm)",
+                      whiteSpace: "pre-wrap",
+                      wordBreak: "break-word",
+                    }}
+                  >
+                    {judgmentText}
+                  </div>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ===========================================================================
+// ItemProcessTimeline — 평가 과정 단계별 stepper (페르소나 → 토론 → 판사 → 최종)
+// ===========================================================================
+// 백엔드 enum 머지 규칙을 사용자 친화 한국어 라벨로 매핑.
+// 원본 키는 reconciler_personas.py / debate/run_debate.py 참조.
+const MERGE_RULE_LABEL: Record<string, string> = {
+  // 페르소나 머지 (reconciler_personas.py)
+  mode_majority: "다수결 합의",
+  median_full_split: "중간값 (의견 분산)",
+  min_compliance: "엄격 모드 (최저점)",
+  single: "단일 평가자",
+  // 토론 머지 (run_debate.py)
+  consensus: "토론 합의",
+  median_vote: "중간값 표결",
+  majority_vote: "다수결",
+  judge_post_debate: "판사 결정",
+  judge_only_fallback: "판사 단독 결정",
+  judge_override: "판사 재정",
+  fallback_median: "폴백 (중간값)",
+};
+function mergeRuleLabel(raw: string | null | undefined): string {
+  if (!raw) return "";
+  return MERGE_RULE_LABEL[raw] ?? raw;
+}
+function ItemProcessTimeline({
+  personaVotes,
+  personaMergePath,
+  personaMergeRule,
+  personaStepSpread,
+  debateApplied,
+  debateMergeRule,
+  judgeScore,
+  finalScore,
+  maxScore,
+}: {
+  personaVotes: PersonaVotes | null | undefined;
+  personaMergePath: string | null | undefined;
+  personaMergeRule: string | null | undefined;
+  personaStepSpread: number | null | undefined;
+  debateApplied: boolean;
+  debateMergeRule: string | null | undefined;
+  judgeScore: number | null | undefined;
+  finalScore: number;
+  maxScore: number;
+}) {
+  const personas = personaVotes
+    ? Object.entries(personaVotes).filter(([, v]) => v != null)
+    : [];
+  const hasPersona = personas.length >= 2;
+  const spread = personaStepSpread ?? 0;
+  const isJudge = personaMergePath === "judge" || judgeScore != null;
+  const isConverged = !isJudge && spread === 0 && hasPersona;
+  // 단계별 토큰
+  type Step = {
+    key: string;
+    icon: string;
+    label: string;
+    body: React.ReactNode;
+    tone: "default" | "active" | "info" | "warn" | "success";
+  };
+  const steps: Step[] = [];
+
+  // Step 1 — AI 평가 (페르소나)
+  steps.push({
+    key: "persona",
+    icon: "🤖",
+    label: hasPersona ? `페르소나 평가 · ${personas.length}명` : "AI 평가",
+    body: hasPersona ? (
+      <div
+        style={{
+          display: "flex",
+          gap: 6,
+          flexWrap: "wrap",
+          alignItems: "center",
+        }}
+      >
+        {personas.map(([name, score]) => {
+          // ★ 2026-05-07: strict/neutral/loose → 품격/정확성/고객경험 친화 라벨 + 페르소나 색상.
+          const style = isPersona(name) ? PERSONA_STYLES[name] : null;
+          return (
+            <span
+              key={name}
+              style={{
+                fontSize: 10,
+                fontWeight: 700,
+                padding: "1px 7px",
+                borderRadius: "var(--radius-pill)",
+                background: style?.bg ?? "var(--surface-muted)",
+                color: style?.color ?? "var(--ink)",
+                border: `1px solid ${style?.border ?? "var(--border)"}`,
+                fontVariantNumeric: "tabular-nums",
+              }}
+            >
+              {style?.label ?? name}: {String(score)}
+            </span>
+          );
+        })}
+        <span style={{ fontSize: 10, color: "var(--ink-muted)" }}>
+          {spread === 0
+            ? "의견 동일"
+            : spread === 1
+              ? "의견 거의 동일"
+              : `의견 분산 (${spread}단계)`}
+        </span>
+      </div>
+    ) : (
+      <span style={{ fontSize: 10.5, color: "var(--ink-muted)" }}>
+        단일 평가
+      </span>
+    ),
+    tone: hasPersona ? "active" : "default",
+  });
+
+  // Step 2 — 토론 (조건부)
+  if (debateApplied) {
+    steps.push({
+      key: "debate",
+      icon: "🗣️",
+      label: "토론 발생",
+      body: (
+        <span style={{ fontSize: 10.5, color: "var(--ink-soft)" }}>
+          {debateMergeRule
+            ? `결정 방식: ${mergeRuleLabel(debateMergeRule)}`
+            : "페르소나 의견 조정"}
+        </span>
+      ),
+      tone: "warn",
+    });
+  } else if (isConverged) {
+    steps.push({
+      key: "consensus",
+      icon: "✓",
+      label: "페르소나 합의",
+      body: (
+        <span style={{ fontSize: 10.5, color: "var(--success)" }}>
+          만장일치 — 토론 불필요
+        </span>
+      ),
+      tone: "success",
+    });
+  }
+  // Step 3 — 판사 결정 (조건부)
+  if (isJudge) {
+    steps.push({
+      key: "judge",
+      icon: "🎭",
+      label: "판사 LLM 결정",
+      body: (
+        <span style={{ fontSize: 10.5, color: "var(--ink-soft)" }}>
+          판사 점수{" "}
+          <b style={{ color: "var(--ink)" }}>
+            {judgeScore != null ? `${judgeScore}/${maxScore}` : "—"}
+          </b>
+        </span>
+      ),
+      tone: "info",
+    });
+  }
+
+  // Step 4 — 최종
+  steps.push({
+    key: "final",
+    icon: "🏁",
+    label: "최종 점수",
+    body: (
+      <span style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>
+        {finalScore} / {maxScore}
+      </span>
+    ),
+    tone: "active",
+  });
+
+  const toneColor = (tone: Step["tone"]) => {
+    if (tone === "active") return "var(--accent)";
+    if (tone === "success") return "var(--success)";
+    if (tone === "warn") return "var(--warn)";
+    if (tone === "info") return "var(--info)";
+    return "var(--ink-subtle)";
+  };
+
+  return (
+    <div
+      style={{
+        marginTop: 10,
+        marginBottom: 10,
+        padding: "10px 12px",
+        background: "var(--surface-muted)",
+        border: "1px solid var(--border)",
+        borderRadius: "var(--radius-sm)",
+      }}
+    >
+      <div
+        style={{
+          fontSize: 9.5,
+          fontWeight: 700,
+          color: "var(--accent-strong)",
+          textTransform: "uppercase",
+          letterSpacing: "0.08em",
+          marginBottom: 8,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+        }}
+      >
+        <span
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            background: "var(--accent)",
+            display: "inline-block",
+          }}
+        />
+        평가 과정
+      </div>
+      <div
+        style={{
+          display: "flex",
+          flexWrap: "wrap",
+          gap: 8,
+          alignItems: "stretch",
+        }}
+      >
+        {steps.map((step, i) => (
+          <div
+            key={step.key}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              flex: "1 1 auto",
+              minWidth: 200,
+            }}
+          >
+            <div
+              style={{
+                flex: 1,
+                padding: "8px 10px",
+                background: "var(--surface)",
+                border: `1.5px solid ${toneColor(step.tone)}`,
+                borderRadius: "var(--radius-sm)",
+                display: "flex",
+                flexDirection: "column",
+                gap: 4,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: 10.5,
+                  fontWeight: 700,
+                  color: toneColor(step.tone),
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span style={{ fontSize: 12 }}>{step.icon}</span>
+                <span>{step.label}</span>
+              </div>
+              <div>{step.body}</div>
+            </div>
+            {i < steps.length - 1 && (
+              <span
+                style={{
+                  color: "var(--ink-subtle)",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                →
+              </span>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }

@@ -111,16 +111,42 @@ function PersonaTurnCard({ turn }: { turn: DebateTurn }) {
   );
 }
 
+// ★ 2026-05-07: 페르소나 발언 본문에서 내부 메타 토큰 제거 (UI 안전망).
+// 백엔드에서도 strip 하지만 구버전 데이터 / 우회 케이스 대비.
+function stripMetaTokens(text: string | null | undefined): string {
+  if (!text) return "";
+  return text
+    .replace(/\s*\[?\s*(VOTE_FINAL|CONSENSUS)\s*[:\]]?\s*/gi, " ")
+    .replace(/  +/g, " ")
+    .trim();
+}
+
 function MergeRuleBadge({ mergeRule }: { mergeRule: string }) {
   const variantByRule: Record<string, string> = {
     consensus: "badge badge-success",
+    judge_post_debate: "badge badge-success",
+    judge_only_fallback: "badge badge-success",
+    judge_override: "badge badge-warn",
     median_vote: "badge badge-warn",
+    majority_vote: "badge badge-success",
+    mode_majority: "badge badge-success",
+    median_full_split: "badge badge-warn",
+    min_compliance: "badge badge-warn",
+    single: "badge badge-neutral",
     fallback_median: "badge badge-danger",
   };
   const label: Record<string, string> = {
-    consensus: "합의",
-    median_vote: "중앙값",
-    fallback_median: "폴백(중앙값)",
+    consensus: "토론 합의",
+    judge_post_debate: "판사 결정",
+    judge_only_fallback: "판사 단독 결정",
+    judge_override: "판사 재정",
+    median_vote: "중간값 표결",
+    majority_vote: "다수결",
+    mode_majority: "다수결 합의",
+    median_full_split: "중간값 (의견 분산)",
+    min_compliance: "엄격 모드 (최저점)",
+    single: "단일 평가자",
+    fallback_median: "폴백 (중간값)",
   };
   const cls = variantByRule[mergeRule] || "badge badge-neutral";
   return <span className={cls}>{label[mergeRule] || mergeRule}</span>;
@@ -142,7 +168,7 @@ function DebateRecordCard({ record, defaultOpen = false }: Props) {
     for (const r of record.rounds || []) {
       for (const t of r.turns || []) {
         if (t.persona in out) {
-          out[t.persona] = { score: t.score, argument: t.argument };
+          out[t.persona] = { score: t.score, argument: stripMetaTokens(t.argument) };
         }
       }
     }

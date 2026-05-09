@@ -90,6 +90,12 @@ interface StatusEvent {
   elapsed?: number;
   scores?: Array<{ item_number?: number; score?: number }>;
   node_status?: string;
+  /** KMS 노드 완료 시 검출된 인텐트 list (백엔드가 SSE 에 포함 시). */
+  detected_intents?: string[];
+  /** 노드 결과 페이로드 일부 — kms_evaluation 등 포함 가능. */
+  result?: { kms_evaluation?: { detected_intents?: string[] } };
+  /** KMS 노드 완료 시 직접 첨부되는 풀 평가 결과 (server_v2 가 status payload 에 첨부). */
+  kms_evaluation?: Record<string, unknown>;
 }
 
 interface ResultEvent {
@@ -97,6 +103,19 @@ interface ResultEvent {
   verification?: unknown;
   score_validation?: unknown;
   status?: string;
+  /** Final state — KMS 노드 결과 등 평가 컨텍스트 포함. */
+  kms_evaluation?: {
+    available?: boolean;
+    detected_intents?: string[];
+    classification_rationale?: string;
+  };
+  state?: {
+    kms_evaluation?: {
+      available?: boolean;
+      detected_intents?: string[];
+      classification_rationale?: string;
+    };
+  };
 }
 
 interface DoneEvent {
@@ -141,14 +160,103 @@ function timestamp(): string {
 interface ManualQALinkedCardProps {
   manualEval: import("@/lib/manualEvalParser").ManualSheet | null;
   gtScores: import("@/lib/types").GTScore | null;
+  gtSampleId: string;
+  gtError: string;
   justLinked: boolean;
 }
 
-function ManualQALinkedCard({ manualEval, gtScores, justLinked }: ManualQALinkedCardProps) {
+function ManualQALinkedCard({ manualEval, gtScores, gtSampleId, gtError, justLinked }: ManualQALinkedCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const linked = !!(manualEval || gtScores);
   const source: "manual" | "gt" | null = manualEval ? "manual" : gtScores ? "gt" : null;
+  // 미연동 상태 세분화 — sample_id 가 잡혔으면 fetch 진행 중 또는 실패. 사용자에게 어느 단계인지 명시.
+  const linking = !linked && !!gtSampleId && !gtError;
+  const linkFailed = !linked && !!gtSampleId && !!gtError;
+
+  if (linking) {
+    return (
+      <div
+        className="mt-2"
+        style={{
+          fontSize: 11.5,
+          padding: "10px 14px",
+          borderRadius: 10,
+          background: "#eff6ff",
+          border: "1px dashed #93c5fd",
+          color: "#1e40af",
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+        }}
+      >
+        <span style={{
+          width: 10, height: 10, borderRadius: "50%", background: "#3b82f6",
+          animation: "pulseDot 1.5s ease-in-out infinite", flexShrink: 0,
+        }} />
+        <span style={{ fontWeight: 500 }}>
+          GT 연동 중 — sample_id=<b>{gtSampleId}</b> 조회 진행 중…
+        </span>
+      </div>
+    );
+  }
+
+  if (linkFailed) {
+    // GT 가 단순히 없는 케이스 (정답표 미존재 / 시트 매칭 실패) 는 오류가 아니라 정보.
+    // 사용자 요구: "백엔드에 GT 가 없으면 'GT 없음' 으로 표시, 오류 박스 띄우지 말 것".
+    const noGt = /gt_xlsx_not_found|시트 0개|sheet.*not.*found|sample.*not.*matched/i.test(
+      gtError,
+    );
+    if (noGt) {
+      return (
+        <div
+          className="mt-2"
+          style={{
+            fontSize: 11.5,
+            padding: "8px 12px",
+            borderRadius: 10,
+            background: "#f4f4f5",
+            border: "1px dashed #d4d4d8",
+            color: "#52525b",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}
+        >
+          <span style={{ fontSize: 13, flexShrink: 0 }}>👤</span>
+          <span>
+            GT값 없음 — sample_id=<code style={{ background: "rgba(0,0,0,0.05)", padding: "0 4px", borderRadius: 3 }}>{gtSampleId}</code> 에 매칭되는 사람 QA 정답표가 없습니다. 평가는 그대로 진행됩니다.
+          </span>
+        </div>
+      );
+    }
+    return (
+      <div
+        className="mt-2"
+        style={{
+          fontSize: 11.5,
+          padding: "10px 14px",
+          borderRadius: 10,
+          background: "#fef2f2",
+          border: "1px dashed #fca5a5",
+          color: "#991b1b",
+          display: "flex",
+          alignItems: "flex-start",
+          gap: 8,
+        }}
+      >
+        <span style={{ fontSize: 14, flexShrink: 0 }}>⚠</span>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontWeight: 600, marginBottom: 2 }}>
+            GT 연동 실패 — sample_id=<code style={{ background: "rgba(0,0,0,0.05)", padding: "0 4px", borderRadius: 3 }}>{gtSampleId}</code>
+          </div>
+          <div style={{ fontSize: 10.5, opacity: 0.85, wordBreak: "break-word" }}>
+            {gtError}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!linked) {
     return (
@@ -403,6 +511,216 @@ function ManualQALinkedCard({ manualEval, gtScores, justLinked }: ManualQALinked
   );
 }
 
+/* ─────────────────────────────────────────────────────────────
+   RerankerToggle — Cohere Rerank 3.5 (Bedrock) 토글 + 실시간 신호등
+   - 토글 ON/OFF
+   - 신호등: 회색(OFF) / 노랑(ON 호출 전) / 초록(ON 호출 성공) / 빨강(ON 호출 실패)
+   - 실제 호출 성공 여부는 백엔드 응답 reranker_runtime 에서 미러됨
+   ───────────────────────────────────────────────────────────── */
+function RerankerToggle({
+  enabled,
+  provider,
+  ragDisabled,
+  running,
+  runtime,
+  onToggle,
+  onProviderChange,
+}: {
+  enabled: boolean;
+  provider: "cohere" | "llm";
+  ragDisabled: boolean;
+  running: boolean;
+  runtime: {
+    enabled: boolean;
+    provider?: "cohere" | "llm";
+    calls: number;
+    success: number;
+    fail: number;
+    actually_active: boolean;
+    last_error?: string | null;
+    documents_reranked?: number;
+    model?: string;
+    region?: string;
+    last_provider?: "cohere" | "llm" | string | null;
+    by_provider?: {
+      cohere?: { calls: number; success: number; fail: number };
+      llm?: { calls: number; success: number; fail: number };
+    };
+  } | null;
+  onToggle: (v: boolean) => void;
+  onProviderChange: (p: "cohere" | "llm") => void;
+}) {
+  // 신호등 상태 결정
+  let lightColor = "var(--ink-subtle)"; // 회색 (OFF 또는 미가용)
+  let lightLabel = "OFF";
+  let pulse = false;
+  let lightTitle = "Reranker 비활성";
+
+  if (ragDisabled) {
+    lightColor = "var(--ink-subtle)";
+    lightLabel = "N/A";
+    lightTitle = "RAG OFF 모드 — Reranker 도 자동 비활성";
+  } else if (enabled) {
+    if (runtime?.actually_active) {
+      // 초록 — 실제 호출 성공. 2026-05-08: provider-aware 라벨/타이틀.
+      lightColor = "var(--success, #16a34a)";
+      const cohereStats = runtime.by_provider?.cohere;
+      const llmStats = runtime.by_provider?.llm;
+      const cohereCalls = (cohereStats?.success ?? 0) + (cohereStats?.fail ?? 0);
+      const llmCalls = (llmStats?.success ?? 0) + (llmStats?.fail ?? 0);
+      const mixed = cohereCalls > 0 && llmCalls > 0;
+      const lastProv = runtime.last_provider;
+      // 라벨: 마지막 provider 이모지 + 호출 수
+      const provIcon =
+        lastProv === "llm" ? "🧠 LLM" : lastProv === "cohere" ? "🪶 Cohere" : provider === "llm" ? "🧠 LLM" : "🪶 Cohere";
+      lightLabel = `LIVE · ${provIcon} ${runtime.success}회`;
+      // 타이틀: mixed → 둘 다 표시 / 단일 provider → 해당 provider 만
+      if (mixed) {
+        lightTitle = `Cohere ${cohereStats?.success ?? 0}회 / LLM ${llmStats?.success ?? 0}회 호출 성공 (총 ${runtime.documents_reranked ?? 0} docs, 실패 ${runtime.fail}회)`;
+      } else if (lastProv === "llm" || (llmCalls > 0 && cohereCalls === 0)) {
+        lightTitle = `LLM (Haiku 4.5) 호출 성공 ${runtime.success}회 / 실패 ${runtime.fail}회 (총 ${runtime.documents_reranked ?? 0} docs)`;
+      } else {
+        lightTitle = `Cohere Rerank 3.5 호출 성공 ${runtime.success}회 / 실패 ${runtime.fail}회 (총 ${runtime.documents_reranked ?? 0} docs)`;
+      }
+    } else if ((runtime?.fail ?? 0) > 0 && (runtime?.success ?? 0) === 0) {
+      // 빨강 — 호출했지만 모두 실패
+      lightColor = "var(--danger, #dc2626)";
+      lightLabel = "ERROR";
+      lightTitle = `Reranker 호출 실패 ${runtime?.fail}회 — ${runtime?.last_error ?? "원인 불명"}`;
+    } else {
+      // 노랑 — 토글 ON 인데 호출 0 (평가 진행 중 또는 RAG hits 없음)
+      lightColor = "var(--warn, #f59e0b)";
+      lightLabel = running ? "STANDBY" : "READY";
+      pulse = running;
+      lightTitle = running
+        ? "Reranker 활성화 — RAG 호출 대기 중"
+        : "Reranker 활성화 — 평가 시작 시 호출";
+    }
+  }
+
+  return (
+    <div
+      className="flex items-center gap-2 text-[13px]"
+      title="Reranker — 4종 RAG (golden_set / reasoning / business_knowledge / hitl) 의 1차 후보를 정밀 재정렬. provider 별로 cohere(빠름/Q&A 학습) vs llm(Haiku 4.5, task fit ↑) 선택 가능."
+    >
+      <span className="font-medium text-[var(--ink-soft)]">Reranker</span>
+      <div
+        className="inline-flex rounded-[var(--radius-sm)] border border-[var(--border-strong)] overflow-hidden"
+        role="group"
+        aria-label="Reranker 토글"
+      >
+        <button
+          type="button"
+          onClick={() => onToggle(false)}
+          disabled={running || ragDisabled}
+          title={ragDisabled ? "RAG OFF 모드라 reranker 도 자동 비활성" : "Reranker 미사용"}
+          className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+          style={{
+            background: !enabled ? "var(--surface-muted)" : "var(--surface)",
+            color: !enabled ? "var(--ink-soft)" : "var(--ink-muted)",
+            fontWeight: !enabled ? 700 : 500,
+            borderRight: "1px solid var(--border-strong)",
+          }}
+        >
+          OFF
+        </button>
+        <button
+          type="button"
+          onClick={() => onToggle(true)}
+          disabled={running || ragDisabled}
+          title={ragDisabled ? "RAG OFF 모드라 reranker 사용 불가" : "Reranker 활성 — provider 선택으로 모델 결정"}
+          className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+          style={{
+            background: enabled && !ragDisabled ? "#dcfce7" : "var(--surface)",
+            color: enabled && !ragDisabled ? "#166534" : "var(--ink-muted)",
+            fontWeight: enabled && !ragDisabled ? 700 : 500,
+          }}
+        >
+          🎯 ON
+        </button>
+      </div>
+
+      {/* Provider 선택 — ON 일 때만 활성. 2026-05-08 추가 */}
+      <div
+        className="inline-flex rounded-[var(--radius-sm)] border border-[var(--border-strong)] overflow-hidden"
+        role="group"
+        aria-label="Reranker provider"
+        style={{
+          opacity: enabled && !ragDisabled ? 1 : 0.4,
+          pointerEvents: enabled && !ragDisabled ? "auto" : "none",
+        }}
+      >
+        <button
+          type="button"
+          onClick={() => onProviderChange("cohere")}
+          disabled={running || !enabled || ragDisabled}
+          title="Cohere Rerank 3.5 — 빠르고 싸다 ($0.002/call, ~200ms). Q&A 학습 모델이라 평가 패턴 매칭엔 부분 fit."
+          className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+          style={{
+            background: provider === "cohere" ? "#fef3c7" : "var(--surface)",
+            color: provider === "cohere" ? "#92400e" : "var(--ink-muted)",
+            fontWeight: provider === "cohere" ? 700 : 500,
+            borderRight: "1px solid var(--border-strong)",
+          }}
+        >
+          🪶 Cohere
+        </button>
+        <button
+          type="button"
+          onClick={() => onProviderChange("llm")}
+          disabled={running || !enabled || ragDisabled}
+          title="LLM (Haiku 4.5) — task fit ↑ (자연어 지시), 비용 ~3x ($0.005/call), latency ~3-5x. 평가 패턴 매칭에 정확."
+          className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+          style={{
+            background: provider === "llm" ? "#dbeafe" : "var(--surface)",
+            color: provider === "llm" ? "#1e40af" : "var(--ink-muted)",
+            fontWeight: provider === "llm" ? 700 : 500,
+          }}
+        >
+          🧠 LLM
+        </button>
+      </div>
+      {/* 신호등 + 라벨 */}
+      <span
+        title={lightTitle}
+        style={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "2px 8px",
+          borderRadius: "var(--radius-pill)",
+          background: "var(--surface)",
+          border: "1px solid var(--border)",
+          fontSize: 10.5,
+          fontWeight: 700,
+          color: lightColor,
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        <span
+          aria-hidden="true"
+          style={{
+            display: "inline-block",
+            width: 8,
+            height: 8,
+            borderRadius: "50%",
+            background: lightColor,
+            boxShadow: `0 0 0 2px ${lightColor}33`,
+            animation: pulse ? "rerankerPulse 1.4s ease-in-out infinite" : undefined,
+          }}
+        />
+        {lightLabel}
+      </span>
+      <style jsx>{`
+        @keyframes rerankerPulse {
+          0%, 100% { transform: scale(1); opacity: 1; }
+          50% { transform: scale(1.4); opacity: 0.6; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 export function EvaluateRunner() {
   // ── AppStateContext bridge ──────────────────────────────────
   // EvaluateRunner 는 로컬 state 로 PipelineFlow/DebatePanel 에 직접 바인딩되지만,
@@ -446,6 +764,8 @@ export function EvaluateRunner() {
   const [edgeStates, setEdgeStates] = useState<Record<string, NodeState>>(() =>
     initEdgeStates(appState.edgeStates),
   );
+  // 노드별 동적 sub override (예: KMS 의 검출 인텐트). NODE_DEFS 의 정적 sub 보다 우선.
+  const [nodeSubOverrides, setNodeSubOverrides] = useState<Record<string, string>>({});
   const [nodeScores, setNodeScores] = useState<Record<string, number>>(
     () => appState.nodeScores ?? {},
   );
@@ -503,6 +823,16 @@ export function EvaluateRunner() {
   const [debateRoundByNode, setDebateRoundByNode] = useState<
     Record<string, { round: number; max: number }>
   >(() => appState.debateRoundByNode ?? {});
+  // 노드별 토론 완료된 item_number 집합 — 멀티 항목 노드(needs/proactiveness/explanation 등)에서
+  // 모든 항목 finalized 되어야 노드 status 가 "done". 단일 항목 노드도 같은 누적 모델로 통일.
+  const [debateFinalizedItemsByNode, setDebateFinalizedItemsByNode] = useState<
+    Record<string, number[]>
+  >({});
+  // 항목별 완료 플래시 — 각 item_number 가 finalized 될 때 4초간 노드 우상단에
+  // "✓ #N · 점수 토론완료" 배지 깜박. 부모(이 컴포넌트) 가 setTimeout 으로 자동 클리어.
+  const [debateFinishFlashByNode, setDebateFinishFlashByNode] = useState<
+    Record<string, { item_number: number; score: number | null; at: number }>
+  >({});
 
   // anyDebateRunning 의 프리미티브 값 (effect 의존) — POST_DEBATE_NODES 선언 뒤,
   // debateStatusByNode 선언 뒤로 배치해야 TDZ 안전.
@@ -520,6 +850,26 @@ export function EvaluateRunner() {
   // 자동 오픈 (토론 시작될 때 자동으로 모달 열기) — 기본 OFF.
   // 노드 위 인터랙티브 배지로 토론 진행 표시. 사용자가 그걸 클릭해 모달 오픈.
   const [autoOpenDiscussion, setAutoOpenDiscussion] = useState(false);
+
+  // 파이프라인 그래프 (ReactFlow 다이어그램) 표시 토글. 기본 ON.
+  // 사용자가 끄면 캔버스 영역 통째로 숨김 — 그래프가 무거워서 입력/결과만 보고 싶을 때.
+  // localStorage 로 persist (새로고침 후 유지).
+  const [showPipelineGraph, setShowPipelineGraph] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    try {
+      const v = window.localStorage.getItem("qa.pipeline.showGraph");
+      return v === null ? true : v === "1";
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem("qa.pipeline.showGraph", showPipelineGraph ? "1" : "0");
+    } catch {
+      /* noop */
+    }
+  }, [showPipelineGraph]);
 
   // 백엔드가 발급한 discussion_id — 토론 시작/다음라운드/중단 API 호출에 사용.
   const [discussionIdMap, setDiscussionIdMap] = useState<Record<string, string>>({});
@@ -728,7 +1078,7 @@ export function EvaluateRunner() {
   );
   const effectiveEdges = effectivePipeline.edges;
   const effectiveLayer2Children = useMemo(
-    () => effectivePipeline.groups.group_layer2?.children || LAYER2_NODES,
+    () => effectivePipeline.layer2Children || LAYER2_NODES,
     [effectivePipeline],
   );
 
@@ -854,12 +1204,22 @@ export function EvaluateRunner() {
               shinhan: "shinhan",
               generic: "generic",
             };
+            // SITE_CD 가 known tenant 이름이면 site_id 로 사용 (학습셋 JSON 패턴).
+            // 그 외 (예: SITE_CD="inbound") 는 channel 로 fallback.
+            const siteCdRaw =
+              (typeof obj?.SITE_CD === "string" && obj.SITE_CD) ||
+              (typeof obj?.site_cd === "string" && obj.site_cd) ||
+              null;
+            const siteCdAsSite =
+              siteCdRaw && TENANT_MAP[siteCdRaw.toLowerCase()] ? siteCdRaw : null;
+
             const rawSite =
               (typeof obj?.site_id === "string" && obj.site_id) ||
               (typeof obj?.tenant_id === "string" && obj.tenant_id) ||
               (typeof obj?.tenant === "string" && obj.tenant) ||
               (typeof obj?.meta?.tenant_id === "string" && obj.meta.tenant_id) ||
               (typeof obj?.metadata?.tenant_id === "string" && obj.metadata.tenant_id) ||
+              siteCdAsSite ||
               null;
             if (rawSite) {
               const lower = rawSite.toLowerCase();
@@ -867,8 +1227,8 @@ export function EvaluateRunner() {
             }
             const rawChannel =
               (typeof obj?.channel === "string" && obj.channel) ||
-              (typeof obj?.SITE_CD === "string" && obj.SITE_CD) ||
-              (typeof obj?.site_cd === "string" && obj.site_cd) ||
+              // SITE_CD 를 site 로 사용한 경우 channel 폴백에서는 제외
+              (siteCdAsSite ? null : siteCdRaw) ||
               null;
             const rawDepartment =
               (typeof obj?.department === "string" && obj.department) ||
@@ -984,13 +1344,24 @@ export function EvaluateRunner() {
                   error: `${errMsg}${xlsxPath}${triedHint} (시트 ${sheetCount}개)`,
                 },
               });
+              // GT 가 단순히 없는 케이스 (정답표 미존재 / 시트 매칭 실패) 는 정보 로그.
+              // 진짜 오류 (HTTP 500 / 파싱 실패 등) 만 warn.
+              const isNoGt = /gt_xlsx_not_found|sheet.*not.*found|sample.*not.*matched/i.test(
+                errMsg,
+              ) || (res.ok === false && res.status === 404);
               setLogs((prev) => [
                 ...prev,
-                {
-                  time: timestamp(),
-                  msg: `⚠ GT 연동 실패 [id=${detectedSampleId}]: ${errMsg}${xlsxPath}${triedHint}${sheetCount > 0 ? ` · 시트 ${sheetCount}개 발견 (앞 5개: ${body.available_sheets.slice(0, 5).join(", ")})` : ""}`,
-                  type: "warn",
-                },
+                isNoGt
+                  ? {
+                      time: timestamp(),
+                      msg: `ℹ GT값 없음 [id=${detectedSampleId}] — 매칭되는 사람 QA 정답표 없음. 평가는 진행됩니다.`,
+                      type: "info",
+                    }
+                  : {
+                      time: timestamp(),
+                      msg: `⚠ GT 연동 실패 [id=${detectedSampleId}]: ${errMsg}${xlsxPath}${triedHint}${sheetCount > 0 ? ` · 시트 ${sheetCount}개 발견 (앞 5개: ${body.available_sheets.slice(0, 5).join(", ")})` : ""}`,
+                      type: "warn",
+                    },
               ]);
             }
           } catch (gtErr) {
@@ -1137,6 +1508,8 @@ export function EvaluateRunner() {
     setSpeakingByNode({});
     setDebateStatusByNode({});
     setDebateRoundByNode({});
+    setDebateFinalizedItemsByNode({});
+    setDebateFinishFlashByNode({});
     // POST-DEBATE 게이트 ref 초기화
     anyDebateRunningRef.current = false;
     layer3HeldRef.current = false;
@@ -1343,11 +1716,19 @@ export function EvaluateRunner() {
       if (phase === "layer1" || phase === "preprocessing") {
         activatePhaseGroup(LAYER1_NODES);
       } else if (phase === "layer2" || phase === "phase_a" || phase === "phase_b1") {
-        // 신한 dept 노드 포함하도록 동적 layer2 fan-out — effective.groups.group_layer2.children 사용
-        const layer2Active = (effectiveLayer2Children.length > 0
-          ? effectiveLayer2Children
-          : LAYER2_NODES);
-        activatePhaseGroup(layer2Active);
+        // ★ 새 토폴로지 (layer1 → kms 단일 → kms 완료 후 sub-agent fan-out) 대응:
+        //   - next === "__parallel__" : Layer 2 sub-agent 그룹 전체 fan-out (KMS 완료 후 시점)
+        //   - next === "kms" 등 단일 노드: 해당 노드만 active (KMS 단독 실행 시점)
+        // 그 외 (next 미지정) 는 안전하게 group 활성화 — legacy 호환.
+        if (next === "__parallel__" || !next) {
+          const layer2Active = (effectiveLayer2Children.length > 0
+            ? effectiveLayer2Children
+            : LAYER2_NODES);
+          activatePhaseGroup(layer2Active);
+        } else {
+          setNodeStates((prev) => ({ ...prev, [next]: "active" }));
+          activateEdgesTo(next);
+        }
       } else if (phase === "layer3" || phase === "phase_b2") {
         activatePhaseGroup(LAYER3_NODES);
       } else if (phase === "layer4" || phase === "phase_c") {
@@ -1442,6 +1823,53 @@ export function EvaluateRunner() {
           if (data.elapsed !== undefined) {
             setNodeTimings((prev) => ({ ...prev, [node]: data.elapsed as number }));
           }
+          // 2026-05-08 — sub-agent 노드 완료 시 debateStatusByNode 동기 정리.
+          // 멀티 항목 노드 (language=#6/#7, needs=#8/#9, explanation=#10/#11,
+          // proactiveness=#12-14, work_accuracy=#15/#16) 에서 백엔드가
+          // discussion_finalized 를 일부만 송출하면 debateStatusByNode 가 "running"
+          // 으로 stale. 노드가 done 으로 보고된 시점에서는 모든 항목 평가가 끝났으므로
+          // 안전하게 "done" 으로 단정. anyDebateRunningRef 도 일관 유지.
+          // EvaluationNode 의 클라이언트측 효과 가드와 별개로 SSoT (debateStatusByNode)
+          // 자체를 정정 → DiscussionModal/PipelineFlow/Drawer 등 모든 consumer 정합.
+          if (data.node_status !== "error" && node in NODE_TO_DEBATE_ITEMS) {
+            setDebateStatusByNode((prev) => {
+              if (prev[node] !== "running") return prev;
+              const nextStatus = { ...prev, [node]: "done" as const };
+              anyDebateRunningRef.current = Object.values(nextStatus).some(
+                (s) => s === "running",
+              );
+              return nextStatus;
+            });
+          }
+          // KMS 노드 완료 시 검출 인텐트 추출 → sub 동적 표시 + 풀 kms_evaluation 을
+          // lastResult 에 즉시 머지 (NodeDrawer 가 파이프라인 종료 전에도 결과 표시 가능).
+          if (node === "kms") {
+            const kmsEval =
+              (data as { kms_evaluation?: Record<string, unknown> })
+                .kms_evaluation ||
+              data.result?.kms_evaluation ||
+              null;
+            if (kmsEval && typeof kmsEval === "object") {
+              appDispatch({
+                type: "MERGE_KMS_EVALUATION",
+                payload: kmsEval as Record<string, unknown>,
+              });
+            }
+            const intents =
+              (kmsEval as { detected_intents?: unknown })?.detected_intents ||
+              data.detected_intents ||
+              data.result?.kms_evaluation?.detected_intents ||
+              [];
+            if (Array.isArray(intents) && intents.length > 0) {
+              setNodeSubOverrides((prev) => ({
+                ...prev,
+                kms: `검출 인텐트: ${intents.join(", ")}`,
+              }));
+            } else if (Array.isArray(intents)) {
+              // 빈 배열 = 외부구매 / 처리 X — 명시적 표시
+              setNodeSubOverrides((prev) => ({ ...prev, kms: "검출 인텐트: 없음" }));
+            }
+          }
           completeEdgesTo(node);
         }
       } else if (status === "error") {
@@ -1513,6 +1941,21 @@ export function EvaluateRunner() {
 
   const onResult = useCallback(
     (data: ResultEvent) => {
+      // KMS 검출 인텐트 — final state 에서 추출 (SSE 에서 못 받은 경우 fallback).
+      const kmsEval = data.kms_evaluation || data.state?.kms_evaluation;
+      if (kmsEval) {
+        const intents = kmsEval.detected_intents || [];
+        setNodeSubOverrides((prev) => {
+          if (Array.isArray(intents) && intents.length > 0) {
+            return { ...prev, kms: `검출 인텐트: ${intents.join(", ")}` };
+          }
+          if (Array.isArray(intents)) {
+            return { ...prev, kms: "검출 인텐트: 없음" };
+          }
+          return prev;
+        });
+      }
+
       const gateFail =
         data.status === "validation_failed" ||
         (!data.report && (data.verification || data.score_validation));
@@ -1566,8 +2009,47 @@ export function EvaluateRunner() {
       if (!gateFail) {
         ctxSetResult(data as unknown as EvaluationResult);
       }
+      // ★ 2026-05-08: reranker_runtime 미러링 — 백엔드 신호등 표시용.
+      const rerRuntime = (data as unknown as { reranker_runtime?: unknown })
+        .reranker_runtime;
+      if (rerRuntime && typeof rerRuntime === "object") {
+        const r = rerRuntime as Record<string, unknown>;
+        // 2026-05-08: provider / by_provider 도 같이 미러링.
+        const providerRaw = typeof r.provider === "string" ? r.provider : "";
+        const provider: "cohere" | "llm" | undefined =
+          providerRaw === "cohere" || providerRaw === "llm"
+            ? providerRaw
+            : undefined;
+        const byProviderRaw = r.by_provider;
+        const byProvider =
+          byProviderRaw && typeof byProviderRaw === "object"
+            ? (byProviderRaw as {
+                cohere?: { calls: number; success: number; fail: number };
+                llm?: { calls: number; success: number; fail: number };
+              })
+            : undefined;
+        appDispatch({
+          type: "SET_RERANKER_RUNTIME",
+          payload: {
+            enabled: !!r.enabled,
+            provider,
+            model: typeof r.model === "string" ? r.model : undefined,
+            region: typeof r.region === "string" ? r.region : undefined,
+            calls: Number(r.calls ?? 0),
+            success: Number(r.success ?? 0),
+            fail: Number(r.fail ?? 0),
+            actually_active: !!r.actually_active,
+            last_error:
+              typeof r.last_error === "string" ? r.last_error : null,
+            documents_reranked: Number(r.documents_reranked ?? 0),
+            by_provider: byProvider,
+            last_provider:
+              typeof r.last_provider === "string" ? r.last_provider : null,
+          },
+        });
+      }
     },
-    [addLog, ctxSetResult],
+    [addLog, ctxSetResult, appDispatch],
   );
 
   const onDone = useCallback(
@@ -1632,6 +2114,7 @@ export function EvaluateRunner() {
       channel: string;
       department: string;
       tenant_id: string;  // 레거시 호환 — site_id 와 동일값 (한시적).
+      consultation_id?: string;  // 프론트가 미리 결정한 ID — 백엔드와 ID 일치 보장 (HITL 큐 매칭).
       bedrock_model_id?: string;
       persona_mode?: "single" | "ensemble";
       auto_start?: boolean;
@@ -1641,6 +2124,10 @@ export function EvaluateRunner() {
       manual_sheet_name?: string;
       manual_evaluation?: string;
       gt_sample_id?: string;  // 백엔드 gt_comparison_node 가 이 필드로 GT 비교 활성화
+      kms_intent_mode?: "llm" | "linear_rag";  // KMS 인텐트 분류 모드 (사용자 토글)
+      disable_rag?: boolean;  // RAG 전역 비활성 토글 (2026-05-08, 비교 실험용)
+      reranker_enabled?: boolean;  // Reranker 활성화 (2026-05-08)
+      reranker_provider?: "cohere" | "llm";  // 2026-05-08: 사용자가 cohere/llm 중 선택
     } = {
       transcript: transcript.trim(),
       llm_backend: backend,
@@ -1650,7 +2137,28 @@ export function EvaluateRunner() {
       channel: appState.channel || "inbound",
       department: appState.department || "default",
       tenant_id: tenantId,
+      kms_intent_mode: appState.kmsIntentMode || "llm",
+      disable_rag: !!appState.ragDisabled,
+      reranker_enabled: !!appState.rerankerEnabled,
+      reranker_provider: appState.rerankerProvider || "llm",
     };
+    // 다음 결과 표시용으로 "이번 실행에서 RAG 가 비활성됐는지" 도 같이 미러.
+    appDispatch({
+      type: "SET_RAG_DISABLED_IN_LAST_RUN",
+      payload: !!appState.ragDisabled,
+    });
+    // Reranker 런타임 초기화 — 평가 시작 시점. 이번 실행 토글값 반영, stats 는 응답 도착 시 갱신.
+    appDispatch({
+      type: "SET_RERANKER_RUNTIME",
+      payload: {
+        enabled: !!appState.rerankerEnabled,
+        provider: appState.rerankerProvider || "llm",
+        calls: 0,
+        success: 0,
+        fail: 0,
+        actually_active: false,
+      },
+    });
     // ensemble 모드 = 토론 자동 진행. Single 모드가 아니면 무조건 auto_start=true.
     // (body 에 auto_start 생략 시 백엔드 기본값 true — 명시적으로 true 설정하여 게이트 우회)
     if (appState.personaMode === "ensemble") {
@@ -1677,9 +2185,20 @@ export function EvaluateRunner() {
     }
     // GT 비교 활성화 — manualEval.sheetId (또는 별도 gtSampleId) 를 백엔드에 전달.
     // 백엔드 gt_comparison_node 가 이 sample_id 로 xlsx 시트를 매칭해 항목별 점수 비교 + LLM 근거 비교 실행.
-    const gtSid = appState.manualEval?.sheetId || gtSampleId;
+    // ★ 2026-04-30: 사용자가 명시 연동 안 했어도 consultation_id 로 lenient 자동 매칭 시도.
+    // _gt_loader.match_sheet 가 부분일치/숫자정규화 fuzzy 매칭이라 못 찾으면 enabled=false 로 안전 무시.
+    // 효과: 668437 같은 consultation_id 만 입력해도 GT xlsx 사람 점수가 자동으로 PostRunReviewModal 까지 흘러옴.
+    const gtSid =
+      appState.manualEval?.sheetId || gtSampleId || consultationIdForReview || null;
     if (gtSid) {
       body.gt_sample_id = String(gtSid);
+    }
+    // consultation_id 동봉 — 백엔드가 자동 생성 v2-{ts} 대신 이 값을 쓰도록 강제.
+    // 안 보내면 백엔드가 즉석 ID 로 DB 적재 → 프론트가 gtSampleId 로 필터 시 매치 실패
+    // → "HITL 큐 동기화 대기 중 시도 5/5" 무한 retry. (ID 일치 보장)
+    const consultId = consultationIdForReview || gtSid;
+    if (consultId) {
+      body.consultation_id = String(consultId);
     }
 
     abortRef.current = apiSSE(
@@ -1739,6 +2258,136 @@ export function EvaluateRunner() {
             elapsed: typeof data.elapsed === "number" ? data.elapsed : undefined,
             detail: data,
           });
+        } else if (eventName === "rag_hits_ready") {
+          // 2026-05-08 — Layer2 sub-agent 또는 토론 단계에서 RAG 검색 직후 도착한 partial hits.
+          // NodeDrawer 가 토론 finalized 까지 기다리지 않고 즉시 표시할 수 있도록
+          // ragHitsPartialByNode 에 누적. 토론 종료 후 result.evaluations[] 의
+          // rag_evidence 가 final 로 덮어 씌움.
+          const nid = typeof data.node_id === "string" ? data.node_id : "";
+          const itemNo =
+            typeof data.item_number === "number" ? data.item_number : null;
+          const fewshot = Array.isArray(
+            (data as { fewshot?: unknown }).fewshot,
+          )
+            ? ((data as { fewshot: unknown[] }).fewshot as Array<
+                Record<string, unknown>
+              >)
+            : [];
+          const fewshotQuery =
+            typeof data.fewshot_query === "string" ? data.fewshot_query : "";
+          const intent = typeof data.intent === "string" ? data.intent : "";
+          const rawPhase =
+            typeof (data as { phase?: unknown }).phase === "string"
+              ? (data as { phase: string }).phase
+              : "";
+          const phase: "layer2" | "debate" | undefined =
+            rawPhase === "debate"
+              ? "debate"
+              : rawPhase === "layer2"
+                ? "layer2"
+                : undefined;
+          // 2026-05-08 — 항목별 "RAG 사용 안 함" 플래그 (#6 정중한 표현 등 LLM 단독 평가).
+          const ragDisabledForItem = Boolean(
+            (data as { rag_disabled_for_item?: unknown }).rag_disabled_for_item,
+          );
+          const ragDisabledReason =
+            typeof (data as { rag_disabled_reason?: unknown }).rag_disabled_reason ===
+            "string"
+              ? ((data as { rag_disabled_reason: string }).rag_disabled_reason)
+              : "";
+          // 빈 fewshot + 빈 query 라도 rag_disabled_for_item 플래그가 있으면 dispatch
+          // (NodeDrawer 가 selectedItem 일치 시 "RAG 사용 안 함" 안내 표시 가능하도록).
+          if (nid && (fewshot.length > 0 || fewshotQuery || ragDisabledForItem)) {
+            appDispatch({
+              type: "PATCH_RAG_HITS_PARTIAL",
+              payload: {
+                node_id: nid,
+                item_number: itemNo,
+                fewshot,
+                fewshot_query: fewshotQuery,
+                intent,
+                phase,
+                rag_disabled_for_item: ragDisabledForItem,
+                rag_disabled_reason: ragDisabledReason,
+              },
+            });
+            const phaseLabel = phase === "debate" ? "토론용" : "라이브";
+            if (ragDisabledForItem) {
+              addLog(
+                `RAG 미사용 항목 [${nid}${itemNo != null ? ` #${itemNo}` : ""}] · ${phaseLabel}`,
+                "info",
+              );
+            } else {
+              addLog(
+                `RAG hits 도착 [${nid}${itemNo != null ? ` #${itemNo}` : ""}] · ${phaseLabel} · ${fewshot.length}건`,
+                "info",
+              );
+            }
+          }
+        } else if (eventName === "kms_intent_detected") {
+          // ★ 2026-05-07: KMS 노드 인텐트 분류 즉시 — sub 텍스트 라이브 갱신.
+          const intents = Array.isArray(
+            (data as { detected_intents?: unknown }).detected_intents,
+          )
+            ? ((data as { detected_intents: unknown[] }).detected_intents as string[])
+            : [];
+          if (intents.length > 0) {
+            setNodeSubOverrides((prev) => ({
+              ...prev,
+              kms: `검출 인텐트: ${intents.join(", ")}`,
+            }));
+            addLog(`KMS 인텐트 검출: ${intents.join(", ")}`, "info");
+          } else {
+            setNodeSubOverrides((prev) => ({
+              ...prev,
+              kms: "검출 인텐트: 없음 (외부구매/처리X)",
+            }));
+            addLog("KMS 인텐트 검출: 없음", "info");
+          }
+        } else if (eventName === "kms_score_progress") {
+          // ★ 2026-05-07: KMS 인텐트별 점수 산출 즉시 — sub 텍스트 누적 + 노드 점수 chip 갱신.
+          const intent = String((data as { intent?: string }).intent || "");
+          const score = (data as { score?: number | null }).score;
+          if (intent && (typeof score === "number" || score === null)) {
+            const scoreStr = score === null ? "—" : String(score);
+            setNodeSubOverrides((prev) => {
+              const cur = prev.kms || "";
+              const head = cur.split(" · ")[0] || cur;
+              const tailParts: string[] = (cur.split(" · ")[1] || "")
+                .replace(/^점수:\s*/, "")
+                .split(",")
+                .map((s) => s.trim())
+                .filter(Boolean);
+              const updated = tailParts.filter((p) => !p.startsWith(`${intent}=`));
+              updated.push(`${intent}=${scoreStr}`);
+              return {
+                ...prev,
+                kms: `${head} · 점수: ${updated.join(", ")}`,
+              };
+            });
+            // KMS 노드 점수 칩 — 검출된 인텐트들의 평균.
+            if (typeof score === "number") {
+              setNodeScores((prev) => {
+                const _accKey = "_kms_acc";
+                const accRaw = (prev as Record<string, unknown>)[_accKey];
+                const acc =
+                  accRaw && typeof accRaw === "object"
+                    ? (accRaw as Record<string, number>)
+                    : {};
+                const next = { ...acc, [intent]: score };
+                const vals = Object.values(next);
+                const avg = vals.length > 0
+                  ? vals.reduce((s, v) => s + v, 0) / vals.length
+                  : 0;
+                return {
+                  ...prev,
+                  kms: Math.round(avg * 10) / 10,
+                  [_accKey]: next as unknown as number,
+                };
+              });
+            }
+            addLog(`KMS 점수 산출: ${intent}=${scoreStr}`, "info");
+          }
         } else if (eventName === "debate_round_start") {
           onDebateRoundStart(data as { item_number?: number; round?: number; max_rounds?: number });
         } else if (eventName === "persona_turn") {
@@ -2069,12 +2718,58 @@ export function EvaluateRunner() {
             updateDebateForItem(itemNo, finalizedUpdater);
             const nid = itemToNodeId[itemNo];
             if (nid) {
-              setDebateStatusByNode((prev) => {
-                const next = { ...prev, [nid]: "done" as const };
-                // 즉시 ref 동기화 — 방금 종료한 이 노드 제외하고 하나라도 running 이 남아있으면 true
-                anyDebateRunningRef.current = Object.values(next).some((s) => s === "running");
-                return next;
+              // 1) finalized 항목 누적 + 노드 단위 done 판정.
+              //    멀티 항목 노드 (needs=[#8,#9], proactiveness=[#12,#13,#14] 등) 는
+              //    NODE_TO_DEBATE_ITEMS 의 모든 항목이 누적되어야 "done". 그 전엔 "running" 유지.
+              //    setter 콜백 안에서 nextList 를 계산하고, 같은 콜백 내부에서
+              //    setDebateStatusByNode 를 호출 → stale closure 회피.
+              setDebateFinalizedItemsByNode((prev) => {
+                const cur = prev[nid] || [];
+                const nextList = cur.includes(itemNo) ? cur : [...cur, itemNo];
+                const finalizedSet = new Set(nextList);
+                const expected = NODE_TO_DEBATE_ITEMS[nid] || [];
+                // expected.length === 0 인 노드 (debate items 미정의) 는 즉시 done 으로
+                // 처리해 기존 동작 유지. expected 정의된 노드는 모두 누적되어야 done.
+                const allDone =
+                  expected.length === 0 ||
+                  expected.every((it) => finalizedSet.has(it));
+                setDebateStatusByNode((statusPrev) => {
+                  const nextStatus = {
+                    ...statusPrev,
+                    [nid]: (allDone ? "done" : "running") as "done" | "running",
+                  };
+                  anyDebateRunningRef.current = Object.values(nextStatus).some(
+                    (s) => s === "running",
+                  );
+                  return nextStatus;
+                });
+                return { ...prev, [nid]: nextList };
               });
+              // 2) 항목별 완료 플래시 — 4초 후 자동 클리어.
+              //    data 는 SSE 핸들러의 Record<string, unknown> 이므로 final_score 만 좁혀서 추출.
+              const finalScoreForFlash = (() => {
+                const fs = (data as { final_score?: number | null }).final_score;
+                return typeof fs === "number" ? fs : null;
+              })();
+              setDebateFinishFlashByNode((prev) => ({
+                ...prev,
+                [nid]: {
+                  item_number: itemNo,
+                  score: finalScoreForFlash,
+                  at: Date.now(),
+                },
+              }));
+              window.setTimeout(() => {
+                setDebateFinishFlashByNode((prev) => {
+                  const cur = prev[nid];
+                  // 같은 nid 의 플래시가 이미 다른 item_number 로 갱신됐으면 clobber 하지 않음.
+                  if (!cur || cur.item_number !== itemNo) return prev;
+                  // 해당 nid 키만 제거.
+                  const rest = { ...prev };
+                  delete rest[nid];
+                  return rest;
+                });
+              }, 4000);
               setSpeakingByNode((prev) => ({ ...prev, [nid]: null }));
             }
           }
@@ -2290,6 +2985,104 @@ export function EvaluateRunner() {
               </button>
             </div>
           </div>
+          {/* KMS Intent Mode 토글 — Step 1 인텐트 분류 방식 선택. LLM 기본 (F1=0.933, 권장) / LinearRAG 대안 (F1=0.435, 실험용). */}
+          <div className="flex items-center gap-2 text-[13px]">
+            <span className="font-medium text-[var(--ink-soft)]">KMS</span>
+            <div className="inline-flex rounded-[var(--radius-sm)] border border-[var(--border-strong)] overflow-hidden" role="group" aria-label="KMS Intent Mode">
+              <button
+                type="button"
+                onClick={() =>
+                  appDispatch({ type: "SET_KMS_INTENT_MODE", payload: "llm" })
+                }
+                disabled={running}
+                title="Sonnet 4.6 Tool Use 강제 (기본, F1=0.933 / Recall=100%)"
+                className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+                style={{
+                  background:
+                    appState.kmsIntentMode !== "linear_rag"
+                      ? "var(--accent-bg)"
+                      : "var(--surface)",
+                  color:
+                    appState.kmsIntentMode !== "linear_rag"
+                      ? "var(--accent)"
+                      : "var(--ink-muted)",
+                  fontWeight: appState.kmsIntentMode !== "linear_rag" ? 700 : 500,
+                  borderRight: "1px solid var(--border-strong)",
+                }}
+              >
+                🧠 LLM
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  appDispatch({ type: "SET_KMS_INTENT_MODE", payload: "linear_rag" })
+                }
+                disabled={running}
+                title="Tri-Graph LinearRAG (Titan v2 + PPR, 실험적 — F1=0.435, 첫 호출 시 인덱싱 30~120초)"
+                className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+                style={{
+                  background:
+                    appState.kmsIntentMode === "linear_rag"
+                      ? "var(--accent-bg)"
+                      : "var(--surface)",
+                  color:
+                    appState.kmsIntentMode === "linear_rag"
+                      ? "var(--accent)"
+                      : "var(--ink-muted)",
+                  fontWeight: appState.kmsIntentMode === "linear_rag" ? 700 : 500,
+                }}
+              >
+                🕸️ LinearRAG
+              </button>
+            </div>
+            {/* ★ 2026-05-08: RAG 초기화 버튼은 파이프라인 탭에서 제거 — RAG 관리 탭(RagAdminPanel)으로 이전. */}
+          </div>
+          {/* RAG 전역 비활성 토글 (2026-05-08) — 비교 실험용. 켜면 모든 RAG 호출 SKIP. */}
+          <div className="flex items-center gap-2 text-[13px]" title="RAG 전역 ON/OFF — 끄면 모든 RAG (fewshot · reasoning · 업무지식 · HITL 골든셋) SKIP. #15 (정확한 안내) 는 업무지식 RAG 부재로 unevaluable + 토론도 skip. RAG 사용 vs 미사용 비교 실험용.">
+            <span className="font-medium text-[var(--ink-soft)]">RAG</span>
+            <div className="inline-flex rounded-[var(--radius-sm)] border border-[var(--border-strong)] overflow-hidden" role="group" aria-label="RAG 전역 토글">
+              <button
+                type="button"
+                onClick={() => appDispatch({ type: "SET_RAG_DISABLED", payload: false })}
+                disabled={running}
+                title="RAG 사용 (기본) — fewshot · reasoning · 업무지식 · HITL 골든셋 모두 활성"
+                className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+                style={{
+                  background: !appState.ragDisabled ? "var(--accent-bg)" : "var(--surface)",
+                  color: !appState.ragDisabled ? "var(--accent)" : "var(--ink-muted)",
+                  fontWeight: !appState.ragDisabled ? 700 : 500,
+                  borderRight: "1px solid var(--border-strong)",
+                }}
+              >
+                ✅ ON
+              </button>
+              <button
+                type="button"
+                onClick={() => appDispatch({ type: "SET_RAG_DISABLED", payload: true })}
+                disabled={running}
+                title="RAG 미사용 — 모든 RAG 호출 SKIP. LLM 단독 판정 결과를 RAG-ON 결과와 비교"
+                className="px-3 py-1 text-[12px] font-medium transition disabled:opacity-50"
+                style={{
+                  background: appState.ragDisabled ? "#fee2e2" : "var(--surface)",
+                  color: appState.ragDisabled ? "#991b1b" : "var(--ink-muted)",
+                  fontWeight: appState.ragDisabled ? 700 : 500,
+                }}
+              >
+                🚫 OFF
+              </button>
+            </div>
+          </div>
+          {/* Reranker 토글 — Cohere Rerank 3.5 (Bedrock) 또는 LLM (Haiku 4.5).
+              RAG OFF 일 땐 의미 없음 → disabled. provider 토글로 모델 전환. */}
+          <RerankerToggle
+            enabled={appState.rerankerEnabled}
+            provider={appState.rerankerProvider}
+            ragDisabled={appState.ragDisabled}
+            running={running}
+            runtime={appState.rerankerRuntime}
+            onToggle={(v) => appDispatch({ type: "SET_RERANKER_ENABLED", payload: v })}
+            onProviderChange={(p) => appDispatch({ type: "SET_RERANKER_PROVIDER", payload: p })}
+          />
           <label className="flex items-center gap-2 text-[13px]">
             <span className="font-medium text-[var(--ink-soft)]">Server</span>
             <input
@@ -2382,6 +3175,8 @@ export function EvaluateRunner() {
             rows={6}
             className="w-full rounded-[var(--radius)] border border-[var(--border-strong)] bg-[var(--surface)] p-3 text-[13px] leading-relaxed text-[var(--ink)] outline-none transition placeholder:text-[var(--ink-subtle)] focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-ring)]"
           />
+          {/* ★ 2026-05-07: TranscriptTurnList 를 results 탭으로 이동.
+              파이프라인 메인은 그래프/입력/액션 위주. evidence 클릭 흐름도 results 안에서 완결. */}
         </div>
 
         <div className="mt-4">
@@ -2401,6 +3196,8 @@ export function EvaluateRunner() {
           <ManualQALinkedCard
             manualEval={appState.manualEval}
             gtScores={appState.gtScores}
+            gtSampleId={appState.gtSampleId}
+            gtError={appState.gtError}
             justLinked={justLinked != null}
           />
         </div>
@@ -2478,46 +3275,85 @@ export function EvaluateRunner() {
         </div>
       </div>
 
-      <div
-        className="tenant-canvas-wrap relative"
-        // 캔버스 전체창 ring/glow 펄스 일시 비활성 (요청). 다시 켜려면 아래 className 으로 복귀:
-        // className={`tenant-canvas-wrap relative ${tenantFlashing ? "tenant-canvas-flash" : ""}`}
-      >
-        <div
-          key={`canvas-overlay-${tenantFlashKey}`}
-          className="tenant-canvas-overlay"
-          aria-live="polite"
-        >
-          <span className="tenant-canvas-overlay-label">테넌트</span>
-          <span className="tenant-canvas-overlay-path">
-            {appState.siteId || "generic"}
-            <span className="tenant-canvas-sep">·</span>
-            {appState.channel || "inbound"}
-            <span className="tenant-canvas-sep">·</span>
-            {appState.department || "default"}
+      <div className="flex items-center justify-between gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-muted)] px-4 py-2 text-[12px]">
+        <div className="flex items-center gap-2">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-[var(--ink-muted)]">
+            파이프라인 다이어그램
           </span>
-          <TenantStatusBadge
-            siteId={appState.siteId || "generic"}
-            channel={appState.channel || "inbound"}
-            department={appState.department || "default"}
-            flashKey={tenantFlashKey}
+          <span className="text-[11px] text-[var(--ink-subtle)]">
+            {showPipelineGraph ? "표시 중 — 노드/엣지 시각화" : "숨김 — 입력/결과 영역만 사용"}
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setShowPipelineGraph((v) => !v)}
+          className="inline-flex items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-1.5 text-[12px] font-medium text-[var(--ink-soft)] transition hover:bg-[var(--surface-hover)]"
+          title={showPipelineGraph ? "파이프라인 그래프를 숨겨 화면 공간 확보" : "파이프라인 그래프를 다시 표시"}
+        >
+          {showPipelineGraph ? (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                <line x1="1" y1="1" x2="23" y2="23" />
+              </svg>
+              그래프 숨기기
+            </>
+          ) : (
+            <>
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                <circle cx="12" cy="12" r="3" />
+              </svg>
+              그래프 보이기
+            </>
+          )}
+        </button>
+      </div>
+
+      {showPipelineGraph && (
+        <div
+          className="tenant-canvas-wrap relative"
+          // 캔버스 전체창 ring/glow 펄스 일시 비활성 (요청). 다시 켜려면 아래 className 으로 복귀:
+          // className={`tenant-canvas-wrap relative ${tenantFlashing ? "tenant-canvas-flash" : ""}`}
+        >
+          <div
+            key={`canvas-overlay-${tenantFlashKey}`}
+            className="tenant-canvas-overlay"
+            aria-live="polite"
+          >
+            <span className="tenant-canvas-overlay-label">테넌트</span>
+            <span className="tenant-canvas-overlay-path">
+              {appState.siteId || "generic"}
+              <span className="tenant-canvas-sep">·</span>
+              {appState.channel || "inbound"}
+              <span className="tenant-canvas-sep">·</span>
+              {appState.department || "default"}
+            </span>
+            <TenantStatusBadge
+              siteId={appState.siteId || "generic"}
+              channel={appState.channel || "inbound"}
+              department={appState.department || "default"}
+              flashKey={tenantFlashKey}
+            />
+          </div>
+          <PipelineFlow
+            nodeStates={nodeStates}
+            nodeScores={nodeScores}
+            nodeTimings={nodeTimings}
+            nodeConfidence={nodeConfidence}
+            edgeStates={edgeStates}
+            onNodeClick={handleNodeClick}
+            personaMode={appState.personaMode}
+            debateStatusByNode={debateStatusByNode}
+            debateRoundByNode={debateRoundByNode}
+            debateFinishFlashByNode={debateFinishFlashByNode}
+            onDebateOpen={handleDebateOpen}
+            tenantContext={pipelineTenantContext}
+            tenantPipelineConfig={tenantPipelineConfig}
+            nodeSubOverrides={nodeSubOverrides}
           />
         </div>
-        <PipelineFlow
-          nodeStates={nodeStates}
-          nodeScores={nodeScores}
-          nodeTimings={nodeTimings}
-          nodeConfidence={nodeConfidence}
-          edgeStates={edgeStates}
-          onNodeClick={handleNodeClick}
-          personaMode={appState.personaMode}
-          debateStatusByNode={debateStatusByNode}
-          debateRoundByNode={debateRoundByNode}
-          onDebateOpen={handleDebateOpen}
-          tenantContext={pipelineTenantContext}
-          tenantPipelineConfig={tenantPipelineConfig}
-        />
-      </div>
+      )}
 
       {appState.personaMode === "ensemble" && (
         <div className="flex items-center gap-3 rounded-[var(--radius-lg)] border border-[var(--border)] bg-[var(--surface-muted)] px-4 py-2.5 text-[12px]">
@@ -2661,6 +3497,12 @@ export function EvaluateRunner() {
           turns={extractTurnsFromPreprocessing(
             (appState.lastResult as { preprocessing?: unknown } | null)?.preprocessing,
           )}
+          /* ★ 2026-04-30: GT xlsx 사람 점수 → ReviewItemCard 까지 흘려준다.
+             HITL 큐 row 가 없거나 human_score=null 이어도 "정답표" fallback 으로 노출. */
+          gtComparison={
+            (appState.lastResult as { gt_comparison?: import("@/lib/types").GtComparison | null } | null)
+              ?.gt_comparison ?? null
+          }
         />
       )}
     </div>

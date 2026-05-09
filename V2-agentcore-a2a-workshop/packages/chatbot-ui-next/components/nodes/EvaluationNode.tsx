@@ -20,9 +20,22 @@ export interface EvaluationNodeData extends Record<string, unknown> {
   debateStatus?: "idle" | "running" | "done";
   debateRound?: number;
   debateMaxRounds?: number;
+  /** 항목별 토론 완료 플래시 — 멀티 항목 노드에서 각 #N finalized 시 4초간 표시.
+   *  부모(EvaluateRunner) 가 setTimeout 으로 자동 제거하므로 노드는 단순히 truthy 면 렌더. */
+  debateFinishFlash?: {
+    item_number: number;
+    score: number | null;
+    at: number;
+  };
   onDebateOpen?: (nodeId: string) => void;
+  /** ★ 2026-05-07: 노드 클릭 액션 — "📋 상세" 버튼이 명시적으로 호출.
+   *  whole-node onClick 은 React Flow internal 이라 외부 prop 으로 전달이 어려움. */
+  onOpenDetail?: (nodeId: string) => void;
   /** 테넌트 전환으로 새로 추가된 노드 — 1.6초 sparkle 애니메이션 */
   isNewlyAdded?: boolean;
+  /** ★ 2026-05-07: 동적 sub 라벨 — KMS 검출 인텐트, 점수 진행 등 라이브 갱신.
+   *  비어 있으면 def.sub 를 fallback. PipelineFlow 의 nodeSubOverrides 가 source. */
+  dynamicSub?: string;
 }
 
 const STATE_TOKENS: Record<
@@ -30,52 +43,52 @@ const STATE_TOKENS: Record<
   { dot: string; ring: string; border: string; bg: string; glow: string }
 > = {
   pending: {
-    dot: "#c3beaf",
+    dot: "var(--ink-subtle)",
     ring: "transparent",
-    border: "#ece8d8",
-    bg: "#ffffff",
-    glow: "0 1px 2px rgba(0,0,0,0.03), 0 4px 10px rgba(0,0,0,0.03)",
+    border: "var(--border)",
+    bg: "var(--surface)",
+    glow: "var(--shadow-subtle)",
   },
   active: {
-    dot: "#c96442",
-    ring: "rgba(201,100,66,0.18)",
-    border: "#c96442",
-    bg: "#ffffff",
-    glow: "0 0 0 4px rgba(201,100,66,0.14), 0 2px 4px rgba(0,0,0,0.04), 0 12px 28px rgba(201,100,66,0.18)",
+    dot: "var(--accent)",
+    ring: "var(--accent-ring)",
+    border: "var(--accent)",
+    bg: "var(--surface)",
+    glow: "0 0 0 4px var(--accent-ring), 0 2px 4px rgba(0,0,0,0.04), 0 12px 28px var(--accent-ring)",
   },
   done: {
-    dot: "#2e7d4f",
+    dot: "var(--success)",
     ring: "transparent",
-    border: "#cfe5d8",
-    bg: "#ffffff",
-    glow: "0 1px 2px rgba(0,0,0,0.04), 0 4px 10px rgba(0,0,0,0.04)",
+    border: "var(--success-border)",
+    bg: "var(--surface)",
+    glow: "var(--shadow-subtle)",
   },
   error: {
-    dot: "#b03a2e",
+    dot: "var(--danger)",
     ring: "rgba(176,58,46,0.14)",
-    border: "#e7c9c4",
-    bg: "#fdf6f4",
+    border: "var(--danger-border)",
+    bg: "var(--danger-bg)",
     glow: "0 1px 2px rgba(176,58,46,0.1)",
   },
   "gate-failed": {
-    dot: "#b03a2e",
+    dot: "var(--danger)",
     ring: "rgba(176,58,46,0.14)",
-    border: "#e7c9c4",
-    bg: "#fdf6f4",
+    border: "var(--danger-border)",
+    bg: "var(--danger-bg)",
     glow: "0 1px 2px rgba(176,58,46,0.1)",
   },
   skipped: {
-    dot: "#bfbaa8",
+    dot: "var(--ink-subtle)",
     ring: "transparent",
-    border: "#e7e3d4",
-    bg: "#f7f5ed",
+    border: "var(--border-subtle)",
+    bg: "var(--surface-muted)",
     glow: "none",
   },
   aborted: {
-    dot: "#806328",
+    dot: "var(--warn)",
     ring: "transparent",
-    border: "#e2d5b3",
-    bg: "#fbf7e8",
+    border: "var(--warn-border)",
+    bg: "var(--warn-bg)",
     glow: "0 1px 2px rgba(128,99,40,0.08)",
   },
 };
@@ -89,12 +102,21 @@ function EvaluationNodeImpl({ data }: NodeProps) {
     elapsed,
     confidence,
     debateEnabled,
-    debateStatus,
+    debateStatus: rawDebateStatus,
     debateRound,
     debateMaxRounds,
+    debateFinishFlash,
     onDebateOpen,
     isNewlyAdded,
+    dynamicSub,
   } = d;
+  // 2026-05-08 — 노드가 이미 "done" 상태면 (sub-agent 완료 후 다음 페이즈 진행 중)
+  // debateStatusByNode 가 stale "running" 으로 남아 있어도 LIVE 배지를 노출하지 않는다.
+  // discussion_finalized 미수신 / 멀티 항목 노드의 누적 미완 등 backend race 보강.
+  const debateStatus: typeof rawDebateStatus =
+    state === "done" && rawDebateStatus === "running"
+      ? "done"
+      : rawDebateStatus;
   const tok = STATE_TOKENS[state] ?? STATE_TOKENS.pending;
 
   // 점수 count-up — undefined → 숫자 도착 시 0 부터 count-up, 그 다음부턴 이전 값 → 새 값.
@@ -111,23 +133,23 @@ function EvaluationNodeImpl({ data }: NodeProps) {
   const confFlash = useFlashOnChange(confidence, 700);
   const confColor =
     confidence == null
-      ? "#9a9583"
+      ? "var(--ink-subtle)"
       : confidence >= 0.8
-        ? "#2e7d4f"
+        ? "var(--success)"
         : confidence >= 0.6
-          ? "#c96442"
-          : "#b03a2e";
+          ? "var(--accent)"
+          : "var(--danger)";
 
   // 점수 ratio 기반 color — done 상태에서만 점수 색상 부여
   const ratio = def.score && score !== undefined ? score / def.score : 0;
   const scoreColor =
     state !== "done"
-      ? "#9a9583"
+      ? "var(--ink-subtle)"
       : ratio >= 0.8
-        ? "#2e7d4f"
+        ? "var(--success)"
         : ratio >= 0.5
-          ? "#c96442"
-          : "#b03a2e";
+          ? "var(--accent)"
+          : "var(--danger)";
 
   const handleDebateClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -168,30 +190,29 @@ function EvaluationNodeImpl({ data }: NodeProps) {
 
   return (
     <div
-      title={disabled ? "현재 비활성 (테넌트 설정에서 비활성화됨)" : undefined}
+      title={disabled ? "현재 비활성 — 운영 토글 또는 테넌트 설정으로 비활성화됨 (재활성화 가능)" : undefined}
       style={{
         width: def.w,
         height: def.h,
         background: tok.bg,
-        border: `1px solid ${tok.border}`,
-        borderRadius: 14,
+        border: `1.5px solid ${tok.border}`,
+        borderRadius: "var(--radius)",
         boxShadow:
           state === "active"
             ? tok.glow
             : debateStatus === "running"
-              ? "0 0 0 4px rgba(106,68,133,0.14), 0 2px 4px rgba(0,0,0,0.04)"
+              ? "0 0 0 4px var(--accent-ring), 0 2px 4px rgba(0,0,0,0.04)"
               : stateFlash
                 ? "0 0 0 3px rgba(46,125,79,0.25), 0 2px 4px rgba(0,0,0,0.04)"
                 : tok.glow,
-        padding: "11px 14px",
+        padding: "12px 14px",
         display: "flex",
         flexDirection: "column",
         gap: 3,
         position: "relative",
         opacity: disabled ? 0.45 : 1,
         filter: disabled ? "grayscale(0.7)" : undefined,
-        // overflow: visible — LIVE 배지 (top: -8, right: -8) 가 노드 밖으로 튀어나가게.
-        // shimmer 효과는 overflow:hidden 필요하지만 배지 우선 → shimmer 제거.
+        cursor: "pointer",
         transition:
           "box-shadow 0.3s cubic-bezier(0.2,0,0,1), border-color 0.3s cubic-bezier(0.2,0,0,1), transform 0.2s ease, opacity 0.3s ease",
         transform: scoreFlash ? "scale(1.015)" : "scale(1)",
@@ -230,7 +251,44 @@ function EvaluationNodeImpl({ data }: NodeProps) {
         aria-hidden="true"
       />
 
-      {/* 토론 진행 중 배지 */}
+      {/* 항목별 토론 완료 플래시 — 4초간 노드 우상단에 "✓ #N · 점수 토론완료" satellite 배지.
+          부모(EvaluateRunner) 가 setTimeout 으로 4초 후 prop 을 비워주므로 노드는 단순 렌더만.
+          멀티 항목 노드 (needs/proactiveness 등) 에서 각 항목 토론이 끝날 때 시각 피드백.
+          running 배지(zIndex 12) 와 위치가 겹칠 수 있으나 z-index 우선순위로 자연스럽게 가려짐 —
+          실제 시퀀스 (item N finalized → 다음 item M start) 상 동시 표시되는 시간 < 4초. */}
+      {debateFinishFlash && (
+        <div
+          title={`#${debateFinishFlash.item_number} 토론 완료${
+            debateFinishFlash.score != null
+              ? ` · ${debateFinishFlash.score}점`
+              : ""
+          }`}
+          style={{
+            position: "absolute",
+            top: -8,
+            right: -8,
+            zIndex: 5,
+            padding: "2px 8px",
+            borderRadius: 12,
+            fontSize: 10,
+            fontWeight: 800,
+            background: "#10b981",
+            color: "white",
+            boxShadow: "0 2px 6px rgba(16,185,129,0.35)",
+            border: "1.5px solid white",
+            animation: "debateFinishFlashFade 4s ease-out forwards",
+            pointerEvents: "none",
+          }}
+        >
+          ✓ #{debateFinishFlash.item_number}
+          {debateFinishFlash.score != null
+            ? ` · ${debateFinishFlash.score}점`
+            : ""}{" "}
+          토론완료
+        </div>
+      )}
+
+      {/* 토론 진행 중 배지 — Mastercard signal orange satellite */}
       {debateStatus === "running" && (
         <span
           title={`토론 진행 중 — R${debateRound ?? "?"}/${debateMaxRounds ?? "?"}`}
@@ -240,18 +298,19 @@ function EvaluationNodeImpl({ data }: NodeProps) {
             right: -8,
             display: "inline-flex",
             alignItems: "center",
-            gap: 3,
-            padding: "3px 8px",
-            background: "linear-gradient(135deg, #7b519c 0%, #6a4485 100%)",
-            color: "#ffffff",
+            gap: 4,
+            padding: "3px 10px",
+            background: "var(--accent)",
+            color: "var(--bg)",
             fontSize: 9.5,
             fontWeight: 700,
-            letterSpacing: "0.04em",
-            borderRadius: 9999,
-            border: "1.5px solid #ffffff",
-            boxShadow: "0 2px 8px rgba(106,68,133,0.35)",
+            letterSpacing: "0.06em",
+            borderRadius: "var(--radius-pill)",
+            border: "1.5px solid var(--bg)",
+            boxShadow: "0 2px 8px var(--accent-ring)",
             animation: "debateBadgePulse 1.4s ease-in-out infinite",
             zIndex: 12,
+            fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
           }}
         >
           <span
@@ -259,7 +318,7 @@ function EvaluationNodeImpl({ data }: NodeProps) {
               width: 5,
               height: 5,
               borderRadius: "50%",
-              background: "#ffffff",
+              background: "var(--bg)",
               animation: "pulseDot 1.1s ease-out infinite",
             }}
             aria-hidden="true"
@@ -270,26 +329,32 @@ function EvaluationNodeImpl({ data }: NodeProps) {
 
       <div
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: "#14110d",
-          letterSpacing: "-0.01em",
+          fontSize: 14,
+          fontWeight: 500,
+          color: "var(--ink-display)",
+          letterSpacing: "-0.02em",
           lineHeight: 1.25,
           paddingLeft: 10,
+          fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
         }}
       >
         {def.label}
       </div>
-      {def.sub && (
+      {(dynamicSub || def.sub) && (
         <div
           style={{
-            fontSize: 10,
-            color: "#9a9583",
-            lineHeight: 1.3,
+            fontSize: 10.5,
+            color: dynamicSub ? "var(--accent-strong)" : "var(--ink-subtle)",
+            fontWeight: dynamicSub ? 600 : 400,
+            lineHeight: 1.35,
             paddingLeft: 10,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
-          {def.sub}
+          {dynamicSub || def.sub}
         </div>
       )}
 
@@ -300,8 +365,9 @@ function EvaluationNodeImpl({ data }: NodeProps) {
           alignItems: "center",
           justifyContent: "space-between",
           marginTop: "auto",
-          paddingTop: 4,
+          paddingTop: 6,
           paddingLeft: 10,
+          paddingBottom: 2,
           gap: 6,
         }}
       >
@@ -318,16 +384,19 @@ function EvaluationNodeImpl({ data }: NodeProps) {
               transition: "color 0.3s ease",
               textShadow: scoreFlash ? `0 0 8px ${scoreColor}66` : "none",
               flexShrink: 0,
+              fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
             }}
           >
-            <span style={{ fontSize: 13 }}>
+            <span style={{ fontSize: 14 }}>
               {animatedScore !== null
                 ? Number.isInteger(animatedScore)
                   ? animatedScore
                   : animatedScore.toFixed(1)
                 : "—"}
             </span>
-            <span style={{ color: "#bfbaa8", fontWeight: 400, fontSize: 10.5 }}>
+            <span
+              style={{ color: "var(--ink-subtle)", fontWeight: 400, fontSize: 10.5 }}
+            >
               / {def.score}
             </span>
           </span>
@@ -368,7 +437,7 @@ function EvaluationNodeImpl({ data }: NodeProps) {
             <span
               style={{
                 fontSize: 10,
-                color: "#9a9583",
+                color: "var(--ink-subtle)",
                 fontVariantNumeric: "tabular-nums",
               }}
             >
@@ -383,26 +452,31 @@ function EvaluationNodeImpl({ data }: NodeProps) {
                 display: "inline-flex",
                 alignItems: "center",
                 gap: 4,
-                padding: "2px 7px",
+                padding: "3px 10px",
                 fontSize: 9.5,
                 fontWeight: 700,
-                color: debateBtnColor,
-                background: debateBtnBg,
-                border: `1px solid ${debateBtnBorder}`,
-                borderRadius: 9999,
-                cursor: "pointer",
-                boxShadow:
+                color:
+                  debateStatus === "running" || debateStatus === "done"
+                    ? "var(--bg)"
+                    : "var(--ink)",
+                background:
                   debateStatus === "running"
-                    ? "0 1px 4px rgba(106,68,133,0.35)"
+                    ? "var(--accent)"
                     : debateStatus === "done"
-                      ? "0 1px 2px rgba(46,125,79,0.2)"
-                      : "0 1px 2px rgba(0,0,0,0.05)",
+                      ? "var(--success)"
+                      : "var(--surface)",
+                border:
+                  debateStatus === "running" || debateStatus === "done"
+                    ? "1.5px solid transparent"
+                    : "1.5px solid var(--ink)",
+                borderRadius: "var(--radius-pill)",
+                cursor: "pointer",
                 whiteSpace: "nowrap",
                 transition:
-                  "transform 0.12s ease, box-shadow 0.22s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease",
+                  "transform 0.12s ease, background 0.3s ease, color 0.3s ease, border-color 0.3s ease",
                 letterSpacing: "-0.01em",
                 flexShrink: 0,
-                opacity: debateStatus === "running" || debateStatus === "done" ? 1 : 0.85,
+                fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
               }}
               title={
                 debateStatus === "running"
@@ -414,13 +488,15 @@ function EvaluationNodeImpl({ data }: NodeProps) {
               onMouseEnter={(e) => {
                 e.currentTarget.style.transform = "translateY(-1px)";
                 if (debateStatus !== "running" && debateStatus !== "done") {
-                  e.currentTarget.style.background = "#f5eef9"; // idle hover — 은은한 보라 배경
+                  e.currentTarget.style.background = "var(--ink)";
+                  e.currentTarget.style.color = "var(--bg)";
                 }
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = "none";
                 if (debateStatus !== "running" && debateStatus !== "done") {
-                  e.currentTarget.style.background = "#ffffff";
+                  e.currentTarget.style.background = "var(--surface)";
+                  e.currentTarget.style.color = "var(--ink)";
                 }
               }}
             >
@@ -430,9 +506,8 @@ function EvaluationNodeImpl({ data }: NodeProps) {
                     width: 5,
                     height: 5,
                     borderRadius: "50%",
-                    background: "#ff5050",
+                    background: "var(--bg)",
                     animation: "pulseDot 1.1s ease-out infinite",
-                    boxShadow: "0 0 0 1.5px rgba(255,80,80,0.3)",
                   }}
                   aria-hidden="true"
                 />
@@ -464,7 +539,12 @@ function evalNodePropsEqual(prev: NodeProps, next: NodeProps): boolean {
     a.debateStatus === b.debateStatus &&
     a.debateRound === b.debateRound &&
     a.debateMaxRounds === b.debateMaxRounds &&
+    a.debateFinishFlash?.item_number === b.debateFinishFlash?.item_number &&
+    a.debateFinishFlash?.at === b.debateFinishFlash?.at &&
+    a.debateFinishFlash?.score === b.debateFinishFlash?.score &&
     a.onDebateOpen === b.onDebateOpen &&
+    a.onOpenDetail === b.onOpenDetail &&
+    a.dynamicSub === b.dynamicSub &&
     a.isNewlyAdded === b.isNewlyAdded &&
     prev.selected === next.selected &&
     prev.dragging === next.dragging

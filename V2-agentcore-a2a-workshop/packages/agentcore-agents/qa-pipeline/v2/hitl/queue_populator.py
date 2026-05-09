@@ -52,31 +52,38 @@ def _resolve_json_root() -> Path:
     return Path(root_str)
 
 
-def _save_report_json(consultation_id: str, state: dict[str, Any]) -> str | None:
-    """검토 큐 풀뷰 렌더용 결과 JSON 파일 저장.
+def _build_full_payload(consultation_id: str, state: dict[str, Any]) -> dict[str, Any]:
+    """평가 결과 탭에 표시되는 모든 정보를 한 dict 로 빌드.
 
-    저장 내용: state 의 report / gt_comparison / gt_evidence_comparison 을 모아
-    한 파일로 떨어뜨림. 프론트 /v2/result/full/{id} 가 이 파일을 읽어 평가 결과 탭
-    풀뷰를 재현.
+    ★ 2026-05-07: kms_evaluation / evaluations 도 포함. 이전 _save_report_json 누락분.
+    DB result_payloads 테이블 + JSON 파일 둘 다 같은 페이로드 사용 (단일 정의).
+    """
+    return {
+        "consultation_id": consultation_id,
+        "transcript": state.get("transcript"),
+        "report": state.get("report"),
+        "evaluations": state.get("evaluations"),  # ★ persona_details 등 항목별 풀 결과
+        "gt_comparison": state.get("gt_comparison"),
+        "gt_evidence_comparison": state.get("gt_evidence_comparison"),
+        "orchestrator": state.get("orchestrator"),
+        "preprocessing": state.get("preprocessing"),
+        "debates": state.get("debates"),
+        "kms_evaluation": state.get("kms_evaluation"),  # ★ 이전 누락
+        "routing": state.get("routing"),
+    }
+
+
+def _save_report_json(consultation_id: str, state: dict[str, Any]) -> str | None:
+    """검토 큐 풀뷰 렌더용 결과 JSON 파일 저장 (백업/이중화).
+
+    DB result_payloads 가 primary source, 이 파일은 백업. 파일 시스템 검색/grep 도 가능.
     """
     try:
         root = _resolve_json_root()
         root.mkdir(parents=True, exist_ok=True)
-        # 파일명 안전화 — 디렉토리 traversal / 경로 구분자 방지
-        safe_cid = str(consultation_id).replace("/", "_").replace("\\", "_")
-        safe_cid = safe_cid or "unknown"
+        safe_cid = str(consultation_id).replace("/", "_").replace("\\", "_") or "unknown"
         target = root / f"{safe_cid}.json"
-        payload = {
-            "consultation_id": consultation_id,
-            "transcript": state.get("transcript"),  # HITL 검토 화면 STT 전문 섹션용
-            "report": state.get("report"),
-            "gt_comparison": state.get("gt_comparison"),
-            "gt_evidence_comparison": state.get("gt_evidence_comparison"),
-            "orchestrator": state.get("orchestrator"),
-            "preprocessing": state.get("preprocessing"),
-            "debates": state.get("debates"),  # Phase 2 — DebateRecord (Dev3 결과 페이지 DebateList 용)
-        }
-        # default=str: datetime 같은 non-serializable 대비
+        payload = _build_full_payload(consultation_id, state)
         target.write_text(
             json.dumps(payload, ensure_ascii=False, indent=2, default=str),
             encoding="utf-8",
@@ -86,6 +93,29 @@ def _save_report_json(consultation_id: str, state: dict[str, Any]) -> str | None
     except Exception as exc:
         logger.warning("hitl_queue_populator: JSON 저장 실패 — %s", exc)
         return None
+
+
+def _save_result_payload_db(consultation_id: str, state: dict[str, Any], model_id: str | None) -> bool:
+    """평가 결과 풀 페이로드를 DB result_payloads 테이블에 INSERT/UPDATE.
+    ★ 2026-05-07: DB 단일 진실 + JSON 백업 dual storage 패턴.
+    검토 큐 상세 (/v2/result/full/{cid}) 가 우선 DB 조회 → 없으면 JSON 파일 fallback.
+    """
+    try:
+        from v2.hitl import db as _hitl_db
+        payload = _build_full_payload(consultation_id, state)
+        _hitl_db.upsert_result_payload(
+            consultation_id=consultation_id,
+            payload=payload,
+            site_id=state.get("site_id") or state.get("tenant_id"),
+            channel=state.get("channel"),
+            department=state.get("department"),
+            model_id=model_id,
+        )
+        logger.info("hitl_queue_populator: saved result payload to DB (cid=%s)", consultation_id)
+        return True
+    except Exception as exc:
+        logger.warning("hitl_queue_populator: DB result_payloads 저장 실패 — %s", exc)
+        return False
 
 
 def _is_disabled() -> bool:
@@ -236,8 +266,30 @@ def hitl_queue_populator_node(state: dict[str, Any]) -> dict[str, Any]:
         logger.info("hitl_queue_populator: 평가 항목 없음 — no-op")
         return {"hitl_queue_populated": {"count": 0, "item_numbers": []}}
 
-    # 검토 큐 풀뷰용 결과 JSON 저장 (report + gt_* 모두 포함)
+    # 검토 큐 풀뷰용 결과 — DB result_payloads 테이블 (primary) + JSON 파일 (백업) 둘 다.
+    # ★ 2026-05-07: 평가 결과 탭의 모든 정보 (report + evaluations + debates + persona_details +
+    # gt_comparison + kms_evaluation + preprocessing + transcript) 를 단일 dict 로 묶어 저장.
+    # 모델 ID 는 첫 평가 항목에서 추출 (loop 진입 전이라 미리 한 번 계산).
+    payload_model_id = (
+        state.get("bedrock_model_id") or os.environ.get("BEDROCK_MODEL_ID")
+    )
+    _save_result_payload_db(consult, state, payload_model_id)
     json_path = _save_report_json(consult, state)
+
+    # ★ 2026-05-07: GT 점수 (정답표 xlsx) 를 항목별로 lookup 가능하게 dict 빌드.
+    # state.gt_comparison.items[].{item_number, gt_score} 구조. 통계 (/v2/drift/stats) 용.
+    gt_score_by_item: dict[int, float] = {}
+    gt_comp = state.get("gt_comparison") or {}
+    for gi in gt_comp.get("items") or []:
+        try:
+            inum = int(gi.get("item_number"))
+            gs = gi.get("gt_score")
+            if gs is not None:
+                gt_score_by_item[inum] = float(gs)
+        except (TypeError, ValueError):
+            continue
+    if gt_score_by_item:
+        logger.info("hitl_queue_populator: GT scores loaded for %d items", len(gt_score_by_item))
 
     override_items: set[int] = set()
     if mode == "flagged":
@@ -285,6 +337,14 @@ def hitl_queue_populator_node(state: dict[str, Any]) -> dict[str, Any]:
         except (TypeError, ValueError):
             ai_score = None
 
+        # ★ 2026-05-07: 평가 시 사용된 모델 ID 기록.
+        # 우선순위: item.llm_model_id (sub_agent 가 채움) → state.bedrock_model_id (요청 override)
+        # → BEDROCK_MODEL_ID env (서버 기본값). 셋 다 없으면 NULL.
+        item_model_id = (
+            item.get("llm_model_id")
+            or state.get("bedrock_model_id")
+            or os.environ.get("BEDROCK_MODEL_ID")
+        )
         try:
             _hitl_db.upsert_review(
                 consultation_id=consult,
@@ -303,6 +363,8 @@ def hitl_queue_populator_node(state: dict[str, Any]) -> dict[str, Any]:
                 site_id=state.get("site_id") or state.get("tenant_id"),
                 channel=state.get("channel"),
                 department=state.get("department"),
+                model_id=item_model_id,
+                gt_score=gt_score_by_item.get(item_number),
             )
             inserted_items.append(item_number)
             logger.debug(
@@ -316,14 +378,129 @@ def hitl_queue_populator_node(state: dict[str, Any]) -> dict[str, Any]:
             )
             continue
 
+    # ★ 2026-05-07: KMS 평가도 검토 큐에 동일하게 저장 (사용자 요청 — 평가 결과 모든 것 미러).
+    # KMS_INTENT_TABS 7종 (회원정보/환불/교환/반품/수선/배송/취소) 각각 item_number 1001~1007.
+    # 신한 dept (901~922) 와 충돌 없도록 1000+ 범위 사용.
+    kms_inserted = _populate_kms_evaluations(
+        state=state,
+        consult=consult,
+        item_model_id=item_model_id,
+        site_id=state.get("site_id") or state.get("tenant_id"),
+        channel=state.get("channel"),
+        department=state.get("department"),
+    )
+    inserted_items.extend(kms_inserted)
+
     result = {
         "count": len(inserted_items),
         "item_numbers": sorted(set(inserted_items)),
         "mode": mode,
         "json_path": json_path,
+        "kms_count": len(kms_inserted),
     }
     logger.info(
-        "hitl_queue_populator[%s]: consult=%s enqueued=%d/%d",
-        mode, consult, result["count"], len(items),
+        "hitl_queue_populator[%s]: consult=%s enqueued=%d (main=%d + kms=%d)",
+        mode, consult, result["count"], len(items), len(kms_inserted),
     )
     return {"hitl_queue_populated": result}
+
+
+# ---------------------------------------------------------------------------
+# KMS 평가 → 검토 큐 적재 (item_number 1001~1007 으로 매핑)
+# ---------------------------------------------------------------------------
+
+# KMS 인텐트 7종 → 큐 item_number 매핑. node/kms_node.py 의 KMS_INTENT_TABS 와 동일 순서.
+_KMS_INTENT_TO_ITEM: dict[str, int] = {
+    "회원정보": 1001,
+    "환불": 1002,
+    "교환": 1003,
+    "반품": 1004,
+    "수선": 1005,
+    "배송": 1006,
+    "취소": 1007,
+}
+
+
+def _populate_kms_evaluations(
+    *,
+    state: dict[str, Any],
+    consult: str,
+    item_model_id: str | None,
+    site_id: str | None,
+    channel: str | None,
+    department: str | None,
+) -> list[int]:
+    """state.kms_evaluation 의 인텐트별 평가를 검토 큐에 적재.
+
+    각 인텐트 = 1행. item_number=1001~1007 (KMS_INTENT_TABS 순서).
+    검출 안 된 인텐트는 skip — 평가가 수행되지 않은 상태라 행 의미 없음.
+    """
+    from v2.hitl import db as _hitl_db
+
+    kms_eval = state.get("kms_evaluation") or {}
+    if not isinstance(kms_eval, dict) or not kms_eval.get("available"):
+        return []
+    evaluations_by_intent = kms_eval.get("evaluations_by_intent") or {}
+    if not isinstance(evaluations_by_intent, dict):
+        return []
+
+    inserted: list[int] = []
+    for intent, intent_eval in evaluations_by_intent.items():
+        item_no = _KMS_INTENT_TO_ITEM.get(str(intent))
+        if item_no is None:
+            logger.warning("hitl_queue_populator: unknown KMS intent '%s' — skip", intent)
+            continue
+        if not isinstance(intent_eval, dict):
+            continue
+        try:
+            ai_score = intent_eval.get("score")
+            ai_score = float(ai_score) if ai_score is not None else None
+        except (TypeError, ValueError):
+            ai_score = None
+
+        # KMS 의 evidence 는 tab_evaluations 의 applied_branches 같은 구조 → JSON 직렬화 그대로 저장
+        evidence_payload: Any = {
+            "intent": intent,
+            "applied_branches": intent_eval.get("applied_branches"),
+            "tab_evaluations": intent_eval.get("tab_evaluations"),
+            "summary": intent_eval.get("summary"),
+            "mismatches": intent_eval.get("mismatches"),
+            "rejected_mismatches": intent_eval.get("rejected_mismatches"),
+        }
+        try:
+            ai_evidence = json.loads(json.dumps(evidence_payload, ensure_ascii=False, default=str))
+        except (TypeError, ValueError):
+            ai_evidence = None
+
+        try:
+            _hitl_db.upsert_review(
+                consultation_id=consult,
+                item_number=item_no,
+                ai_score=ai_score,
+                human_score=None,
+                ai_evidence=ai_evidence,
+                ai_judgment=intent_eval.get("reasoning"),
+                human_note=None,
+                ai_confidence=None,
+                reviewer_id=None,
+                reviewer_role="senior",
+                force_t3=False,
+                status="pending",
+                site_id=site_id,
+                channel=channel,
+                department=department,
+                model_id=item_model_id,
+                gt_score=None,  # KMS 는 GT 매핑 없음 (현재 스키마 기준)
+            )
+            inserted.append(item_no)
+            logger.debug(
+                "hitl_queue_populator[KMS]: enqueue consult=%s intent=%s item=%d score=%s",
+                consult, intent, item_no, ai_score,
+            )
+        except Exception as exc:
+            logger.warning(
+                "hitl_queue_populator[KMS]: upsert 실패 consult=%s intent=%s — %s",
+                consult, intent, exc,
+            )
+            continue
+    return inserted

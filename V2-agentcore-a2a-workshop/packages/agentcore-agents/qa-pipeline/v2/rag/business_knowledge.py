@@ -364,8 +364,52 @@ def retrieve_knowledge(
     fallback 체인이 적용되어 부서별 manual.md 가 우선, 없으면 tenant 메인 manual.md 로
     폴백.
     """
+    # ★ 2026-05-08 (재정정): 사용자 정책 — RAG OFF 토글이면 **모든 종류의 RAG** 비활성.
+    # 업무지식 RAG 도 예외 없음. unevaluable=True 로 반환 → work_accuracy 가 unevaluable
+    # 분기로 빠져 #15 평가/토론 자연 skip (manual 부재 케이스와 동일 흐름).
+    from . import is_rag_disabled, is_reranker_enabled, rerank
+
+    if is_rag_disabled():
+        logger.info(
+            "[RAG knowledge] tenant=%s/%s/%s intent=%s → SKIPPED (rag_disabled)",
+            tenant_id, channel, department, intent,
+        )
+        return KnowledgeResult(
+            intent=intent,
+            query=query or "",
+            chunks=[],
+            source_refs=[],
+            unevaluable=True,
+            match_reason="rag_disabled",
+            no_hit_but_evaluable=False,
+            truly_unevaluable=True,
+        )
+
     engine = _get_engine(tenant_id, channel, department)
-    result = engine.retrieve(intent, query, top_k=top_k)
+    # 사용자 지시 (2026-05-08): fetch_k 모두 10 으로 고정.
+    fetch_k = 10
+    result = engine.retrieve(intent, query, top_k=fetch_k)
+    if is_reranker_enabled() and result.chunks and len(result.chunks) > top_k:
+        docs = [c.text or "" for c in result.chunks]
+        order, ok = rerank(query or "", docs, top_n=top_k)
+        # 2026-05-08: rerank() 호출 시점의 provider — UI 가 chip 에 표시.
+        from . import get_reranker_provider as _get_provider
+        _provider_at_call = _get_provider()
+        if order and ok:
+            new_chunks = []
+            for original_idx, score in order:
+                ch = result.chunks[original_idx]
+                # KnowledgeChunk dataclass 에 rerank score 보강 — score 필드 자체를 cohere score 로 교체.
+                ch.score = float(score)
+                ch.rerank_provider = _provider_at_call
+                new_chunks.append(ch)
+            result.chunks = new_chunks
+            result.match_reason = (result.match_reason or "") + " · reranked"
+        elif order and not ok:
+            # 폴백 — 입력 순서로 잘렸지만 score 는 원본 (RRF/cosine) 유지. UI 가 "🎯 rr 0.00" 안 보이도록.
+            new_chunks = [result.chunks[original_idx] for original_idx, _ in order]
+            result.chunks = new_chunks
+            result.match_reason = (result.match_reason or "") + " · reranker_fallback"
     chunks = result.chunks or []
     if chunks:
         logger.info(

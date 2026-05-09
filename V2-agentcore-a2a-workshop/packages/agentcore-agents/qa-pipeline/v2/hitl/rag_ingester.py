@@ -163,10 +163,24 @@ def _build_external_id(cid: str, item_number: int, score_signature: str) -> str:
 
 
 def _embed_text_for(meta: dict[str, Any], body: str) -> str:
-    """임베딩 입력 텍스트. body 가 비면 transcript_excerpt + ai/human 텍스트로 fallback."""
-    body = (body or "").strip()
-    if body:
-        return body
+    """임베딩 입력 텍스트. 우선순위 (★ 2026-04-30 KNN 정렬 개선):
+
+    1. body 의 ``## 상담 원문 (전체 — RAG 임베딩 input)`` 섹션 — md_exporter 가 full_transcript
+       동봉 시 추가. 검색 query (run_debate 의 transcript) 와 동일 의미공간 → cos ≈ 1.0.
+    2. body 전체 — 위 섹션 없는 옛 MD 호환 (KNN 정렬 약하지만 동작은 함).
+    3. body 비면 meta 에서 텍스트 합성.
+    """
+    body_raw = (body or "").strip()
+
+    # ★ 우선 — 전체 상담 원문 섹션 추출 (있으면 임베딩 정렬 정상)
+    if body_raw:
+        full_tx = _extract_section(body_raw, "## 상담 원문 (전체 — RAG 임베딩 input)")
+        if full_tx:
+            return full_tx
+
+    if body_raw:
+        return body_raw
+
     parts: list[str] = []
     if meta.get("item_name"):
         parts.append(f"항목: {meta['item_name']}")

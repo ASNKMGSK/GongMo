@@ -50,6 +50,7 @@ async def greeting_sub_agent(
     llm_backend: str | None = None,
     bedrock_model_id: str | None = None,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     """1 LLM 호출로 #1 + #2 동시 평가.
 

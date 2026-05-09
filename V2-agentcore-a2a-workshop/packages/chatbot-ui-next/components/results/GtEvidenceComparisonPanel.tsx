@@ -25,6 +25,8 @@ interface FullGtEvidenceItem {
   verdict_label?: string;
   reasoning?: string;
   gt_note?: string | null;
+  /** ★ 2026-05-07: GT xlsx col 7 — 검수자가 참조한 STT 발화 원문. */
+  gt_evidence_excerpt?: string | null;
   ai_evidence?: string[] | null;
   ai_judgment?: string | null;
 }
@@ -287,7 +289,48 @@ export default function GtEvidenceComparisonPanel({ ge }: Props) {
                     lineHeight: 1.5,
                   }}
                 >
+                  <div
+                    style={{
+                      fontSize: 9.5,
+                      fontWeight: 700,
+                      color: "#166534",
+                      textTransform: "uppercase",
+                      letterSpacing: "0.06em",
+                      marginBottom: 3,
+                    }}
+                  >
+                    검수자 코멘트
+                  </div>
                   {row.gt_note || "(없음)"}
+                  {row.gt_evidence_excerpt && (
+                    <>
+                      <div
+                        style={{
+                          marginTop: 8,
+                          paddingTop: 6,
+                          borderTop: "1px dashed #86efac",
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          color: "#166534",
+                          textTransform: "uppercase",
+                          letterSpacing: "0.06em",
+                          marginBottom: 3,
+                        }}
+                      >
+                        검수자가 본 STT 발화 (T 구간)
+                      </div>
+                      <div
+                        style={{
+                          fontFamily:
+                            "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)",
+                          fontSize: 10.5,
+                          color: "#14532d",
+                        }}
+                      >
+                        {row.gt_evidence_excerpt}
+                      </div>
+                    </>
+                  )}
                 </div>
               </div>
               <div>

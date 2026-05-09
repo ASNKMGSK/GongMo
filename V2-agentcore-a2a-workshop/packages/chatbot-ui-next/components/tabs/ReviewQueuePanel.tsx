@@ -7,18 +7,101 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import StatusLight from "@/components/StatusLight";
+import { useAppState } from "@/lib/AppStateContext";
 import {
   bulkConfirm,
   bulkRevert,
   deleteConsultation,
   exportReviewQueueXlsx,
+  fetchResultFull,
   fetchReviewQueue,
 } from "@/lib/api";
 import { groupByConsultation } from "@/lib/group";
+import {
+  buildResultJsonPayload,
+  buildResultMarkdown,
+} from "@/lib/resultExport";
 import { useToast } from "@/lib/toast";
-import type { ReviewItem } from "@/lib/types";
+import type { EvaluationResult, ReviewItem } from "@/lib/types";
+import { buildResultsXlsx } from "@/lib/xlsxExport";
 
 type StatusFilter = "pending" | "confirmed" | "all";
+
+/**
+ * ★ 2026-05-07: ISO 8601 (예: "2026-05-07T15:18:53+09:00") 를 한국 친화 형식으로.
+ * 백엔드 _now_iso() 가 이미 +09:00 으로 emit 하지만 ISO 가 읽기 어려움.
+ * 출력 형식: "2026-05-07 15:18".
+ */
+function formatKstDateTime(s: string | null | undefined): string {
+  if (!s) return "";
+  try {
+    const d = new Date(s);
+    if (Number.isNaN(d.getTime())) return s;
+    const fmt = new Intl.DateTimeFormat("ko-KR", {
+      timeZone: "Asia/Seoul",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    // ko-KR 출력: "2026. 05. 07. 15:18" → 정리해서 "2026-05-07 15:18"
+    const parts = fmt.formatToParts(d).reduce<Record<string, string>>(
+      (acc, p) => ((acc[p.type] = p.value), acc),
+      {},
+    );
+    const yyyy = parts.year ?? "";
+    const mm = parts.month ?? "";
+    const dd = parts.day ?? "";
+    const hh = parts.hour ?? "";
+    const mn = parts.minute ?? "";
+    if (yyyy && mm && dd && hh && mn) return `${yyyy}-${mm}-${dd} ${hh}:${mn}`;
+    return s;
+  } catch {
+    return s;
+  }
+}
+
+/**
+ * 모델 ID 짧은 라벨로 변환. 예: "us.anthropic.claude-haiku-4-5-20251001-v1:0" → "Haiku 4.5".
+ */
+function shortModelLabel(modelId: string | null | undefined): string {
+  if (!modelId) return "";
+  const m = modelId.toLowerCase();
+  if (m.includes("opus-4-7")) return "Opus 4.7";
+  if (m.includes("opus-4-6")) return "Opus 4.6";
+  if (m.includes("opus-4-5")) return "Opus 4.5";
+  if (m.includes("sonnet-4-6")) return "Sonnet 4.6";
+  if (m.includes("sonnet-4-5")) return "Sonnet 4.5";
+  if (m.includes("sonnet-4")) return "Sonnet 4";
+  if (m.includes("sonnet-3-7") || m.includes("3.7-sonnet")) return "Sonnet 3.7";
+  if (m.includes("haiku-4-5")) return "Haiku 4.5";
+  if (m.includes("haiku-3-5") || m.includes("3.5-haiku")) return "Haiku 3.5";
+  if (m.includes("nova-2-lite")) return "Nova 2 Lite";
+  if (m.includes("nova-2-omni")) return "Nova 2 Omni";
+  if (m.includes("nova-2-sonic")) return "Nova 2 Sonic";
+  if (m.includes("nova-pro")) return "Nova Pro";
+  if (m.includes("nova-lite")) return "Nova Lite";
+  if (m.includes("nova-micro")) return "Nova Micro";
+  if (m.includes("nova-premier")) return "Nova Premier";
+  if (m.includes("deepseek")) return "DeepSeek V3.2";
+  if (m.includes("llama4-maverick") || m.includes("llama 4 maverick")) return "Llama 4 Maverick";
+  if (m.includes("llama4-scout") || m.includes("llama 4 scout")) return "Llama 4 Scout";
+  if (m.includes("llama3-3-70b") || m.includes("llama 3.3 70b")) return "Llama 3.3 70B";
+  if (m.includes("gemma-3-27b")) return "Gemma 3 27B";
+  if (m.includes("gemma-3-12b")) return "Gemma 3 12B";
+  if (m.includes("gemma-3-4b")) return "Gemma 3 4B";
+  if (m.includes("pixtral")) return "Pixtral Large";
+  if (m.includes("qwen3-32b") || m.includes("qwen3 32b")) return "Qwen3 32B";
+  if (m.includes("jamba")) return "Jamba 1.5";
+  if (m.includes("glm-5") || m.includes("glm5")) return "GLM 5";
+  if (m.includes("nemotron")) return "Nemotron";
+  // ★ 2026-05-07 fallback: 마지막 경로 한 단계만 — `.` 으로 split 하지 않음.
+  // 이전엔 `.` 도 split 해서 "deepseek.v3.2" → "2" 표시되는 버그.
+  const parts = modelId.split("/");
+  return parts[parts.length - 1] || modelId;
+}
 
 /**
  * ReviewQueuePanel — 기존 /review 페이지의 HITL 큐 로직을 탭 패널로 이관.
@@ -33,9 +116,25 @@ export function ReviewQueuePanel() {
   const [sortDesc, setSortDesc] = useState(true);
   const [bulkBusyId, setBulkBusyId] = useState<string | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [downloadBusy, setDownloadBusy] = useState<"" | "xlsx" | "md" | "json">(
+    "",
+  );
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [deleting, setDeleting] = useState(false);
   const toast = useToast();
+  const { state } = useAppState();
+  const llmBackend = state.llmBackend;
+
+  const triggerDownload = useCallback((blob: Blob, filename: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 200);
+  }, []);
 
   const handleExport = useCallback(async () => {
     setExporting(true);
@@ -88,6 +187,189 @@ export function ReviewQueuePanel() {
     () => groupByConsultation(items, sortDesc),
     [items, sortDesc],
   );
+
+  // 선택된 cid 목록. 0건 선택 시 전체 (현재 필터 적용된 consultations) 사용.
+  const targetCids = useMemo(() => {
+    return selectedIds.size > 0
+      ? Array.from(selectedIds)
+      : consultations.map((c) => c.consultation_id);
+  }, [selectedIds, consultations]);
+
+  const filterTag =
+    statusFilter === "pending"
+      ? "대기"
+      : statusFilter === "confirmed"
+        ? "확정"
+        : "전체";
+
+  /**
+   * cid 목록 → 평가 결과 풀(/v2/result/full/{cid}) 병렬 fetch → 평가 결과 탭과
+   * 동일한 xlsx/md/json 빌더 호출 → JSZip 으로 묶어 단일 .zip 다운로드.
+   * 1건 선택 시에는 zip 우회 — 단일 파일 직접 다운로드.
+   */
+  const downloadAsZipOrSingle = useCallback(
+    async (ext: "xlsx" | "md" | "json", cids: string[]): Promise<void> => {
+      if (cids.length === 0) return;
+
+      // 풀 결과 병렬 fetch — 8개 동시 제한 청크 처리.
+      const CHUNK = 8;
+      const results: { cid: string; full: EvaluationResult | null }[] = [];
+      for (let i = 0; i < cids.length; i += CHUNK) {
+        const slice = cids.slice(i, i + CHUNK);
+        const chunkResults = await Promise.all(
+          slice.map(async (cid) => {
+            try {
+              const r = await fetchResultFull(cid);
+              // ConsultationFull → data 가 EvaluationResult. not_found 응답은 data 부재.
+              if ("data" in r && r.data) {
+                return { cid, full: r.data as EvaluationResult };
+              }
+              return { cid, full: null as EvaluationResult | null };
+            } catch {
+              return { cid, full: null as EvaluationResult | null };
+            }
+          }),
+        );
+        results.push(...chunkResults);
+      }
+
+      const ok = results.filter((r) => r.full) as {
+        cid: string;
+        full: EvaluationResult;
+      }[];
+      const fail = results.filter((r) => !r.full);
+      if (ok.length === 0) {
+        toast.error("다운로드 실패", {
+          description: "평가 결과를 가져오지 못했습니다",
+        });
+        return;
+      }
+      if (fail.length > 0) {
+        toast.warn(`${fail.length}건 result 없음 — 스킵`, {
+          description: fail
+            .slice(0, 5)
+            .map((f) => f.cid)
+            .join(", "),
+        });
+      }
+
+      // 단건 — zip 우회.
+      if (ok.length === 1) {
+        const { cid, full } = ok[0];
+        if (ext === "xlsx") {
+          const out = await buildResultsXlsx(full, llmBackend);
+          if (!out) {
+            toast.error("xlsx 모듈 로드 실패", {
+              description: "네트워크/패키지 확인",
+            });
+            return;
+          }
+          const blob = new Blob([out.buf], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          });
+          triggerDownload(blob, `${cid}.xlsx`);
+        } else if (ext === "md") {
+          const md = buildResultMarkdown({
+            result: full,
+            llmBackend,
+            consultationId: cid,
+          });
+          triggerDownload(
+            new Blob([md], { type: "text/markdown;charset=utf-8" }),
+            `${cid}.md`,
+          );
+        } else {
+          const payload = buildResultJsonPayload({
+            result: full,
+            llmBackend,
+            consultationId: cid,
+          });
+          triggerDownload(
+            new Blob([JSON.stringify(payload, null, 2)], {
+              type: "application/json",
+            }),
+            `${cid}.json`,
+          );
+        }
+        return;
+      }
+
+      // 다건 — zip 묶음.
+      const JSZip = (await import("jszip")).default;
+      const zip = new JSZip();
+      for (const { cid, full } of ok) {
+        if (ext === "xlsx") {
+          const out = await buildResultsXlsx(full, llmBackend);
+          if (out) zip.file(`${cid}.xlsx`, out.buf);
+        } else if (ext === "md") {
+          zip.file(
+            `${cid}.md`,
+            buildResultMarkdown({
+              result: full,
+              llmBackend,
+              consultationId: cid,
+            }),
+          );
+        } else {
+          const payload = buildResultJsonPayload({
+            result: full,
+            llmBackend,
+            consultationId: cid,
+          });
+          zip.file(`${cid}.json`, JSON.stringify(payload, null, 2));
+        }
+      }
+      const blob = await zip.generateAsync({ type: "blob" });
+      const ts = new Date()
+        .toISOString()
+        .replace(/:/g, "-")
+        .replace(/\..+$/, "");
+      triggerDownload(blob, `qa_review_queue_${filterTag}_${ts}.zip`);
+    },
+    [llmBackend, toast, triggerDownload, filterTag],
+  );
+
+  const handleDownloadXlsx = useCallback(async () => {
+    if (targetCids.length === 0) return;
+    setDownloadBusy("xlsx");
+    try {
+      await downloadAsZipOrSingle("xlsx", targetCids);
+    } catch (err) {
+      toast.error("xlsx 다운로드 실패", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setDownloadBusy("");
+    }
+  }, [targetCids, downloadAsZipOrSingle, toast]);
+
+  const handleDownloadMd = useCallback(async () => {
+    if (targetCids.length === 0) return;
+    setDownloadBusy("md");
+    try {
+      await downloadAsZipOrSingle("md", targetCids);
+    } catch (err) {
+      toast.error("md 다운로드 실패", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setDownloadBusy("");
+    }
+  }, [targetCids, downloadAsZipOrSingle, toast]);
+
+  const handleDownloadJson = useCallback(async () => {
+    if (targetCids.length === 0) return;
+    setDownloadBusy("json");
+    try {
+      await downloadAsZipOrSingle("json", targetCids);
+    } catch (err) {
+      toast.error("json 다운로드 실패", {
+        description: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setDownloadBusy("");
+    }
+  }, [targetCids, downloadAsZipOrSingle, toast]);
 
   const totalPending = consultations.reduce((s, c) => s + c.pendingCount, 0);
   const totalConfirmed = consultations.reduce((s, c) => s + c.confirmedCount, 0);
@@ -297,7 +579,7 @@ export function ReviewQueuePanel() {
             onClick={handleExport}
             disabled={exporting || loading || consultations.length === 0}
             className="btn-ghost"
-            title="현재 필터 기준 검토 큐를 xlsx 로 내보냅니다"
+            title="현재 필터 기준 검토 큐를 xlsx 로 내보냅니다 (서버 파일시스템 저장)"
           >
             {exporting ? (
               <>
@@ -305,9 +587,99 @@ export function ReviewQueuePanel() {
                 내보내는 중
               </>
             ) : (
-              "📥 내보내기"
+              "📊 xlsx 내보내기"
             )}
           </button>
+          <button
+            type="button"
+            onClick={() =>
+              toggleAll(selectedIds.size !== consultations.length)
+            }
+            disabled={consultations.length === 0}
+            className="btn-ghost"
+            style={{ fontSize: 12 }}
+            title="현재 필터에 보이는 상담 전체 선택/해제"
+          >
+            {selectedIds.size === consultations.length &&
+            consultations.length > 0
+              ? "선택 해제"
+              : "전체 선택"}
+          </button>
+          {/* 브라우저 직접 다운로드 — xlsx / md / json (평가 결과 탭과 동일 빌더, cid 별 파일을 zip 으로 묶음. 단건 선택 시 zip 우회) */}
+          <div
+            style={{
+              display: "inline-flex",
+              border: "1px solid var(--border-strong)",
+              borderRadius: "var(--radius-sm)",
+              overflow: "hidden",
+            }}
+          >
+            <button
+              type="button"
+              className="btn-ghost"
+              title={
+                selectedIds.size === 0
+                  ? "현재 필터의 전체 상담을 zip 으로 다운로드 (cid별 .xlsx)"
+                  : `선택한 ${selectedIds.size}건을 zip 으로 다운로드 (cid별 .xlsx) — 1건일 땐 단일 파일`
+              }
+              disabled={downloadBusy !== "" || targetCids.length === 0}
+              onClick={handleDownloadXlsx}
+              style={{
+                borderRadius: 0,
+                border: "none",
+                fontSize: 12,
+                padding: "4px 12px",
+              }}
+            >
+              {downloadBusy === "xlsx"
+                ? "내보내는 중..."
+                : `⬇ xlsx (${targetCids.length}${selectedIds.size === 0 ? " · 전체" : ""})`}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost"
+              title={
+                selectedIds.size === 0
+                  ? "현재 필터의 전체 상담을 zip 으로 다운로드 (cid별 .md)"
+                  : `선택한 ${selectedIds.size}건을 zip 으로 다운로드 (cid별 .md) — 1건일 땐 단일 파일`
+              }
+              disabled={downloadBusy !== "" || targetCids.length === 0}
+              onClick={handleDownloadMd}
+              style={{
+                borderRadius: 0,
+                border: "none",
+                borderLeft: "1px solid var(--border-strong)",
+                fontSize: 12,
+                padding: "4px 12px",
+              }}
+            >
+              {downloadBusy === "md"
+                ? "..."
+                : `⬇ md (${targetCids.length}${selectedIds.size === 0 ? " · 전체" : ""})`}
+            </button>
+            <button
+              type="button"
+              className="btn-ghost"
+              title={
+                selectedIds.size === 0
+                  ? "현재 필터의 전체 상담을 zip 으로 다운로드 (cid별 .json)"
+                  : `선택한 ${selectedIds.size}건을 zip 으로 다운로드 (cid별 .json) — 1건일 땐 단일 파일`
+              }
+              disabled={downloadBusy !== "" || targetCids.length === 0}
+              onClick={handleDownloadJson}
+              style={{
+                borderRadius: 0,
+                border: "none",
+                borderLeft: "1px solid var(--border-strong)",
+                fontSize: 12,
+                padding: "4px 12px",
+              }}
+            >
+              {downloadBusy === "json"
+                ? "..."
+                : `⬇ json (${targetCids.length}${selectedIds.size === 0 ? " · 전체" : ""})`}
+            </button>
+          </div>
           <button
             type="button"
             onClick={handleDeleteSelected}
@@ -482,9 +854,30 @@ export function ReviewQueuePanel() {
                       overflow: "hidden",
                       textOverflow: "ellipsis",
                       whiteSpace: "nowrap",
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 6,
                     }}
                   >
-                    {con.createdAt || "-"}
+                    <span>{formatKstDateTime(con.createdAt) || "-"}</span>
+                    {con.modelId && (
+                      <span
+                        title={con.modelMixed ? `mixed: ${con.modelId}` : con.modelId}
+                        style={{
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          padding: "1px 6px",
+                          borderRadius: "var(--radius-pill)",
+                          background: "var(--surface-muted)",
+                          color: "var(--ink-soft)",
+                          border: "1px solid var(--border)",
+                          letterSpacing: "0.02em",
+                        }}
+                      >
+                        {shortModelLabel(con.modelId)}
+                        {con.modelMixed ? " ⚠" : ""}
+                      </span>
+                    )}
                   </span>
                   <span
                     className="tabular-nums"

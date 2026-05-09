@@ -25,6 +25,7 @@ from v2.agents.group_a._shared import (
     attach_persona_meta,
     build_item_verdict,
     build_sub_agent_response,
+    emit_rag_hits_ready,
     format_fewshot_block,
     get_assigned_turns,
     get_intent,
@@ -43,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = "listening-communication-agent"
 CATEGORY_KEY = "listening_communication"
+NODE_ID = "listening_comm"
 
 
 async def listening_comm_sub_agent(
@@ -51,6 +53,7 @@ async def listening_comm_sub_agent(
     llm_backend: str | None = None,
     bedrock_model_id: str | None = None,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     with Stopwatch() as sw:
         if is_quality_unevaluable(preprocessing):
@@ -66,9 +69,9 @@ async def listening_comm_sub_agent(
         resolved: dict[int, dict[str, Any]] = {}
         tasks: list[tuple[int, Any]] = []
 
-        tasks.append((4, _llm_evaluate_item_4(preprocessing, rv4, llm_backend, bedrock_model_id, tenant_id=tenant_id)))
+        tasks.append((4, _llm_evaluate_item_4(preprocessing, rv4, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event)))
         if hold_detected:
-            tasks.append((5, _llm_evaluate_item_5(preprocessing, rv5, llm_backend, bedrock_model_id, tenant_id=tenant_id)))
+            tasks.append((5, _llm_evaluate_item_5(preprocessing, rv5, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event)))
         else:
             resolved[5] = _build_skipped_full_item_5(rv5, reason="대기 미발생")
 
@@ -124,6 +127,7 @@ async def _llm_evaluate_item_4(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt
@@ -144,6 +148,11 @@ async def _llm_evaluate_item_4(
     fewshot, reasoning = await asyncio.gather(
         async_safe_retrieve_fewshot(4, intent, numbered, top_k=4, tenant_id=tenant_id),
         async_safe_retrieve_reasoning_evidence(4, numbered, top_k=7, tenant_id=tenant_id),
+    )
+    # 라이브 SSE — RAG hits 도착 즉시 프론트 NodeDrawer 가 표시 (LLM/토론 대기 없이)
+    emit_rag_hits_ready(
+        on_event, node_id=NODE_ID, agent_id=AGENT_ID, item_number=4,
+        phase="layer2", fewshot=fewshot, fewshot_query=numbered, intent=intent,
     )
     fewshot_block = format_fewshot_block(fewshot)
     rag_stdev = reasoning["stdev"]
@@ -217,6 +226,7 @@ async def _llm_evaluate_item_5(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt
@@ -236,6 +246,11 @@ async def _llm_evaluate_item_5(
     fewshot, reasoning = await asyncio.gather(
         async_safe_retrieve_fewshot(5, intent, numbered, top_k=4, tenant_id=tenant_id),
         async_safe_retrieve_reasoning_evidence(5, numbered, top_k=7, tenant_id=tenant_id),
+    )
+    # 라이브 SSE — RAG hits 도착 즉시 프론트 NodeDrawer 가 표시
+    emit_rag_hits_ready(
+        on_event, node_id=NODE_ID, agent_id=AGENT_ID, item_number=5,
+        phase="layer2", fewshot=fewshot, fewshot_query=numbered, intent=intent,
     )
     fewshot_block = format_fewshot_block(fewshot)
     rag_stdev = reasoning["stdev"]

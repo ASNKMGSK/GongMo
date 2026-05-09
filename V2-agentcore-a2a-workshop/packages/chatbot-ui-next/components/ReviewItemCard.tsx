@@ -37,6 +37,12 @@ interface Props {
   category: string;
   hitlRow?: ReviewItem;
   /**
+   * ★ 2026-04-30: GT xlsx 의 사람 점수 (gt_comparison.items[].gt_score). HITL 큐 row 가 없거나
+   * human_score=null 일 때 fallback 으로 노출. UI 라벨도 "정답표" 로 출처 구분.
+   * 우선순위: hitlRow.human_score > gtScore > null("—").
+   */
+  gtScore?: number | null;
+  /**
    * 상담 STT 전문 (raw) — turns 가 없을 때 fallback. 카드를 펼치면 collapsible 로 노출.
    */
   transcript?: string | null;
@@ -83,6 +89,7 @@ function ReviewItemCard({
   item,
   category,
   hitlRow,
+  gtScore,
   transcript,
   turns,
   consultationId,
@@ -90,30 +97,40 @@ function ReviewItemCard({
   onToast,
 }: Props) {
   const [editing, setEditing] = useState(false);
-  const [scoreInput, setScoreInput] = useState<string>(
-    hitlRow?.human_score != null ? String(hitlRow.human_score) : "",
-  );
+  const [scoreInput, setScoreInput] = useState<string>(() => {
+    // ★ 2026-04-30: hitlRow.human_score > gtScore > "" 우선순위로 prefill.
+    const initialFallback = hitlRow?.human_score ?? gtScore ?? null;
+    return initialFallback != null ? String(initialFallback) : "";
+  });
   const [noteInput, setNoteInput] = useState<string>(hitlRow?.human_note || "");
   const [busy, setBusy] = useState<"" | "confirm" | "revert">("");
   const [transcriptOpen, setTranscriptOpen] = useState(false);
 
   const statusKey = hitlRow?.status || "pending";
   const statusInfo = STATUS_LABELS[statusKey] || STATUS_LABELS.pending;
-  const humanScore = hitlRow?.human_score;
+  // ★ 2026-04-30: 표시용 사람 점수 — HITL 검수 확정 점수가 우선, 없으면 GT xlsx 사람 점수.
+  // source 는 입력창 prefill / 라벨 분기에 사용 ("사람" vs "정답표").
+  const hitlHumanScore = hitlRow?.human_score;
+  const displayedHumanScore =
+    hitlHumanScore != null ? hitlHumanScore : gtScore != null ? gtScore : null;
+  const humanScoreSource: "hitl" | "gt" | null =
+    hitlHumanScore != null ? "hitl" : gtScore != null ? "gt" : null;
   const humanDiff =
-    humanScore != null && Number(humanScore) !== Number(item.score);
+    displayedHumanScore != null && Number(displayedHumanScore) !== Number(item.score);
 
   // hitlRow 가 늦게 도착하는 케이스 (populator DB commit 지연으로 모달 첫 렌더 시 undefined →
   // 백오프 retry 후 채워짐) 동기화. 사용자가 입력 중 (editing=true) 일 때는 덮어쓰지 않음.
+  // ★ 2026-04-30: gtScore 도 prop 변화 시 prefill 동기화에 포함 (HITL 큐 미생성 + GT xlsx 만 있는 케이스).
   const hitlRowId = hitlRow?.id;
   const incomingHumanScore = hitlRow?.human_score;
   const incomingHumanNote = hitlRow?.human_note;
   useEffect(() => {
     if (editing) return;
+    const fallback = incomingHumanScore ?? gtScore ?? null;
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setScoreInput(incomingHumanScore != null ? String(incomingHumanScore) : "");
+    setScoreInput(fallback != null ? String(fallback) : "");
     setNoteInput(incomingHumanNote || "");
-  }, [hitlRowId, incomingHumanScore, incomingHumanNote, editing]);
+  }, [hitlRowId, incomingHumanScore, incomingHumanNote, gtScore, editing]);
 
   const confidenceFinal = item.confidence?.final;
   const lowConf = confidenceFinal != null && confidenceFinal <= 2;
@@ -272,7 +289,8 @@ function ReviewItemCard({
         const open = (e.currentTarget as HTMLDetailsElement).open;
         if (open) {
           setEditing(true);
-          setScoreInput(humanScore != null ? String(humanScore) : "");
+          // ★ 2026-04-30: HITL 검수가 없으면 GT 점수로 prefill (사용자가 그대로 확정 가능).
+          setScoreInput(displayedHumanScore != null ? String(displayedHumanScore) : "");
           setNoteInput(hitlRow?.human_note || "");
         }
       }}
@@ -306,22 +324,33 @@ function ReviewItemCard({
             color: "var(--info)",
           }}
         >
-          AI {item.score}/{item.max_score}
+          {/* ★ 2026-04-30 fix: score=null (unevaluable / LLM 실패) 일 때 "AI /15" 처럼
+              빈 칸 표시되던 문제 → "AI 미평가/15" 로 명시. */}
+          AI {item.score == null ? "미평가" : item.score}/{item.max_score}
         </span>
+        {/* ★ 2026-04-30: 출처 분기 — HITL 검수 확정이면 "사람", GT xlsx fallback 이면 "정답표".
+            둘 다 없으면 "사람 —" (placeholder). */}
         <span
           style={{
             fontSize: 12,
             fontWeight: 800,
             color:
-              humanScore == null
+              displayedHumanScore == null
                 ? "var(--ink-muted)"
                 : humanDiff
                   ? "var(--warn)"
                   : "var(--success)",
             padding: "0 4px",
           }}
+          title={
+            humanScoreSource === "gt"
+              ? "GT xlsx (수기 QA 정답표) 의 사람 점수 — 아직 HITL 큐에 검수 row 가 없어 GT fallback"
+              : humanScoreSource === "hitl"
+                ? "HITL 검수자가 확정/임시저장한 사람 점수"
+                : "아직 사람 점수가 없습니다"
+          }
         >
-          사람 {humanScore ?? "—"}
+          {humanScoreSource === "gt" ? "정답표" : "사람"} {displayedHumanScore ?? "—"}
         </span>
         {confidenceFinal != null && (
           <span className={`badge ${lowConf ? "badge-danger" : "badge-info"}`}>
@@ -750,10 +779,10 @@ function ReviewItemCard({
               <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>
                 AI 점수: <b style={{ color: "var(--ink)" }}>{item.score ?? "-"}</b>
               </span>
-              {humanScore != null && (
+              {displayedHumanScore != null && (
                 <span style={{ fontSize: 11, color: "var(--ink-muted)" }}>
-                  이전 사람 점수:{" "}
-                  <b style={{ color: "var(--ink)" }}>{humanScore}</b>
+                  {humanScoreSource === "gt" ? "정답표 사람 점수" : "이전 사람 점수"}:{" "}
+                  <b style={{ color: "var(--ink)" }}>{displayedHumanScore}</b>
                 </span>
               )}
             </div>

@@ -286,6 +286,39 @@ class AossStore:
             logger.warning("delete_by_tenant 실패 (AOSS Serverless 미지원 가능): %s", e)
             raise
 
+    def delete_by_item(self, tenant_id: str, item_number: int) -> int:
+        """tenant 의 특정 item_number doc 삭제 — 항목별 재빌드용.
+
+        AOSS Serverless 에서 _delete_by_query 미지원 시 Exception.
+        """
+        body = {
+            "query": {
+                "bool": {
+                    "filter": [
+                        {"term": {"tenant_id": tenant_id}},
+                        {"term": {"item_number": item_number}},
+                    ]
+                }
+            }
+        }
+        try:
+            resp = self.client.delete_by_query(
+                index=self.index_name, body=body,
+                refresh=True, conflicts="proceed",
+            )
+            n = int(resp.get("deleted", 0))
+            logger.info(
+                "AOSS delete_by_item tenant=%s item=%d → deleted=%d",
+                tenant_id, item_number, n,
+            )
+            return n
+        except Exception as e:  # noqa: BLE001
+            logger.warning(
+                "delete_by_item 실패 tenant=%s item=%d: %s",
+                tenant_id, item_number, e,
+            )
+            raise
+
     def count_by_tenant(self, tenant_id: str) -> int:
         """tenant 단위 현재 doc 개수 — delete_by_query 후 eventual consistency 폴링용."""
         body = {"query": {"term": {"tenant_id": tenant_id}}}

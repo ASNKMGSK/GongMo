@@ -8,11 +8,20 @@ import { useCallback, useMemo, useState } from "react";
 import DebateRecordCard from "@/components/DebateRecord";
 import ManualEvalCompareTable from "@/components/ManualEvalCompareTable";
 import { useAppState } from "@/lib/AppStateContext";
-import { AGENT_ITEMS, ITEM_NAMES, STT_MAX_SCORES, scoreColor } from "@/lib/items";
+import {
+  AGENT_ITEMS,
+  ITEM_NAMES,
+  STT_MAX_SCORES,
+  scoreColor,
+} from "@/lib/items";
+import { NODE_ITEMS } from "@/lib/pipeline";
+import { pushNodeWithItem } from "@/lib/useNodeDrawerUrlSync";
 import {
   computeClientGtComparison,
   getManualRowByItem,
 } from "@/lib/manualEvalMapper";
+import { KmsReportCard, type KmsEvaluation } from "./KmsReportCard";
+import { buildResultJsonPayload, buildResultMarkdown } from "@/lib/resultExport";
 import { useToast } from "@/lib/toast";
 import type {
   CategoryItem,
@@ -28,6 +37,8 @@ import GtComparisonPanel from "./GtComparisonPanel";
 import GtEvidenceComparisonPanel from "./GtEvidenceComparisonPanel";
 import ItemCard from "./ItemCard";
 import { prepareItemProps, type RawReport } from "./prepareItemProps";
+import { extractTurnsFromPreprocessing } from "@/components/PostRunReviewModal";
+import TranscriptTurnList from "@/components/TranscriptTurnList";
 
 /**
  * ResultsTab — V2 HTML 6775~7497 이식.
@@ -60,9 +71,36 @@ interface ScoreAdjustmentRef {
   reason?: string;
 }
 
-interface PickedReport extends RawReport {
+interface DeductionRef {
+  item_number?: number;
+  item_name?: string;
+  reason?: string;
+  evidence?: string;
+  points?: number;
+}
+
+interface CoachingPointRef {
+  item_number?: number;
+  item_name?: string;
+  text?: string;
+  description?: string;
+  recommendation?: string;
+  suggestion?: string;
+  title?: string;
+  area?: string;
+  priority?: string;
+}
+
+interface PickedReport
+  extends Omit<RawReport, "strengths" | "improvements" | "coaching_points"> {
   summary?: { total_score?: number; max_score?: number; grade?: string };
   item_scores?: CategoryItem[];
+  deductions?: DeductionRef[];
+  strengths?: Array<string | CoachingPointRef>;
+  improvements?: Array<string | CoachingPointRef>;
+  coaching_points?: Array<string | CoachingPointRef>;
+  /** EvaluationResult.debates passthrough — ResultsTab 가 lastResult 에서 흡수. */
+  debates?: Record<string, DebateRecordType> | null;
   verification_issues?: {
     reasons?: VerifIssueReason[];
     critical_issues?: VerifIssueReason[];
@@ -89,7 +127,7 @@ function pickReport(result: unknown): PickedReport {
 }
 
 export function ResultsTab() {
-  const { state } = useAppState();
+  const { state, setOpenNode } = useAppState();
   const {
     lastResult,
     streamingItems,
@@ -97,6 +135,29 @@ export function ResultsTab() {
     manualEval,
     consultationId,
   } = state;
+
+  // item_number → node_id 역매핑 — ItemCard 에서 "노드 상세 열기" 트리거 시 사용.
+  // NODE_ITEMS 는 Record<string, number[]>. 첫 번째 매칭만 반환 (한 항목이 여러 노드에
+  // 속할 일은 없으나 안전하게 break).
+  const itemToNodeId = useCallback((itemNum: number): string | null => {
+    for (const [nid, items] of Object.entries(NODE_ITEMS)) {
+      if (items.includes(itemNum)) return nid;
+    }
+    return null;
+  }, []);
+
+  const handleOpenNodeDrawer = useCallback(
+    (itemNum: number) => {
+      const nid = itemToNodeId(itemNum);
+      if (!nid) return;
+      // 1) URL 에 ?node + ?item 동시 set — useNodeDrawerUrlSync 의 URL→state effect 가
+      //    setOpenNode 보다 먼저 들어와도 ?item 이 보존되도록 직접 갱신.
+      pushNodeWithItem(nid, itemNum);
+      // 2) AppState 갱신 — GlobalNodeDrawer 가 즉시 열림.
+      setOpenNode(nid);
+    },
+    [itemToNodeId, setOpenNode],
+  );
 
   const [viewMode, setViewMode] = useState<"item" | "agent">("agent");
   const [expandVersion, setExpandVersion] = useState(0);
@@ -115,8 +176,43 @@ export function ResultsTab() {
     [],
   );
 
-  const report = useMemo(() => pickReport(lastResult), [lastResult]);
+  const report = useMemo(() => {
+    const rp = pickReport(lastResult);
+    // ★ lastResult.debates 를 report 에 흡수 — prepareItemProps 가 항목별로 lookup 하기 위함.
+    // 백엔드 응답 최상위 (EvaluationResult.debates) 와 report 내부 어느 쪽이든 가능.
+    const lr = (lastResult || {}) as { debates?: Record<string, DebateRecordType> | null };
+    if (!rp.debates && lr.debates) {
+      return { ...rp, debates: lr.debates };
+    }
+    return rp;
+  }, [lastResult]);
   const sm = report.summary || {};
+  // KMS 보고서 — 통합 보고서와 *별도 카드* 로 표시. lastResult.kms_evaluation 추출.
+  const kmsEvaluation: KmsEvaluation | null = useMemo(() => {
+    if (!lastResult) return null;
+    const r = lastResult as { kms_evaluation?: KmsEvaluation };
+    return r.kms_evaluation ?? null;
+  }, [lastResult]);
+
+  // ★ 2026-05-08: AI 마무리 총평 — report_narrator 노드 산출 (그래프 끝 LLM 호출).
+  // 모든 노드 결과를 종합한 자연어 결론 + 코칭. 평가가 끝난 뒤에만 도착.
+  const reportNarratorSummary = useMemo(() => {
+    if (!lastResult) return null;
+    const r = lastResult as {
+      report_llm_summary?: {
+        narrative?: string;
+        strengths?: string[];
+        improvements?: string[];
+        coaching_points?: Array<{
+          category?: string;
+          priority?: "high" | "medium" | "low";
+          title?: string;
+          detail?: string;
+        }>;
+      } | null;
+    };
+    return r.report_llm_summary ?? null;
+  }, [lastResult]);
   const finalItems: CategoryItem[] = report.item_scores || [];
   const hasFinal = finalItems.length > 0 || !!sm.grade;
 
@@ -264,7 +360,10 @@ export function ResultsTab() {
     if (!lastResult) return;
     setDownloadBusy("xlsx");
     try {
-      const out = await buildResultsXlsx(lastResult, state.llmBackend);
+      const out = await buildResultsXlsx(lastResult, state.llmBackend, {
+        manualEvalRows: manualEval?.rows ?? null,
+        gcClient: gc,
+      } as unknown as Parameters<typeof buildResultsXlsx>[2]);
       if (!out) {
         toast.error("다운로드 실패", {
           description: "xlsx 모듈 로드 실패 — 네트워크/패키지 확인",
@@ -282,14 +381,23 @@ export function ResultsTab() {
     } finally {
       setDownloadBusy("");
     }
-  }, [lastResult, state.llmBackend, toast, triggerDownload]);
+  }, [lastResult, state.llmBackend, toast, triggerDownload, manualEval, gc]);
 
   const handleDownloadJson = useCallback(() => {
     if (!lastResult) return;
     setDownloadBusy("json");
     try {
-      const payload = JSON.stringify(lastResult, null, 2);
-      const blob = new Blob([payload], { type: "application/json" });
+      const payload = buildResultJsonPayload({
+        result: lastResult,
+        llmBackend: state.llmBackend,
+        consultationId,
+        manualEval: manualEval ?? null,
+        gc,
+        humanSavedMap,
+      });
+      const blob = new Blob([JSON.stringify(payload, null, 2)], {
+        type: "application/json",
+      });
       const ts = new Date().toISOString().replace(/:/g, "-").replace(/\..+$/, "");
       triggerDownload(blob, `qa_result_${ts}.json`);
     } catch (err) {
@@ -299,57 +407,49 @@ export function ResultsTab() {
     } finally {
       setDownloadBusy("");
     }
-  }, [lastResult, toast, triggerDownload]);
+  }, [
+    lastResult,
+    state.llmBackend,
+    toast,
+    triggerDownload,
+    manualEval,
+    gc,
+    consultationId,
+    humanSavedMap,
+  ]);
 
   const handleDownloadMd = useCallback(() => {
     if (!lastResult) return;
     setDownloadBusy("md");
     try {
-      // Report → markdown. V2 원본은 별도 함수가 없으므로 요약/항목/감점 중심 포맷.
-      const rp = pickReport(lastResult);
-      const sm = rp.summary || {};
-      const lines: string[] = [];
-      lines.push("# QA 평가 결과 리포트");
-      lines.push("");
-      lines.push(`- 생성일시: ${new Date().toLocaleString("ko-KR")}`);
-      lines.push(`- LLM 백엔드: ${state.llmBackend === "sagemaker" ? "Qwen3-8B" : "Sonnet-4.6"}`);
-      lines.push(`- 총점: **${sm.total_score ?? 0}** / ${sm.max_score ?? 100}점`);
-      if (sm.grade) lines.push(`- 등급: **${sm.grade}**`);
-      lines.push("");
-      lines.push("## 항목별 평가");
-      lines.push("");
-      lines.push("| # | 항목 | 점수 | 판정 사유 |");
-      lines.push("|---|---|---|---|");
-      for (const it of rp.item_scores || []) {
-        const jd = String(it.judgment || it.summary || "").replace(/\|/g, "\\|").replace(/\n/g, " ");
-        lines.push(
-          `| ${it.item_number} | ${it.item_name || ITEM_NAMES[it.item_number] || ""} | ${it.score ?? "-"}/${it.max_score ?? STT_MAX_SCORES[it.item_number] ?? ""} | ${jd} |`,
-        );
-      }
-      lines.push("");
-      const gtEv = (lastResult as unknown as { gt_evidence_comparison?: GtEvidenceComparison })
-        ?.gt_evidence_comparison;
-      if (gtEv?.summary) {
-        lines.push("## GT 근거 비교 (LLM 판정)");
-        lines.push("");
-        lines.push(
-          `일치 ${gtEv.summary.match ?? 0} / 부분 ${gtEv.summary.partial ?? 0} / 불일치 ${gtEv.summary.mismatch ?? 0} — 일치율 ${gtEv.summary.match_rate ?? 0}%`,
-        );
-        lines.push("");
-      }
-      const blob = new Blob([lines.join("\n")], {
-        type: "text/markdown;charset=utf-8",
+      const md = buildResultMarkdown({
+        result: lastResult,
+        llmBackend: state.llmBackend,
+        consultationId,
+        manualEval: manualEval ?? null,
+        gc,
+        humanSavedMap,
       });
+      const blob = new Blob([md], { type: "text/markdown;charset=utf-8" });
       const ts = new Date().toISOString().replace(/:/g, "-").replace(/\..+$/, "");
       triggerDownload(blob, `qa_result_${ts}.md`);
     } catch (err) {
-      toast.error("다운로드 실패", {
+      toast.error("md 다운로드 실패", {
         description: err instanceof Error ? err.message : String(err),
       });
     } finally {
       setDownloadBusy("");
     }
-  }, [lastResult, state.llmBackend, toast, triggerDownload]);
+  }, [
+    lastResult,
+    state.llmBackend,
+    consultationId,
+    manualEval,
+    gc,
+    humanSavedMap,
+    toast,
+    triggerDownload,
+  ]);
 
   if (!hasFinal && !isStreaming && evaluationsFallback.length === 0) {
     return (
@@ -366,6 +466,9 @@ export function ResultsTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      {/* KMS 별도 보고서 — 통합 보고서와 분리. 응답에 kms_evaluation 있을 때만 표시. */}
+      {kmsEvaluation && <KmsReportCard kmsEvaluation={kmsEvaluation} />}
+
       {/* 헤드라인 */}
       <div
         className="card card-padded"
@@ -570,6 +673,9 @@ export function ResultsTab() {
           </div>
         </div>
       </div>
+
+      {/* Tier 분포 미니 차트 (PDF §8.2 라우팅 모니터링) */}
+      <TierDistributionPanel items={items} />
 
       {/* GT 비교 패널 */}
       <GtComparisonPanel gc={gc} />
@@ -889,7 +995,7 @@ export function ResultsTab() {
                   label={ag.label}
                   phase={ag.phase}
                   items={ag.items}
-                  report={report}
+                  report={report as unknown as RawReport}
                   allItems={items}
                   gtItemsByNum={gtItemsByNum}
                   defaultOpen={hasGap}
@@ -899,12 +1005,13 @@ export function ResultsTab() {
                   consultationId={consultationId}
                   humanSavedMap={humanSavedMap}
                   onHumanSaved={handleHumanSaved}
+                  onOpenNodeDrawer={handleOpenNodeDrawer}
                 />
               );
             })
           : items.map((it) => {
               const num = it.item_number;
-              const props = prepareItemProps(it, num, report);
+              const props = prepareItemProps(it, num, report as unknown as RawReport);
               const gtRow = gtItemsByNum[num];
               const manualRow = getManualRowByItem(manualEval, num);
               const saved = humanSavedMap[num];
@@ -959,10 +1066,22 @@ export function ResultsTab() {
                         }
                       : null
                   }
+                  personaDetails={props.personaDetails}
+                  debateRecord={props.debateRecord}
+                  onOpenNodeDrawer={handleOpenNodeDrawer}
                 />
               );
             })}
       </div>
+
+      {/* ★ 2026-05-07: 파싱된 발화 — evidence T#N 클릭 점프 대상.
+          이전엔 pipeline 탭에 있어 클릭 시 탭 이동 + 메인 화면 노이즈 발생 → results 탭으로 이주.
+          기본 접힘 상태 (defaultOpen=false). T#N 클릭 시 자동 펼침 + 스크롤 + flash. */}
+      <TranscriptTurnList
+        turns={extractTurnsFromPreprocessing(
+          (lastResult as { preprocessing?: unknown } | null)?.preprocessing,
+        )}
+      />
 
       {/* 토론 기록 — 항목별 AG2 토론 결과 (페르소나 발언, 모더레이터 판정, 최종 합의/투표) */}
       {(() => {
@@ -1014,6 +1133,235 @@ export function ResultsTab() {
         );
       })()}
 
+      {/* ★ 2026-05-08: AI 마무리 총평 — report_narrator 노드 산출. 모든 결과 종합 LLM 결론 + 코칭. */}
+      {reportNarratorSummary && (
+        reportNarratorSummary.narrative ||
+        (reportNarratorSummary.strengths?.length ?? 0) > 0 ||
+        (reportNarratorSummary.improvements?.length ?? 0) > 0 ||
+        (reportNarratorSummary.coaching_points?.length ?? 0) > 0
+      ) ? (
+        <section
+          className="card card-padded"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: 14,
+            borderLeft: "3px solid var(--accent)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 8,
+              fontSize: 11,
+              fontWeight: 700,
+              color: "var(--accent-strong)",
+              letterSpacing: "0.06em",
+              textTransform: "uppercase",
+            }}
+          >
+            <span
+              style={{
+                display: "inline-block",
+                width: 6,
+                height: 6,
+                borderRadius: "50%",
+                background: "var(--accent)",
+              }}
+            />
+            AI 마무리 총평
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 500,
+                color: "var(--ink-subtle)",
+                letterSpacing: 0,
+                textTransform: "none",
+              }}
+            >
+              · 모든 평가 결과 종합 (LLM 자연어 결론 + 코칭)
+            </span>
+          </div>
+
+          {reportNarratorSummary.narrative && (
+            <div
+              style={{
+                fontSize: 14,
+                lineHeight: 1.7,
+                color: "var(--ink)",
+                background: "var(--surface-muted)",
+                padding: "14px 16px",
+                borderRadius: "var(--radius)",
+              }}
+            >
+              {reportNarratorSummary.narrative}
+            </div>
+          )}
+
+          {(reportNarratorSummary.strengths?.length ?? 0) > 0 && (
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--success)",
+                  marginBottom: 6,
+                }}
+              >
+                ✅ 잘한 점
+              </div>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 20,
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  color: "var(--ink-soft)",
+                }}
+              >
+                {reportNarratorSummary.strengths!.map((s, i) => (
+                  <li key={`str-${i}`}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(reportNarratorSummary.improvements?.length ?? 0) > 0 && (
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--warn)",
+                  marginBottom: 6,
+                }}
+              >
+                ⚠ 개선이 필요한 점
+              </div>
+              <ul
+                style={{
+                  margin: 0,
+                  paddingLeft: 20,
+                  fontSize: 13,
+                  lineHeight: 1.7,
+                  color: "var(--ink-soft)",
+                }}
+              >
+                {reportNarratorSummary.improvements!.map((s, i) => (
+                  <li key={`imp-${i}`}>{s}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {(reportNarratorSummary.coaching_points?.length ?? 0) > 0 && (
+            <div>
+              <div
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--accent-strong)",
+                  marginBottom: 6,
+                }}
+              >
+                🎯 코칭 포인트
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 8,
+                }}
+              >
+                {reportNarratorSummary.coaching_points!.map((cp, i) => {
+                  const priColor =
+                    cp.priority === "high"
+                      ? "var(--danger)"
+                      : cp.priority === "low"
+                        ? "var(--ink-subtle)"
+                        : "var(--accent)";
+                  const priLabel =
+                    cp.priority === "high"
+                      ? "HIGH"
+                      : cp.priority === "low"
+                        ? "LOW"
+                        : "MED";
+                  return (
+                    <div
+                      key={`cp-${i}`}
+                      style={{
+                        padding: "10px 12px",
+                        border: "1px solid var(--border)",
+                        borderRadius: "var(--radius)",
+                        background: "var(--surface)",
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: 4,
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          gap: 8,
+                          flexWrap: "wrap",
+                        }}
+                      >
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            color: priColor,
+                            border: `1px solid ${priColor}`,
+                            padding: "1px 6px",
+                            borderRadius: "var(--radius-pill)",
+                            letterSpacing: "0.08em",
+                          }}
+                        >
+                          {priLabel}
+                        </span>
+                        {cp.category && (
+                          <span
+                            style={{
+                              fontSize: 10.5,
+                              color: "var(--ink-muted)",
+                              fontWeight: 600,
+                            }}
+                          >
+                            {cp.category}
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            fontSize: 13,
+                            fontWeight: 700,
+                            color: "var(--ink)",
+                          }}
+                        >
+                          {cp.title}
+                        </span>
+                      </div>
+                      {cp.detail && (
+                        <div
+                          style={{
+                            fontSize: 12.5,
+                            lineHeight: 1.6,
+                            color: "var(--ink-soft)",
+                          }}
+                        >
+                          {cp.detail}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </section>
+      ) : null}
+
       {/* 경과 시간 */}
       {lastResult && (lastResult as unknown as { elapsed_seconds?: number })?.elapsed_seconds != null && (
         <div
@@ -1031,6 +1379,200 @@ export function ResultsTab() {
       )}
 
       {/* NodeDrawer 는 app/evaluate/page.tsx 의 <GlobalNodeDrawer /> 가 렌더 — 여기선 중복 방지 */}
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+ * TierDistributionPanel
+ * ─────────────────────────────────────────────────────────────────────────
+ * PDF §8.2 Tier 라우팅 분포 미니 차트.
+ *   - T0 자동통과 (목표 ~70%)
+ *   - T1 스팟체크 (목표 5~10%)
+ *   - T2 플래그검수 (목표 15~20%)
+ *   - T3 필수검수 (목표 ≤5%)
+ *
+ * Tier 추정 fallback chain (백엔드 필드명 변동 가능성 흡수):
+ *   1) it.routing_tier
+ *   2) it.tier_route
+ *   3) it.force_t3 || it.mandatory_human_review → "T3"
+ *   4) it.grade_detail?.routing_tier_hint
+ *   5) confidence.final 기반 추정 (4→T0, 3→T1, 2→T2, 1→T3)
+ *
+ * 평가 항목이 0건이면 패널 자체 미렌더.
+ * ─────────────────────────────────────────────────────────────────────────*/
+
+type Tier = "T0" | "T1" | "T2" | "T3";
+
+interface TierMeta {
+  label: string;
+  desc: string;
+  color: string;
+  /** 목표 비중 [min%, max%]. min/max 동일 시 점추정. */
+  target: [number, number];
+  /** 사람-읽기용 목표 표시 */
+  targetText: string;
+}
+
+const TIER_META: Record<Tier, TierMeta> = {
+  T0: { label: "T0 자동통과", desc: "목표 ~70%", color: "#16a34a", target: [65, 75], targetText: "~70%" },
+  T1: { label: "T1 스팟체크", desc: "목표 5~10%", color: "#06b6d4", target: [5, 10], targetText: "5~10%" },
+  T2: { label: "T2 플래그검수", desc: "목표 15~20%", color: "#f59e0b", target: [15, 20], targetText: "15~20%" },
+  T3: { label: "T3 필수검수", desc: "목표 ≤5%", color: "#ef4444", target: [0, 5], targetText: "≤5%" },
+};
+
+function inferTier(it: CategoryItem): Tier | null {
+  // backend 필드는 타입 정의에 없으므로 unknown record 로 접근.
+  const raw = it as unknown as Record<string, unknown>;
+
+  const direct = raw["routing_tier"] ?? raw["tier_route"];
+  if (typeof direct === "string") {
+    const up = direct.toUpperCase();
+    if (up === "T0" || up === "T1" || up === "T2" || up === "T3") return up as Tier;
+  }
+
+  if (it.force_t3 || it.mandatory_human_review) return "T3";
+
+  const gradeDetail = raw["grade_detail"];
+  if (gradeDetail && typeof gradeDetail === "object") {
+    const hint = (gradeDetail as Record<string, unknown>)["routing_tier_hint"];
+    if (typeof hint === "string") {
+      const up = hint.toUpperCase();
+      if (up === "T0" || up === "T1" || up === "T2" || up === "T3") return up as Tier;
+    }
+  }
+
+  const final = it.confidence?.final;
+  if (typeof final === "number") {
+    if (final >= 4) return "T0";
+    if (final === 3) return "T1";
+    if (final === 2) return "T2";
+    if (final <= 1) return "T3";
+  }
+
+  return null;
+}
+
+function diffLabel(pct: number, target: [number, number]): { text: string; color: string } {
+  const [lo, hi] = target;
+  if (pct < lo) {
+    const gap = Math.round((lo - pct) * 10) / 10;
+    return { text: `미달 -${gap}%p`, color: "var(--warn, #f59e0b)" };
+  }
+  if (pct > hi) {
+    const gap = Math.round((pct - hi) * 10) / 10;
+    return { text: `초과 +${gap}%p`, color: "var(--danger, #ef4444)" };
+  }
+  return { text: "정상", color: "var(--success, #16a34a)" };
+}
+
+interface TierDistributionPanelProps {
+  items: CategoryItem[];
+}
+
+function TierDistributionPanel({ items }: TierDistributionPanelProps) {
+  if (!items || items.length === 0) return null;
+
+  const counts: Record<Tier, number> = { T0: 0, T1: 0, T2: 0, T3: 0 };
+  let classified = 0;
+  for (const it of items) {
+    const t = inferTier(it);
+    if (t) {
+      counts[t] += 1;
+      classified += 1;
+    }
+  }
+  if (classified === 0) return null;
+
+  const total = classified;
+  const tiers: Tier[] = ["T0", "T1", "T2", "T3"];
+
+  return (
+    <div className="card card-padded" style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+        <span style={{ fontSize: 16 }}>🎯</span>
+        <div className="section-eyebrow" style={{ marginBottom: 0 }}>
+          Tier 분포 (PDF §8.2 목표 대비)
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {tiers.map((t) => {
+          const meta = TIER_META[t];
+          const n = counts[t];
+          const pct = total > 0 ? (n / total) * 100 : 0;
+          const pctRounded = Math.round(pct * 10) / 10;
+          const dl = diffLabel(pct, meta.target);
+          const barWidth = n === 0 ? "1px" : `${Math.max(pct, 1)}%`;
+          return (
+            <div key={t} style={{ display: "flex", flexDirection: "column", gap: 2 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 8,
+                  fontSize: 12,
+                  color: "var(--ink)",
+                }}
+              >
+                <span style={{ minWidth: 110, fontWeight: 600 }}>{meta.label}</span>
+                <div
+                  style={{
+                    flex: 1,
+                    height: 14,
+                    background: "var(--bg-soft, rgba(0,0,0,0.04))",
+                    borderRadius: 4,
+                    overflow: "hidden",
+                    position: "relative",
+                  }}
+                >
+                  <div
+                    style={{
+                      width: barWidth,
+                      height: "100%",
+                      background: n === 0 ? "var(--border, #d4d4d4)" : meta.color,
+                      transition: "width 200ms ease",
+                    }}
+                  />
+                </div>
+                <span
+                  className="tabular-nums"
+                  style={{ minWidth: 90, textAlign: "right", fontSize: 12 }}
+                >
+                  {n}건 ({pctRounded}%)
+                </span>
+              </div>
+              <div
+                style={{
+                  display: "flex",
+                  gap: 6,
+                  fontSize: 11,
+                  color: "var(--ink-muted)",
+                  paddingLeft: 118,
+                }}
+              >
+                <span>{meta.desc}</span>
+                <span style={{ color: "var(--ink-subtle, #999)" }}>─</span>
+                <span style={{ color: dl.color, fontWeight: 600 }}>{dl.text}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <div
+        style={{
+          fontSize: 11,
+          color: "var(--ink-muted)",
+          borderTop: "1px solid var(--border, rgba(0,0,0,0.06))",
+          paddingTop: 6,
+        }}
+      >
+        총 {total}건 평가됨
+        {classified < items.length && (
+          <span style={{ marginLeft: 6 }}>
+            (Tier 미상 {items.length - classified}건 제외)
+          </span>
+        )}
+      </div>
     </div>
   );
 }

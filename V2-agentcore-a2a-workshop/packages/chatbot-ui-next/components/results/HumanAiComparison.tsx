@@ -494,8 +494,16 @@ export function HumanAiComparison({ consultationId }: HumanAiComparisonProps) {
                       <td className="px-2 py-1.5 text-right font-mono">
                         {ai !== null ? ai : "—"}
                       </td>
-                      <td className="px-2 py-1.5 text-right font-mono">
-                        {hu !== null ? hu : "—"}
+                      <td
+                        className="px-2 py-1.5 text-right font-mono"
+                        style={
+                          hu === null
+                            ? { color: "var(--ink-muted)", fontStyle: "italic", fontSize: 11 }
+                            : undefined
+                        }
+                        title={hu === null ? "이 항목의 사람 QA 점수가 없습니다" : undefined}
+                      >
+                        {hu !== null ? hu : "GT값 없음"}
                       </td>
                       <td
                         className={`px-2 py-1.5 text-right font-mono font-bold ${deltaCls}`}

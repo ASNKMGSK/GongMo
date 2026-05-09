@@ -21,10 +21,12 @@ import { ITEM_NAMES, STT_MAX_SCORES } from "@/lib/items";
 type AnyRec = Record<string, unknown>;
 type Dict = Record<string, AnyRec>;
 
+// ★ 2026-04-30: 영어 라벨 (Strict/Neutral/Loose) 제거 — 한국어 도메인 명 (품격/정확성/고객경험) 으로 통일.
+// ko 필드는 평가 성향 (엄격/중립/관대) 을 보조 표시.
 const PERSONA_META = [
   {
     key: "strict",
-    label: "Strict",
+    label: "품격",
     ko: "엄격",
     bg: "#fee2e2",
     color: "#991b1b",
@@ -32,7 +34,7 @@ const PERSONA_META = [
   },
   {
     key: "neutral",
-    label: "Neutral",
+    label: "정확성",
     ko: "중립",
     bg: "#dbeafe",
     color: "#1e3a8a",
@@ -40,7 +42,7 @@ const PERSONA_META = [
   },
   {
     key: "loose",
-    label: "Loose",
+    label: "고객경험",
     ko: "관대",
     bg: "#dcfce7",
     color: "#166534",

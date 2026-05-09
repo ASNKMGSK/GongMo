@@ -222,7 +222,12 @@ def _score_signature(ai_score: Any, human_score: Any) -> str:
     return f"ai={ai_score}|human={human_score}"
 
 
-def export_review_row(row: dict[str, Any], *, item_meta: dict[str, Any] | None = None) -> Path | None:
+def export_review_row(
+    row: dict[str, Any],
+    *,
+    item_meta: dict[str, Any] | None = None,
+    full_transcript: str | None = None,
+) -> Path | None:
     """단일 ``human_reviews`` 행 → MD 파일.
 
     Parameters
@@ -235,6 +240,11 @@ def export_review_row(row: dict[str, Any], *, item_meta: dict[str, Any] | None =
     item_meta : dict | None
         report.evaluation 에서 가져올 수 있는 item 메타. ``item_name``, ``max_score``
         가 있으면 frontmatter 에 포함.
+    full_transcript : str | None
+        ★ 2026-04-30: 검수 시점 상담의 **전체 파싱 원문**. body 의 `## 상담 원문 (전체)`
+        섹션으로 저장 → ``rag_ingester._embed_text_for`` 가 임베딩 input 으로 사용.
+        검색 query (run_debate 가 보내는 transcript) 와 의미공간 정렬되어 KNN cos ≈ 1.0 보장.
+        None 이면 기존처럼 ai_evidence 발화 발췌만 색인 (KNN 정렬 약함).
 
     Returns
     -------
@@ -291,7 +301,14 @@ def export_review_row(row: dict[str, Any], *, item_meta: dict[str, Any] | None =
     except (TypeError, ValueError):
         delta = None
 
+    # ★ 2026-04-30: full_transcript 가 score_signature 에 영향 — transcript 가 추가되면
+    # 기존 색인 doc 은 KNN 정렬이 약했으므로 재임베딩 트리거 (signature 변경).
+    transcript_full_clean = (full_transcript or "").strip()
+    has_full = bool(transcript_full_clean)
     sig = _score_signature(ai_score, human_score)
+    if has_full:
+        sig = sig + "|tx=full"
+
     target = md_path_for(cid, item_no)
     target.parent.mkdir(parents=True, exist_ok=True)
 
@@ -344,6 +361,14 @@ def export_review_row(row: dict[str, Any], *, item_meta: dict[str, Any] | None =
         f"- delta (AI - 사람): {delta if delta is not None else '?'}",
         "",
     ]
+    # ★ 2026-04-30: 전체 파싱 원문 섹션 — rag_ingester._embed_text_for 가 우선 임베딩 input 으로 사용.
+    # 검색 query (run_debate 의 transcript) 와 동일 의미공간 → 자기상담 KNN cos ≈ 1.0.
+    if has_full:
+        body_lines.extend([
+            "## 상담 원문 (전체 — RAG 임베딩 input)",
+            transcript_full_clean,
+            "",
+        ])
     body = "\n".join(body_lines)
 
     text = _render_frontmatter(meta_out) + "\n\n" + body
@@ -357,10 +382,13 @@ def export_consultation_confirmed(
     *,
     review_rows: Iterable[dict[str, Any]],
     item_meta_by_number: dict[int, dict[str, Any]] | None = None,
+    full_transcript: str | None = None,
 ) -> list[Path]:
     """주어진 review rows 중 ``status='confirmed'`` 만 MD 파일로 저장.
 
     ``item_meta_by_number`` 가 있으면 frontmatter 의 ``item_name`` / ``max_score`` 채움.
+    ``full_transcript`` 가 있으면 모든 MD body 에 ``## 상담 원문 (전체)`` 섹션으로 같이 저장 →
+    rag_ingester 가 임베딩 input 으로 사용. 같은 cid 의 모든 항목이 동일 transcript 공유.
     실패한 row 는 warning 후 skip — 다른 row 는 계속 진행.
     """
     item_meta_by_number = item_meta_by_number or {}
@@ -371,7 +399,11 @@ def export_consultation_confirmed(
         except (TypeError, ValueError):
             continue
         try:
-            p = export_review_row(row, item_meta=item_meta_by_number.get(item_no))
+            p = export_review_row(
+                row,
+                item_meta=item_meta_by_number.get(item_no),
+                full_transcript=full_transcript,
+            )
         except Exception as exc:
             logger.warning("export_review_row 실패 cid=%s item=%s — %s", consultation_id, item_no, exc)
             continue

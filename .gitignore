@@ -124,6 +124,21 @@ tb_ai_ta_data_*.csv
 batch_*.json
 batch_*.csv
 
+# 샘플별 GT 마크다운 (실 transcript 발췌 포함)
+V2-agentcore-a2a-workshop/packages/agentcore-agents/qa-pipeline/v2/tenants/*/golden_set/*_*.md
+!V2-agentcore-a2a-workshop/packages/agentcore-agents/qa-pipeline/v2/tenants/*/golden_set/_schema.md
+
+# LinearRAG 실험 데이터/결과 (실 KMS · 실 케이스 transcript)
+V2-agentcore-a2a-workshop/packages/agentcore-agents/qa-pipeline/scripts/linear_rag_experiment/data/
+V2-agentcore-a2a-workshop/packages/agentcore-agents/qa-pipeline/scripts/linear_rag_experiment/results/
+
+# UI 백업 디렉토리
+V2-agentcore-a2a-workshop/packages/chatbot-ui-next.backup-*/
+V2-agentcore-a2a-workshop/packages/chatbot-ui-next.backup-pre-*/
+
+# 폰트 다운로드 덤프 (라이선스 경로별 외부 zip 추출)
+OnlineWebFonts_COM_*/
+
 # 프롬프트 튜닝 산출물 (대용량)
 prompt_tuning/
 tuning_*/

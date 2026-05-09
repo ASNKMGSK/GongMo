@@ -18,6 +18,8 @@ from __future__ import annotations
 import json
 import logging
 import os
+import re
+import signal
 import sys
 import threading
 import time
@@ -26,11 +28,68 @@ from pathlib import Path
 from typing import Any
 
 
+# ★ 2026-05-07: .env 자동 로드 — uvicorn 직접 실행 시에도 BEDROCK_MODEL_ID /
+# QA_DEBATE_MAX_PARALLEL / QA_KMS_MAX_WORKERS 등 환경변수 적용. 기존엔 .env 가
+# 자동 로드되지 않아 동시성/모델 ID 변경이 사실상 무효였음.
+try:
+    from dotenv import load_dotenv  # noqa: E402
+    # qa-pipeline/.env 는 이 파일 기준 parents[2] (server_v2 → serving → v2 → qa-pipeline)
+    _ENV_PATH = Path(__file__).resolve().parents[2] / ".env"
+    if _ENV_PATH.exists():
+        load_dotenv(_ENV_PATH, override=False)
+except Exception:  # pragma: no cover
+    pass
+
+
 # ★ 로깅 설정을 최상단에서 무조건 실행 — `python -m uvicorn v2.serving.server_v2:app`
 # 처럼 main_v2.py 를 거치지 않는 경로에서도 로그 포맷 / Bedrock 훅이 설치되게 한다.
 from .logging_setup import configure as _configure_logging  # noqa: E402
 
 _configure_logging()
+
+
+# ---------------------------------------------------------------------------
+# ★ Ctrl+C 강제 종료 핸들러 (Windows + ThreadPool + 동기 boto3 응답성 문제 해결)
+# ---------------------------------------------------------------------------
+# 문제: uvicorn graceful shutdown 이 active request 완료를 기다리고, ThreadPoolExecutor
+# 워커는 boto3 동기 호출이 끝날 때까지 안 멈춤. LinearRAG 인덱싱처럼 100+ 호출이
+# 직렬로 도는 중에 Ctrl+C 면 사실상 응답 없음.
+#
+# 해결: 첫 Ctrl+C → 정상 graceful shutdown 신호 발송. 3초 안에 두 번째 Ctrl+C 가
+# 들어오면 즉시 `os._exit(130)` 으로 강제 종료 (cleanup 우회, 모든 thread 동시 죽음).
+_last_sigint_ts: float = 0.0
+_DOUBLE_CTRL_C_WINDOW = 3.0  # 초
+
+
+def _force_exit_on_double_ctrl_c(signum: int, frame: Any) -> None:
+    global _last_sigint_ts
+    now = time.time()
+    if now - _last_sigint_ts < _DOUBLE_CTRL_C_WINDOW:
+        # 두 번째 Ctrl+C — 즉시 강제 종료
+        sys.stderr.write(
+            "\n[FORCE-EXIT] 두 번째 Ctrl+C 감지 — 모든 thread / boto3 호출 즉시 중단\n"
+        )
+        sys.stderr.flush()
+        os._exit(130)  # 128 + SIGINT
+    _last_sigint_ts = now
+    sys.stderr.write(
+        "\n[Ctrl+C] graceful shutdown 시작 — 3초 안에 한 번 더 누르면 즉시 강제 종료\n"
+    )
+    sys.stderr.flush()
+    # uvicorn 의 KeyboardInterrupt 처리로 위임 (default behavior)
+    raise KeyboardInterrupt()
+
+
+# uvicorn 이 자체 SIGINT 핸들러 등록하는 시점보다 늦게 실행되도록
+# lifespan 의 startup 에서 다시 install. 모듈 load 시 일단 install 해두고,
+# uvicorn 의 install_signal_handlers() 가 덮어쓰면 lifespan 에서 재설치.
+try:
+    signal.signal(signal.SIGINT, _force_exit_on_double_ctrl_c)
+    if hasattr(signal, "SIGTERM"):
+        signal.signal(signal.SIGTERM, _force_exit_on_double_ctrl_c)
+except (ValueError, OSError):
+    # signal.signal() 은 main thread 에서만 호출 가능 — uvicorn worker 에선 무시
+    pass
 
 
 # qa-pipeline 루트를 path 에
@@ -161,7 +220,13 @@ app = FastAPI(title="QA Evaluation Pipeline V2", version="2.0.0", lifespan=lifes
 # allow_credentials=True 필요 시 와일드카드 금지 → Next.js dev origin 명시
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:3001", "http://127.0.0.1:3000"],
+    # ★ 2026-05-07: 127.0.0.1 변종도 추가. 브라우저가 localhost / 127.0.0.1 둘 중 어느 쪽으로
+    # 접속하든 CORS 통과. 프론트 BASE_URL 변경 (localhost → 127.0.0.1) 시 origin 호환.
+    allow_origins=[
+        "http://localhost:3000", "http://localhost:3001",
+        "http://127.0.0.1:3000", "http://127.0.0.1:3001",
+        "http://localhost:3002", "http://127.0.0.1:3002",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -214,6 +279,15 @@ def _count_source_docs_at(base: Path, kind: str) -> int:
             d = base / "golden_set"
             if not d.is_dir():
                 return 0
+            # 신규 (md 모드): `NN_slug_sampleid.md` 1파일 = 1 청크.
+            md_count = 0
+            for f in d.glob("[0-9][0-9]_*.md"):
+                if f.name.startswith("_"):
+                    continue
+                md_count += 1
+            if md_count > 0:
+                return md_count
+            # 레거시 (json 모드): `NN_slug.json` 의 examples 합산.
             n = 0
             for f in d.glob("[0-9][0-9]_*.json"):
                 try:
@@ -470,6 +544,69 @@ async def tenant_rubric(site_id: str, department: str | None = None) -> JSONResp
     })
 
 
+@app.get("/v2/debug/env")
+async def debug_env_snapshot() -> JSONResponse:
+    """런타임 환경변수 / 동시성 설정 확인용. .env 가 실제 적용됐는지 검증."""
+    import os as _os
+    keys = [
+        "BEDROCK_MODEL_ID",
+        "QA_DEBATE_MAX_PARALLEL",
+        "QA_DEBATE_STAGGER_SEC",
+        "QA_DEBATE_SPEAKER_SELECTION",
+        "QA_DEBATE_MAX_ROUNDS",
+        "QA_DEBATE_ENABLED",
+        "QA_DEBATE_SPREAD_THRESHOLD",
+        "QA_KMS_MAX_WORKERS",
+        "QA_KMS_BEDROCK_MODEL_ID",
+        "BATCH_MAX_CONCURRENT",
+        "SAGEMAKER_MAX_CONCURRENT",
+    ]
+    env_dump = {k: _os.environ.get(k) for k in keys}
+    # 코드 default 도 같이 보여줘 적용 여부 분명히.
+    try:
+        from v2.debate.team import DEFAULT_MODEL_ID as _DEBATE_DEFAULT
+    except Exception:
+        _DEBATE_DEFAULT = None
+    try:
+        from nodes.llm import BEDROCK_MODEL_ID as _LLM_DEFAULT
+    except Exception:
+        _LLM_DEFAULT = None
+    return JSONResponse({
+        "env": env_dump,
+        "code_defaults": {
+            "debate_team.DEFAULT_MODEL_ID": _DEBATE_DEFAULT,
+            "nodes.llm.BEDROCK_MODEL_ID": _LLM_DEFAULT,
+        },
+    })
+
+
+@app.get("/v2/metrics/bedrock")
+async def bedrock_metrics_snapshot() -> JSONResponse:
+    """Bedrock 토큰 사용량 누적 스냅샷 + TPM/RPM 추정 + 모델별 분포.
+
+    평가 1건 시작 전에 POST /v2/metrics/bedrock/reset 호출 → 평가 후 GET 으로 정확한 측정.
+    ★ 2026-05-07: by_model 필드 — 모델별 호출 횟수/토큰 분포 (드롭다운 검증).
+    """
+    from v2.serving.bedrock_metrics import model_breakdown, snapshot
+    snap = snapshot()
+    snap["by_model"] = model_breakdown()
+    return JSONResponse(snap)
+
+
+@app.post("/v2/metrics/bedrock/reset")
+async def bedrock_metrics_reset() -> JSONResponse:
+    """누적 카운터 초기화. 직전 스냅샷을 응답으로 반환."""
+    from v2.serving.bedrock_metrics import reset
+    return JSONResponse({"reset": True, "previous": reset()})
+
+
+@app.get("/v2/metrics/bedrock/trace")
+async def bedrock_metrics_trace(limit: int = 50) -> JSONResponse:
+    """가장 최근 호출 trace (디버깅용)."""
+    from v2.serving.bedrock_metrics import trace
+    return JSONResponse({"trace": trace(limit=max(1, min(limit, 500)))})
+
+
 @app.get("/v2/rag/status")
 async def rag_status() -> JSONResponse:
     """모든 tenant × 모든 RAG 인덱스 도큐먼트 수 매트릭스 + source 비교."""
@@ -544,6 +681,122 @@ async def rag_status() -> JSONResponse:
     return JSONResponse(out)
 
 
+@app.post("/v2/rag/delete-indices")
+async def rag_delete_indices(request: Request) -> JSONResponse:
+    """AOSS 인덱스 삭제 (재빌드 X). 명시적 confirm 강제.
+
+    body:
+      {
+        "confirm": "DELETE_ALL",          # 필수 — 안전장치
+        "indices": ["qa-golden-set", ...] # 선택 — 생략 시 3개 전체
+      }
+
+    반환: {ok, results: [{index, before, after, ok}]}
+    """
+    body = {}
+    try:
+        body = await request.json()
+    except Exception:
+        pass
+    confirm = body.get("confirm")
+    if confirm != "DELETE_ALL":
+        return JSONResponse(
+            {
+                "ok": False,
+                "error": "confirm_required",
+                "hint": 'body 에 {"confirm": "DELETE_ALL"} 명시 필요',
+            },
+            status_code=400,
+        )
+
+    requested = body.get("indices")
+    if not requested:
+        from v2.rag.aoss_store import (
+            GOLDEN_INDEX,
+            KNOWLEDGE_INDEX,
+            REASONING_INDEX,
+        )
+
+        requested = [GOLDEN_INDEX, REASONING_INDEX, KNOWLEDGE_INDEX]
+
+    from v2.rag.aoss_store import AossStore
+
+    results: list[dict] = []
+    for idx_name in requested:
+        try:
+            store = AossStore(idx_name)
+            before = store.index_exists()
+            if not before:
+                results.append({"index": idx_name, "before": False, "after": False, "ok": True, "skipped": True})
+                continue
+            store.delete_index()
+            after = store.index_exists()
+            results.append({"index": idx_name, "before": True, "after": after, "ok": not after})
+        except Exception as e:
+            results.append({"index": idx_name, "error": f"{type(e).__name__}: {e}"})
+
+    all_ok = all(r.get("ok") for r in results if "error" not in r) and not any(
+        "error" in r for r in results
+    )
+    return JSONResponse({"ok": all_ok, "results": results})
+
+
+@app.post("/v2/kms-rag/reset")
+async def kms_rag_reset() -> JSONResponse:
+    """KMS LinearRAG 디스크 캐시 초기화.
+
+    삭제 대상: `%TEMP%/qa_kms_linear_rag/` 전체 (tenant 디렉토리 + sig stamp)
+    + 모듈 레벨 in-process 캐시 (_LINEAR_RAG_INSTANCE / _LINEAR_RAG_CORPUS_SIG)
+
+    다음 KMS 호출 시 md → corpus → 임베딩 재인덱싱 (~ 90초).
+    """
+    import shutil
+    import tempfile
+
+    cache_dir = Path(tempfile.gettempdir()) / "qa_kms_linear_rag"
+    deleted_files = 0
+    deleted_bytes = 0
+    if cache_dir.exists():
+        for p in cache_dir.rglob("*"):
+            if p.is_file():
+                try:
+                    deleted_bytes += p.stat().st_size
+                    deleted_files += 1
+                except OSError:
+                    pass
+        try:
+            shutil.rmtree(cache_dir)
+        except OSError as e:
+            return JSONResponse(
+                {"ok": False, "error": f"cache_remove_failed: {e}", "cache_dir": str(cache_dir)},
+                status_code=500,
+            )
+
+    # 모듈 레벨 in-process 캐시도 invalidate
+    try:
+        from v2.nodes import kms_node as _kms_mod
+
+        _kms_mod._LINEAR_RAG_INSTANCE = None
+        _kms_mod._LINEAR_RAG_CORPUS_SIG = None
+        _kms_mod._TAB_CACHE = None
+        _kms_mod._CACHE_DIR = None
+        in_memory_cleared = True
+    except Exception as e:
+        logger.warning("kms-rag reset: in-memory cache invalidation 실패 — %s", e)
+        in_memory_cleared = False
+
+    return JSONResponse(
+        {
+            "ok": True,
+            "cache_dir": str(cache_dir),
+            "deleted_files": deleted_files,
+            "deleted_bytes": deleted_bytes,
+            "in_memory_cleared": in_memory_cleared,
+            "next_call_will_rebuild": True,
+        }
+    )
+
+
 @app.post("/v2/rag/build")
 async def rag_build(request: Request) -> StreamingResponse:
     """bootstrap_aoss_qa.py 실행 + 진행 SSE 스트리밍.
@@ -564,6 +817,14 @@ async def rag_build(request: Request) -> StreamingResponse:
     department = body.get("department")  # None = 전체 부서
     recreate = bool(body.get("recreate", False))
     clean_tenant = bool(body.get("clean_tenant", False))
+    # 항목별 빌드 — list[int] 또는 콤마 분리 string. 지정 시 해당 item_number 만 인덱싱.
+    raw_items = body.get("item_numbers")
+    item_numbers_csv = ""
+    if raw_items:
+        if isinstance(raw_items, list):
+            item_numbers_csv = ",".join(str(int(x)) for x in raw_items)
+        elif isinstance(raw_items, str):
+            item_numbers_csv = raw_items.strip()
 
     import asyncio as _asyncio
     import subprocess as _subprocess
@@ -582,6 +843,8 @@ async def rag_build(request: Request) -> StreamingResponse:
         args += ["--recreate"]
     if clean_tenant:
         args += ["--clean-tenant"]
+    if item_numbers_csv:
+        args += ["--item-numbers", item_numbers_csv]
 
     def sse(event: str, data: dict[str, Any]) -> str:
         return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
@@ -605,6 +868,7 @@ async def rag_build(request: Request) -> StreamingResponse:
                 "department": department or "ALL",
                 "tenant": site_id or "ALL",  # 레거시 호환
                 "recreate": recreate,
+                "item_numbers": item_numbers_csv or "ALL",
             },
         )
 
@@ -679,46 +943,17 @@ async def gt_scores(sample_id: str, sheet: str | None = None) -> JSONResponse:
     반환: {sample_id, sheet_name, total_score, items[], available_sheets[], match_method, xlsx_path}
       items[i] = {category, item_name, max_score, score, note, item_number}
     """
-    import os as _os
-    import platform as _platform
-    import re as _re
+    # ★ 2026-04-30 S4 fix: GT xlsx 경로 + 시트 매칭을 v2.layer4._gt_loader 단일 헬퍼로 통합.
+    # 이전엔 layer4/gt_comparison.py 와 이 라우트가 동일 알고리즘을 따로 인라인 → drift 위험.
+    from v2.layer4._gt_loader import gt_xlsx_candidates, match_sheet, resolve_gt_xlsx_path
 
-    # 후보 경로 — 환경변수 우선, 없으면 OS 별 기본 경로 순차 탐색.
-    # 2026-04-27: 환경별 분기 — Windows 는 Desktop, Linux(EC2) 는 홈/표준 데이터 디렉토리.
-    _GT_FILENAMES = (
-        "QA정답-STT_기반_통합_상담평가표_v3재평가_fixed.xlsx",
-        "QA정답-STT_기반_통합_상담평가표_v3재평가.xlsx",
-        "코오롱 업무 정확도 auto_qa_criteria.xlsx",
-    )
-    candidates: list[str] = []
-    env_path = _os.environ.get("QA_GT_XLSX_PATH")
-    if env_path:
-        candidates.append(env_path)
-
-    if _platform.system() == "Windows":
-        # 로컬 개발 — 사용자 Desktop
-        _base_dirs = [Path(r"C:\Users\META M\Desktop")]
-    else:
-        # EC2 / Linux — 표준 위치 후보
-        _qa_pipeline_root = Path(__file__).resolve().parent.parent.parent  # qa-pipeline/
-        _base_dirs = [
-            Path.home() / "qa-data",
-            Path("/home/ubuntu/qa-data"),
-            Path("/opt/qa-pipeline/data"),
-            _qa_pipeline_root / "data" / "gt",
-            _qa_pipeline_root / "data",
-        ]
-    for _b in _base_dirs:
-        for _fn in _GT_FILENAMES:
-            candidates.append(str(_b / _fn))
-
-    xlsx_path = next((p for p in candidates if p and Path(p).exists()), None)
+    xlsx_path = resolve_gt_xlsx_path()
 
     if not xlsx_path:
         return JSONResponse(
             {
                 "error": "gt_xlsx_not_found",
-                "tried": [c for c in candidates if c],
+                "tried": gt_xlsx_candidates(),
                 "hint": "환경변수 QA_GT_XLSX_PATH 로 지정하거나 Desktop 에 파일 배치",
             },
             status_code=404,
@@ -733,39 +968,7 @@ async def gt_scores(sample_id: str, sheet: str | None = None) -> JSONResponse:
 
     try:
         sheets = wb.sheetnames
-        match_method = "none"
-        matched: list[str] = []
-
-        # 0) 사용자가 sheet 쿼리 파라미터로 직접 지정
-        if sheet and sheet in sheets:
-            matched = [sheet]
-            match_method = "explicit"
-        else:
-            # 1) suffix 매칭 (V2 호환)
-            target_suffix = f"_{sample_id}"
-            matched = [s for s in sheets if s.endswith(target_suffix)]
-            if matched:
-                match_method = "suffix"
-            else:
-                # 2) 단순 포함 매칭
-                matched = [s for s in sheets if sample_id in s]
-                if matched:
-                    match_method = "contains"
-                else:
-                    # 3) 숫자만 비교 (앞 0 패딩 무시) — sample_id "4" / 시트 "_004" 매칭
-                    sid_digits = _re.sub(r"\D", "", sample_id) or sample_id
-                    sid_int: int | None = None
-                    try:
-                        sid_int = int(sid_digits) if sid_digits else None
-                    except (ValueError, TypeError):
-                        sid_int = None
-                    if sid_int is not None:
-                        for s in sheets:
-                            nums = _re.findall(r"\d+", s)
-                            if any(int(n) == sid_int for n in nums if n):
-                                matched.append(s)
-                        if matched:
-                            match_method = "digits"
+        matched, match_method = match_sheet(sheets, sample_id, explicit_sheet=sheet)
 
         if not matched:
             return JSONResponse(
@@ -787,12 +990,16 @@ async def gt_scores(sample_id: str, sheet: str | None = None) -> JSONResponse:
         cur_idx = 0
         current_category: str | None = None
 
-        for r in range(6, 50):
-            cat_cell = ws.cell(row=r, column=1).value
-            item_name = ws.cell(row=r, column=2).value
-            max_score = ws.cell(row=r, column=4).value
-            score = ws.cell(row=r, column=5).value
-            note = ws.cell(row=r, column=6).value
+        # ★ 2026-05-08 perf: 셀 단위 ws.cell(r,c) 호출은 openpyxl read-only 에서
+        # 매 호출마다 XML 처음부터 재스트리밍 → 44행 × 5컬 = 220회 호출에 ~155ms.
+        # iter_rows(values_only=True) 1회 호출은 동일 범위를 ~0ms 에 처리 (~150x 가속).
+        rows_iter = ws.iter_rows(min_row=6, max_row=49, min_col=1, max_col=6, values_only=True)
+        for row_vals in rows_iter:
+            cat_cell = row_vals[0] if len(row_vals) > 0 else None
+            item_name = row_vals[1] if len(row_vals) > 1 else None
+            max_score = row_vals[3] if len(row_vals) > 3 else None
+            score = row_vals[4] if len(row_vals) > 4 else None
+            note = row_vals[5] if len(row_vals) > 5 else None
 
             if cat_cell and isinstance(cat_cell, str) and "총점" in cat_cell:
                 break
@@ -1202,6 +1409,9 @@ def _build_initial_state(body: dict[str, Any]) -> dict[str, Any]:
             },
         ),
         "plan": body.get("plan") or {},
+        # KMS 인텐트 분류 모드 — "llm" (기본, Sonnet 4.6) | "linear_rag" (Tri-Graph 대안).
+        # 프론트 토글에서 사용자가 선택.
+        "kms_intent_mode": (body.get("kms_intent_mode") or "llm").strip().lower(),
     }
 
 
@@ -1349,6 +1559,10 @@ def _apply_debate_overrides(
         judge_deductions = rec.get("judge_deductions") or []
         judge_evidence = rec.get("judge_evidence") or []
         judge_human_cases = rec.get("judge_human_cases") or []
+        # ★ 2026-04-30: 페르소나 토론에서 참조한 HITL 사례 (frontend 노드 드로어 표시용).
+        persona_hitl_cases = rec.get("persona_hitl_cases") or []
+        # ★ 2026-05-07: 페르소나 RAG 검색 query — frontend 노드 드로어 "검색어" 노출.
+        persona_rag_query = rec.get("persona_rag_query")
         # 점수가 final_score 로 갱신되면 deductions / evidence 도 정합화해야 한다.
         # 이전에는 score 만 덮어쓰고 deductions 는 페르소나 1차 + Layer3 OVERRIDE 누적분을
         # 그대로 남겨서, 판사가 만점(=감점 0) 으로 올린 케이스에 빈 reason -3 + OVERRIDE -10
@@ -1377,15 +1591,9 @@ def _apply_debate_overrides(
             return list(orig), list(ev_lines)
 
         # 판사 성공 시 judgment / summary 도 판사 reasoning 으로 교체.
-        # 이전에는 페르소나 1차 판정 텍스트 (예: "7점 부여") 가 그대로 남아 score=10 인데
-        # judgment 는 7점 설명이라 사용자가 모순 지적. 판사가 HITL 사례로 점수를 바꿨으면
-        # 그 reasoning (HITL 기반 판단) 이 화면에 노출되어야 함.
+        # ★ 2026-04-30: 판사는 RAG/HITL 미사용. HITL 헤더 prepend 제거.
         def _judgment_text() -> str | None:
             if judge_succeeded and judge_reasoning:
-                # HITL 채택 케이스를 사용자가 식별할 수 있게 헤더 prepend
-                hitl_count = len(judge_human_cases or [])
-                if hitl_count:
-                    return f"🎭 [판사 판정 · HITL {hitl_count}건 참조] {judge_reasoning}"
                 return f"🎭 [판사 판정] {judge_reasoning}"
             return None  # None = 기존 judgment 유지
 
@@ -1412,6 +1620,8 @@ def _apply_debate_overrides(
             new_inner["judge_deductions"] = judge_deductions
             new_inner["judge_evidence"] = judge_evidence
             new_inner["judge_human_cases"] = judge_human_cases
+            new_inner["persona_hitl_cases"] = persona_hitl_cases
+            new_inner["persona_rag_query"] = persona_rag_query
             new_ev["evaluation"] = new_inner
         else:
             orig_deds = new_ev.get("deductions") or []
@@ -1432,12 +1642,17 @@ def _apply_debate_overrides(
             new_ev["judge_deductions"] = judge_deductions
             new_ev["judge_evidence"] = judge_evidence
             new_ev["judge_human_cases"] = judge_human_cases
+            new_ev["persona_hitl_cases"] = persona_hitl_cases
+            new_ev["persona_rag_query"] = persona_rag_query
         out.append(new_ev)
     return out
 
 
 def _extract_response(final_state: dict[str, Any]) -> dict[str, Any]:
-    """응답 payload — V2 orchestrator / preprocessing / evaluations / report / gt_comparison."""
+    """응답 payload — V2 orchestrator / preprocessing / evaluations / report / gt_comparison.
+
+    kms_evaluation 은 별도 필드로 분리 노출 — 통합 보고서와 *섞이지 않고* 독립 표시.
+    """
     debates = final_state.get("debates") or {}
     evaluations = _apply_debate_overrides(final_state.get("evaluations"), debates)
     return {
@@ -1452,7 +1667,28 @@ def _extract_response(final_state: dict[str, Any]) -> dict[str, Any]:
         "node_timings": final_state.get("node_timings"),
         "gt_comparison": final_state.get("gt_comparison"),
         "gt_evidence_comparison": final_state.get("gt_evidence_comparison"),
+        # KMS 평가 — 별도 보고서 (통합 report 와 분리). 프론트가 별도 섹션/탭 으로 렌더.
+        "kms_evaluation": final_state.get("kms_evaluation"),
+        # ★ 2026-05-08: report_narrator 산출 — 그래프 끝에서 모든 노드 데이터를 종합한
+        # LLM 자연어 마무리 결론 + 코칭. 프론트가 보고서 끝에 "AI 마무리 총평" 카드로 표시.
+        "report_llm_summary": final_state.get("report_llm_summary"),
+        # ★ 2026-05-08: Cohere Rerank 3.5 호출 통계 + 메타 — 프론트 신호등 표시용.
+        # {enabled, model, region, calls, success, fail, actually_active, last_error, ...}
+        "reranker_runtime": _build_reranker_runtime(),
     }
+
+
+def _build_reranker_runtime() -> dict[str, Any] | None:
+    """현재 contextvar 의 reranker 메타 + stats 합쳐 응답에 포함."""
+    try:
+        from v2.rag import get_reranker_meta, get_reranker_stats
+    except ImportError:
+        return None
+    meta = get_reranker_meta() or {}
+    stats = get_reranker_stats() or {}
+    if not meta and not stats:
+        return None
+    return {**meta, **stats}
 
 
 @app.post("/evaluate")
@@ -1491,21 +1727,88 @@ async def evaluate(request: Request) -> JSONResponse:
     except Exception:  # noqa: BLE001
         pass
 
+    # 전역 RAG 비활성 토글 (사용자 비교 실험용). body 또는 plan 에서 둘 다 받음.
+    # contextvar 는 task 트리 안에서 자동 전파 → 모든 RAG 진입점이 빈 결과 반환.
+    from v2.rag import (
+        reset_rag_disabled,
+        reset_reranker_enabled,
+        reset_reranker_stats,
+        set_rag_disabled,
+        set_reranker_enabled,
+        init_reranker_stats,
+        get_reranker_stats,
+        get_reranker_meta,
+    )
+    from v2.rag.reranker import (
+        reset_reranker_llm_model,
+        reset_reranker_provider,
+        set_reranker_llm_model,
+        set_reranker_provider,
+    )
+
+    _disable_rag = bool(body.get("disable_rag")) or bool(
+        (body.get("plan") or {}).get("disable_rag")
+    )
+    _rag_token = set_rag_disabled(_disable_rag)
+    if _disable_rag:
+        logger.info("evaluate: RAG 전역 비활성 모드 — 모든 RAG 호출 SKIPPED")
+
+    # Reranker 토글 — body.reranker_enabled 또는 plan.reranker_enabled.
+    _reranker_enabled = bool(body.get("reranker_enabled")) or bool(
+        (body.get("plan") or {}).get("reranker_enabled")
+    )
+    _reranker_token = set_reranker_enabled(_reranker_enabled)
+    # Reranker provider — body.reranker_provider 또는 plan.reranker_provider.
+    # "cohere" / "llm" 만 허용. 미지정/알수없는 값이면 LLM (Haiku 4.5) 기본.
+    _reranker_provider = (
+        body.get("reranker_provider")
+        or (body.get("plan") or {}).get("reranker_provider")
+        or "llm"
+    )
+    _reranker_provider_token = set_reranker_provider(str(_reranker_provider))
+    # 2026-05-08: LLM rerank 시 사용자가 선택한 bedrock model 따라가게.
+    # body.reranker_llm_model 명시값 우선, 없으면 body.bedrock_model_id 폴백.
+    _reranker_llm_model = (
+        body.get("reranker_llm_model")
+        or body.get("bedrock_model_id")
+        or (body.get("plan") or {}).get("bedrock_model_id")
+        or None
+    )
+    _reranker_llm_model_token = set_reranker_llm_model(_reranker_llm_model)
+    _reranker_stats_token = init_reranker_stats()
+    if _reranker_enabled:
+        logger.info(
+            "evaluate: Reranker 활성화 (provider=%s, model=%s) — RAG 후처리 재정렬",
+            _reranker_provider, _reranker_llm_model or "(default)",
+        )
+
     t0 = time.time()
     try:
         final_state = await graph.ainvoke(initial)
     except Exception as e:
         logger.exception("evaluate 실패")
         return JSONResponse({"error": "graph_invoke_failed", "detail": str(e)}, status_code=500)
+    finally:
+        reset_rag_disabled(_rag_token)
+        # reranker stats 는 응답 빌드 후에 reset 해야 stats 캡처 가능 — 아래에서 처리
+        pass
 
     elapsed = round(time.time() - t0, 2)
     response = _extract_response(final_state)
+    _rer_stats = get_reranker_stats() or {}
     response["_meta"] = {
         "pipeline": "v2",
         "elapsed_sec": elapsed,
         "session_id": initial["session_id"],
         "persona_mode": _persona_applied,
+        "rag_disabled": _disable_rag,
+        "reranker": {**get_reranker_meta(), **_rer_stats, "enabled": _reranker_enabled},
     }
+    # 토큰 reset — 다음 요청 영향 없게.
+    reset_reranker_enabled(_reranker_token)
+    reset_reranker_provider(_reranker_provider_token)
+    reset_reranker_llm_model(_reranker_llm_model_token)
+    reset_reranker_stats(_reranker_stats_token)
     return JSONResponse(response)
 
 
@@ -1537,6 +1840,7 @@ _LAYER2_SUB_AGENTS = (
     "proactiveness",
     "work_accuracy",
     "privacy",
+    "kms",  # KMS 도 Layer 2 와 병렬 fan-out — sub-agent 와 동급 phase 분류
 )
 # 신한 부서특화 dept 노드 — base 8 외 동적 fan-out 대상 (Layer 2 phase 분류에 포함)
 try:
@@ -1617,6 +1921,42 @@ def _preview_text(text: str | None, limit: int = 400) -> str | None:
     if len(s) <= limit:
         return s
     return s[:limit] + f"... (+{len(s) - limit} chars)"
+
+
+def _trim_evidence_lists_inplace(payload: Any, max_evidence_per_item: int = 5) -> None:
+    """SSE result 페이로드의 evaluations[].evidence 리스트를 항목당 max 5건으로 컷.
+
+    ★ 2026-04-30 S1 fix: 단일 SSE 이벤트 5MB 누적 방지. evidence 가 항목당 수십~수백 건
+    있으면 final result event 가 거대해져 client disconnect. UI 는 어차피 상위 5건만 표시.
+    """
+    if not isinstance(payload, dict):
+        return
+    evals = payload.get("evaluations")
+    if isinstance(evals, list):
+        for item in evals:
+            if not isinstance(item, dict):
+                continue
+            inner = item.get("evaluation") if isinstance(item.get("evaluation"), dict) else item
+            ev = inner.get("evidence") if isinstance(inner, dict) else None
+            if isinstance(ev, list) and len(ev) > max_evidence_per_item:
+                inner["evidence"] = ev[:max_evidence_per_item]
+                inner["_evidence_truncated"] = len(ev)
+    # report.categories[].items[].evidence 도 동일 처리
+    report = payload.get("report")
+    if isinstance(report, dict):
+        cats = report.get("categories")
+        if isinstance(cats, list):
+            for cat in cats:
+                if not isinstance(cat, dict):
+                    continue
+                citems = cat.get("items")
+                if not isinstance(citems, list):
+                    continue
+                for it in citems:
+                    ev = it.get("evidence") if isinstance(it, dict) else None
+                    if isinstance(ev, list) and len(ev) > max_evidence_per_item:
+                        it["evidence"] = ev[:max_evidence_per_item]
+                        it["_evidence_truncated"] = len(ev)
 
 
 def _sanitize_trace_output(result: Any, depth: int = 0) -> Any:
@@ -1765,11 +2105,15 @@ def _node_item_scores(node: str, delta: dict[str, Any]) -> list[dict[str, Any]]:
     return out
 
 
-async def _build_stream_events(body: dict[str, Any], graph: Any):
+async def _build_stream_events(body: dict[str, Any], graph: Any, request: Request | None = None):
     """graph.astream(updates) 기반 실시간 SSE 이벤트.
 
     body / graph 는 엔드포인트에서 선처리 후 전달 — 제너레이터 내부에서 `await request.json()`
     을 호출하면 첫 `yield` 이후 본문 read 가 블록되어 SSE 스트림이 정지하는 문제가 있음.
+
+    request 가 주어지면 클라이언트 disconnect 를 1초 간격으로 폴링 → 감지 시 graph.astream
+    iterator 를 aclose 해서 진행 중인 노드(LangGraph task pool) 까지 cancel 전파.
+    프론트 "중단" 버튼이 fetch.abort() 호출 → TCP 끊김 → 여기서 감지.
 
     V3 interactive discussion:
       - 사전 바인드된 asyncio.Queue 를 통해 debate 노드 내부 (sync, thread pool) 의 실시간
@@ -1835,6 +2179,59 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
     # (JSON /evaluate 와 동일한 공통 헬퍼 호출)
     _apply_persona_mode_override(initial)
 
+    # 전역 RAG 비활성 토글 — body.disable_rag 또는 plan.disable_rag.
+    # contextvar 는 graph.astream task 트리에 자동 전파되어 모든 RAG 호출이 SKIPPED 됨.
+    from v2.rag import (
+        reset_rag_disabled,
+        reset_reranker_enabled,
+        reset_reranker_stats,
+        set_rag_disabled,
+        set_reranker_enabled,
+        init_reranker_stats,
+        get_reranker_stats,
+        get_reranker_meta,
+    )
+    from v2.rag.reranker import (
+        reset_reranker_llm_model,
+        reset_reranker_provider,
+        set_reranker_llm_model,
+        set_reranker_provider,
+    )
+
+    _disable_rag = bool(body.get("disable_rag")) or bool(
+        (body.get("plan") or {}).get("disable_rag")
+    )
+    _rag_token = set_rag_disabled(_disable_rag)
+    if _disable_rag:
+        logger.info("evaluate/stream: RAG 전역 비활성 모드 — 모든 RAG 호출 SKIPPED")
+
+    # Reranker 토글 (SSE stream)
+    _reranker_enabled = bool(body.get("reranker_enabled")) or bool(
+        (body.get("plan") or {}).get("reranker_enabled")
+    )
+    _reranker_token = set_reranker_enabled(_reranker_enabled)
+    # Reranker provider — body.reranker_provider, 미지정 시 LLM 기본.
+    _reranker_provider = (
+        body.get("reranker_provider")
+        or (body.get("plan") or {}).get("reranker_provider")
+        or "llm"
+    )
+    _reranker_provider_token = set_reranker_provider(str(_reranker_provider))
+    # LLM rerank 모델 — body.reranker_llm_model 또는 body.bedrock_model_id 폴백.
+    _reranker_llm_model = (
+        body.get("reranker_llm_model")
+        or body.get("bedrock_model_id")
+        or (body.get("plan") or {}).get("bedrock_model_id")
+        or None
+    )
+    _reranker_llm_model_token = set_reranker_llm_model(_reranker_llm_model)
+    _reranker_stats_token = init_reranker_stats()
+    if _reranker_enabled:
+        logger.info(
+            "evaluate/stream: Reranker 활성화 (provider=%s, model=%s)",
+            _reranker_provider, _reranker_llm_model or "(default)",
+        )
+
     # ── V3 interactive discussion 실시간 이벤트 큐 ────────────────────────────
     # debate_node 는 sync 노드이고 LangGraph 가 threadpool 에서 실행하므로,
     # 실시간 SSE 푸시를 위해 asyncio.Queue + call_soon_threadsafe 로 브릿지.
@@ -1853,6 +2250,12 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
         "vote_cast",
         "discussion_round_complete",
         "discussion_finalized",
+        # KMS 노드 라이브 진행 — 인텐트 분류 즉시 / 점수 산출 즉시 노드 sub 갱신
+        "kms_intent_detected",
+        "kms_score_progress",
+        # 2026-05-08: Layer2 sub-agent / 토론 RAG 검색 직후 hits 라이브 푸시
+        # → 프론트 NodeDrawer 가 LLM 평가/토론 끝까지 기다리지 않고 즉시 표시.
+        "rag_hits_ready",
         # 서버 로그 스트리밍 — 백엔드 콘솔에 찍히는 Bedrock 호출/LLM req·res 등
         "log",
     }
@@ -2034,39 +2437,58 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
                     started_emitted.add("layer4")
                 last_phase = "layer4"
             else:
-                # Layer 2 fan-out → 활성 Sub Agent 들 동시 started 로 표시.
-                # 신한 부서일 때 work_accuracy 빠지고 dept 노드 (coll_accuracy 등) 추가됨.
-                # graph_v2 의 _resolve_active_sub_agents 와 동일한 룰.
-                site_id = accum.get("site_id") or accum.get("tenant_id") or "generic"
-                dept = accum.get("department") or accum.get("team_id")
-                active_subs: list[str] = list(_LAYER2_SUB_AGENTS)
-                if site_id == "shinhan" and dept and _DEPT_SUB_AGENTS:
-                    try:
-                        from v2.agents.shinhan_dept.registry import get_dept_nodes_for_tenant
-                        dept_nodes = get_dept_nodes_for_tenant(site_id, dept)
-                    except Exception:
-                        dept_nodes = []
-                    if dept_nodes:
-                        # work_accuracy 제외 + dept 노드 추가
-                        active_subs = [n for n in active_subs if n != "work_accuracy"] + list(dept_nodes)
-
+                # 새 토폴로지: layer1 → kms (단일) → kms 완료 후 sub-agent fan-out.
+                # layer1 완료 시점에는 KMS 만 "started" 로 표시. sub-agent 들은 KMS 완료 후 emit.
                 events.append(
                     sse(
                         "routing",
                         {
                             "phase": "layer2",
                             "phase_label": phase_labels["layer2"],
-                            "next_node": "__parallel__",
-                            "next_label": f"Layer 2 · Fan-out ({len(active_subs)} Sub Agents)",
+                            "next_node": "kms",
+                            "next_label": "Layer 2 · KMS (인텐트 분류 + 평가)",
                         },
                     )
                 )
-                for sub_agent in active_subs:
-                    if sub_agent not in started_emitted:
-                        events.append(sse("status", {"node": sub_agent, "status": "started"}))
-                        node_start[sub_agent] = time.time()
-                        started_emitted.add(sub_agent)
+                if "kms" not in started_emitted:
+                    events.append(sse("status", {"node": "kms", "status": "started"}))
+                    node_start["kms"] = time.time()
+                    started_emitted.add("kms")
                 last_phase = "layer2"
+
+        elif completed_node == "kms":
+            # KMS 완료 → Layer 2 sub-agent 8개 (+ dept) fan-out 시작.
+            # graph_v2 의 _resolve_active_sub_agents 와 동일한 룰.
+            site_id = accum.get("site_id") or accum.get("tenant_id") or "generic"
+            dept = accum.get("department") or accum.get("team_id")
+            active_subs: list[str] = [n for n in _LAYER2_SUB_AGENTS if n != "kms"]
+            if site_id == "shinhan" and dept and _DEPT_SUB_AGENTS:
+                try:
+                    from v2.agents.shinhan_dept.registry import get_dept_nodes_for_tenant
+                    dept_nodes = get_dept_nodes_for_tenant(site_id, dept)
+                except Exception:
+                    dept_nodes = []
+                if dept_nodes:
+                    # work_accuracy 제외 + dept 노드 추가
+                    active_subs = [n for n in active_subs if n != "work_accuracy"] + list(dept_nodes)
+
+            events.append(
+                sse(
+                    "routing",
+                    {
+                        "phase": "layer2",
+                        "phase_label": phase_labels["layer2"],
+                        "next_node": "__parallel__",
+                        "next_label": f"Layer 2 · Fan-out ({len(active_subs)} Sub Agents)",
+                    },
+                )
+            )
+            for sub_agent in active_subs:
+                if sub_agent not in started_emitted:
+                    events.append(sse("status", {"node": sub_agent, "status": "started"}))
+                    node_start[sub_agent] = time.time()
+                    started_emitted.add(sub_agent)
+            last_phase = "layer2"
 
         elif completed_node == "layer2_barrier":
             # Layer 2 barrier 완료 → Layer 3 진입 (프론트: orchestrator_v2)
@@ -2146,6 +2568,21 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
     _graph_next_task: asyncio.Task | None = None
     _rt_next_task: asyncio.Task | None = None
 
+    # 클라이언트 disconnect watcher — fetch.abort() 로 TCP 가 끊기면 1초 안에 감지.
+    _client_disconnected = [False]
+    _disconnect_task: asyncio.Task | None = None
+    if request is not None:
+        async def _watch_disconnect():
+            try:
+                while True:
+                    if await request.is_disconnected():
+                        return
+                    await asyncio.sleep(1.0)
+            except asyncio.CancelledError:
+                raise
+
+        _disconnect_task = asyncio.ensure_future(_watch_disconnect())
+
     try:
         while not _graph_done or not _rt_event_queue.empty():
             if _graph_next_task is None and not _graph_done:
@@ -2153,7 +2590,7 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
             if _rt_next_task is None:
                 _rt_next_task = asyncio.ensure_future(_rt_event_queue.get())
 
-            pending = [t for t in (_graph_next_task, _rt_next_task) if t is not None]
+            pending = [t for t in (_graph_next_task, _rt_next_task, _disconnect_task) if t is not None]
             if not pending:
                 break
             # idle 시 15초 간격으로 keepalive 를 보내 프록시/브라우저 disconnect 방지.
@@ -2163,6 +2600,28 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
                 # 타임아웃 — 아무 태스크도 완료 안 됨. keepalive 푸시하고 계속 대기.
                 yield sse_keepalive()
                 continue
+
+            # ── 클라이언트 disconnect 감지 시 즉시 정리 + 종료 ──
+            if _disconnect_task is not None and _disconnect_task in done:
+                _client_disconnected[0] = True
+                logger.warning(
+                    "⚠️ CLIENT DISCONNECT — /evaluate/stream aborting "
+                    "(session=%s sample=%s)",
+                    initial.get("session_id"),
+                    body.get("gt_sample_id") or body.get("sample_id") or "?",
+                )
+                # graph iterator 닫기 → 진행 중인 LangGraph 노드 task 들에 CancelledError 전파.
+                try:
+                    await _astream_iter.aclose()
+                except Exception:
+                    pass
+                # 남은 race task 정리.
+                for _t in (_graph_next_task, _rt_next_task):
+                    if _t is not None and not _t.done():
+                        _t.cancel()
+                _disconnect_task = None
+                # finally 블록이 나머지 정리 처리 — 프론트는 이미 읽지 않으므로 yield 스킵.
+                return
 
             # ── realtime 이벤트 먼저 드레인 (프론트 반응성 우선) ──
             if _rt_next_task in done:
@@ -2241,6 +2700,8 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
                                 "vote_cast",
                                 "discussion_round_complete",
                                 "discussion_finalized",
+                                # 2026-05-08: 토론 단계 RAG hits 도 _debate_events 버퍼 경유로 흐를 수 있어 허용
+                                "rag_hits_ready",
                             }
                             _flushed = 0
                             for ev in debate_events:
@@ -2287,6 +2748,14 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
                     # 노드 완료 status 이벤트 — 프론트 노드 이름으로 확장 emit
                     scores = _node_item_scores(node, delta)
                     frontend_targets = _frontend_node_names(node)
+                    # ★ KMS 노드는 slim trace 가 dict 값을 메타로 치환하므로 풀 데이터를
+                    #    status payload 에 직접 첨부 (프론트가 NodeDrawer 즉시 렌더 가능).
+                    kms_eval_full: dict | None = None
+                    if node == "kms":
+                        kms_eval_full = (
+                            (delta or {}).get("kms_evaluation")
+                            or (accum or {}).get("kms_evaluation")
+                        )
                     for fe_name in frontend_targets:
                         started = node_start.get(fe_name, node_start.get(node, time.time()))
                         elapsed = round(time.time() - started, 2)
@@ -2299,6 +2768,8 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
                         if scores and fe_name == frontend_targets[-1]:
                             # 점수는 마지막 프론트 노드에만 첨부 (중복 방지)
                             status_payload["scores"] = scores
+                        if kms_eval_full and fe_name == frontend_targets[-1]:
+                            status_payload["kms_evaluation"] = kms_eval_full
                         yield sse("status", status_payload)
 
                     # node_trace 이벤트 — 프론트 Trace 탭 입력용
@@ -2335,7 +2806,7 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
             accum.get("completed_nodes") or [],
         )
         logger.info("=" * 78)
-        for _t in (_graph_next_task, _rt_next_task):
+        for _t in (_graph_next_task, _rt_next_task, _disconnect_task):
             if _t is not None and not _t.done():
                 _t.cancel()
         return
@@ -2347,11 +2818,35 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
             _rt_next_task.cancel()
         if _graph_next_task is not None and not _graph_next_task.done():
             _graph_next_task.cancel()
+        if _disconnect_task is not None and not _disconnect_task.done():
+            _disconnect_task.cancel()
         # SSE log handler detach — 다음 요청에 끌려가지 않게 반드시 제거.
         try:
             for _lg in _log_attached_loggers:
                 _lg.removeHandler(_sse_log_handler)
             logger.info("📡 SSE log streaming 종료 — 전송 %d건", _log_seen[0])
+        except Exception:
+            pass
+        # RAG 비활성 토글 contextvar 복원 — 다음 요청이 영향 안 받게.
+        try:
+            reset_rag_disabled(_rag_token)
+        except Exception:
+            pass
+        # Reranker 토글 + provider + LLM model + stats contextvar 복원.
+        try:
+            reset_reranker_enabled(_reranker_token)
+        except Exception:
+            pass
+        try:
+            reset_reranker_provider(_reranker_provider_token)
+        except Exception:
+            pass
+        try:
+            reset_reranker_llm_model(_reranker_llm_model_token)
+        except Exception:
+            pass
+        try:
+            reset_reranker_stats(_reranker_stats_token)
         except Exception:
             pass
 
@@ -2373,7 +2868,14 @@ async def _build_stream_events(body: dict[str, Any], graph: Any):
         "tenant_id": initial.get("tenant_id") or "generic",
     }
 
-    # result 이벤트 — 최종 리포트/평가 전체 payload
+    # ★ 2026-04-30 S1 fix: result 이벤트 payload 슬림화.
+    # 이전엔 final_state 전체 (node_traces 2~5MB + 18 evaluations × evidence 다수) 가
+    # 단일 SSE 이벤트로 푸시 → uvicorn h11 가 64KB 청크로 쪼개는 동안 client idle disconnect.
+    # node_traces 는 result 페이로드에서 제거 (개별 node_trace 이벤트로 이미 streaming),
+    # evaluations[].evidence 는 항목당 max 5건으로 컷.
+    response.pop("node_traces", None)
+    _trim_evidence_lists_inplace(response)
+
     logger.info("SSE stream: result emit (session=%s, elapsed=%.2fs)", initial.get("session_id"), elapsed_total)
     yield sse("result", response)
 
@@ -2419,7 +2921,7 @@ async def evaluate_stream(request: Request) -> StreamingResponse:
         return StreamingResponse(_graph_error(), media_type="text/event-stream")
 
     return StreamingResponse(
-        _build_stream_events(body, graph),
+        _build_stream_events(body, graph, request),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache, no-transform", "X-Accel-Buffering": "no", "Connection": "keep-alive"},
     )
@@ -2574,6 +3076,287 @@ async def review_queue(status: str = "pending", force_t3_only: bool = False, lim
         return JSONResponse({"error": "queue_failed", "detail": str(e)}, status_code=500)
 
 
+@app.get("/v2/drift/stats")
+async def drift_stats(days: int = 7) -> JSONResponse:
+    """운영 통계 — human_reviews 테이블 실시간 집계.
+
+    ★ 2026-05-07: MAE 산출 기준이 human_score → gt_score 로 변경.
+    GT (정답표 xlsx) 는 평가 즉시 비교 가능 → 검수 누적 기다리지 않음.
+    검수자 수정률 / Tier 분포는 기존대로 human_score 기반 유지.
+
+    응답 스키마:
+      - summary             : {n, mae, rmse, bias, mape, accuracy, exact_rate, close_rate}
+      - mae_trend           : 일별 MAE (vs GT)
+      - by_model            : 모델별 MAE/RMSE/Bias/Accuracy/n — Sonnet vs DeepSeek vs Nova 비교
+      - by_item             : 평가항목 (#1~#18) 별 MAE/Accuracy/n — 어느 항목이 잘 맞나
+      - score_agreement     : exact(Δ=0) / close(Δ=1) / wide(Δ≥2) 분포
+      - reviewer_revisions  : 강(Δ≥3)/약(Δ=1~2)/무(Δ=0) — confirmed 행만
+      - tier_history        : 일별 T0~T3 비율
+      - empty / period_days / total_reviews / total_with_gt / total_confirmed
+    """
+    try:
+        _ensure_hitl_db()
+        import math
+        from datetime import datetime as _dt, timedelta as _td, timezone as _tz
+        from v2.hitl import db as _hitl_db
+
+        period_days = max(1, min(int(days), 90))
+        cutoff = (_dt.now(_tz.utc) - _td(days=period_days)).isoformat(timespec="seconds")
+
+        with _hitl_db.get_conn() as conn:
+            # ── 카운트 ─────────────────────────────────────
+            total_reviews = int(conn.execute(
+                "SELECT COUNT(*) AS c FROM human_reviews WHERE created_at >= ?", (cutoff,)
+            ).fetchone()["c"])
+            total_with_gt = int(conn.execute(
+                "SELECT COUNT(*) AS c FROM human_reviews WHERE created_at >= ? AND ai_score IS NOT NULL AND gt_score IS NOT NULL",
+                (cutoff,),
+            ).fetchone()["c"])
+            total_confirmed = int(conn.execute(
+                "SELECT COUNT(*) AS c FROM human_reviews WHERE created_at >= ? AND status='confirmed'",
+                (cutoff,),
+            ).fetchone()["c"])
+
+            # ── 비교 데이터 한 번에 로드 ──
+            # ★ 2026-05-07: gt_score 없으면 human_score 로 fallback. 둘 다 없으면 제외.
+            # reference_kind 컬럼으로 어느 기준 썼는지 추적.
+            raw_rows = conn.execute(
+                """
+                SELECT substr(created_at, 6, 5) AS d,
+                       ai_score, gt_score, human_score,
+                       model_id, item_number, status
+                FROM human_reviews
+                WHERE ai_score IS NOT NULL
+                  AND (gt_score IS NOT NULL OR human_score IS NOT NULL)
+                  AND created_at >= ?
+                """,
+                (cutoff,),
+            ).fetchall()
+            # reference_score 결정 — gt_score 우선
+            gt_rows: list[dict[str, Any]] = []
+            ref_kind_count = {"gt": 0, "human": 0}
+            for r in raw_rows:
+                gs = r["gt_score"]
+                hs = r["human_score"]
+                ref = gs if gs is not None else hs
+                kind = "gt" if gs is not None else "human"
+                if ref is None:
+                    continue
+                ref_kind_count[kind] += 1
+                gt_rows.append({
+                    "d": r["d"],
+                    "ai_score": r["ai_score"],
+                    "gt_score": float(ref),  # reference (gt 우선, fallback=human)
+                    "model_id": r["model_id"],
+                    "item_number": r["item_number"],
+                })
+
+            # ── 전체 요약 (summary) — 직관적 지표 위주 ──
+            # MAE: 평균 점수 차이 (낮을수록 GT 와 가까움)
+            # 과대/과소/정확 비율: LLM 이 GT 보다 높게/낮게/똑같이 줬는지 (직관)
+            # bias: AI - GT 평균 (양수 = LLM 이 평균적으로 더 후함)
+            # gap_distribution: 점수 차이 별 건수 (-3 ~ +3, ±4 이상은 끝값)
+            n = len(gt_rows)
+            sum_abs = sum_sq = sum_signed = sum_pct = 0.0
+            over = under = match = 0   # AI > GT / AI < GT / AI == GT
+            exact = close = wide = 0
+            gap_dist = {-4: 0, -3: 0, -2: 0, -1: 0, 0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+            for r in gt_rows:
+                ai = float(r["ai_score"]); gt = float(r["gt_score"])
+                d = ai - gt
+                sum_abs += abs(d)
+                sum_sq += d * d
+                sum_signed += d
+                if gt != 0:
+                    sum_pct += abs(d) / abs(gt) * 100
+                # 방향성 카운트
+                if d > 0.5:
+                    over += 1
+                elif d < -0.5:
+                    under += 1
+                else:
+                    match += 1
+                # 점수차 분포 (정수 round → ±4 cap)
+                gd = max(-4, min(4, int(round(d))))
+                gap_dist[gd] = gap_dist.get(gd, 0) + 1
+                ad = abs(d)
+                if ad < 0.5: exact += 1
+                elif ad < 1.5: close += 1
+                else: wide += 1
+            summary = {
+                "n": n,
+                "mae": round(sum_abs / n, 3) if n else 0.0,
+                "rmse": round(math.sqrt(sum_sq / n), 3) if n else 0.0,
+                "bias": round(sum_signed / n, 3) if n else 0.0,
+                "mape": round(sum_pct / n, 2) if n else 0.0,
+                # ★ 사용자 직관 지표
+                "over_rate": round(over / n * 100, 1) if n else 0.0,   # LLM 이 GT 보다 후함 (%)
+                "under_rate": round(under / n * 100, 1) if n else 0.0, # LLM 이 GT 보다 엄격함 (%)
+                "match_rate": round(match / n * 100, 1) if n else 0.0, # 일치 (±0.5)
+                "tendency": (
+                    "후함" if over > under * 1.5 else
+                    "엄격" if under > over * 1.5 else
+                    "균형"
+                ),
+                "exact_rate": round(exact / n * 100, 1) if n else 0.0,  # ±0.5
+                "close_rate": round((exact + close) / n * 100, 1) if n else 0.0,  # ±1점 이내
+                "accuracy": round(exact / n * 100, 1) if n else 0.0,
+            }
+            # gap_distribution → list (프론트 차트용)
+            gap_distribution = [
+                {"delta": k, "count": gap_dist[k], "label": (f"AI {'>' if k > 0 else '<'} GT {abs(k)}점" if k != 0 else "AI = GT")}
+                for k in sorted(gap_dist.keys())
+            ]
+
+            # ── 일별 MAE 추이 ──
+            from collections import defaultdict
+            day_buckets: dict[str, list[float]] = defaultdict(list)
+            for r in gt_rows:
+                day_buckets[r["d"]].append(abs(float(r["ai_score"]) - float(r["gt_score"])))
+            mae_trend = [
+                {"date": d, "mae": round(sum(diffs) / len(diffs), 3), "n": len(diffs)}
+                for d, diffs in sorted(day_buckets.items())
+            ]
+
+            # ── 모델별 통계 (직관 지표 추가) ──
+            model_buckets: dict[str, list[tuple[float, float]]] = defaultdict(list)
+            for r in gt_rows:
+                m = r["model_id"] or "(unknown)"
+                model_buckets[m].append((float(r["ai_score"]), float(r["gt_score"])))
+            by_model = []
+            for m, pairs in model_buckets.items():
+                k = len(pairs)
+                if k == 0:
+                    continue
+                sa = sum(abs(a - g) for a, g in pairs)
+                ss = sum((a - g) ** 2 for a, g in pairs)
+                sg = sum((a - g) for a, g in pairs)
+                ex = sum(1 for a, g in pairs if abs(a - g) < 0.5)
+                ov = sum(1 for a, g in pairs if (a - g) > 0.5)
+                un = sum(1 for a, g in pairs if (a - g) < -0.5)
+                by_model.append({
+                    "model_id": m,
+                    "n": k,
+                    "mae": round(sa / k, 3),
+                    "rmse": round(math.sqrt(ss / k), 3),
+                    "bias": round(sg / k, 3),
+                    "accuracy": round(ex / k * 100, 1),
+                    "over_rate": round(ov / k * 100, 1),
+                    "under_rate": round(un / k * 100, 1),
+                    "tendency": "후함" if ov > un * 1.5 else "엄격" if un > ov * 1.5 else "균형",
+                })
+            by_model.sort(key=lambda x: x["mae"])  # MAE 낮은 순 (정확한 모델 위로)
+
+            # ── 항목별 통계 (#1~#18) — 직관 지표 추가 ──
+            item_buckets: dict[int, list[tuple[float, float]]] = defaultdict(list)
+            for r in gt_rows:
+                try:
+                    inum = int(r["item_number"])
+                except (TypeError, ValueError):
+                    continue
+                item_buckets[inum].append((float(r["ai_score"]), float(r["gt_score"])))
+            by_item = []
+            for inum in sorted(item_buckets.keys()):
+                pairs = item_buckets[inum]
+                k = len(pairs)
+                sa = sum(abs(a - g) for a, g in pairs)
+                sg = sum((a - g) for a, g in pairs)
+                ex = sum(1 for a, g in pairs if abs(a - g) < 0.5)
+                ov = sum(1 for a, g in pairs if (a - g) > 0.5)
+                un = sum(1 for a, g in pairs if (a - g) < -0.5)
+                by_item.append({
+                    "item_number": inum,
+                    "n": k,
+                    "mae": round(sa / k, 3),
+                    "bias": round(sg / k, 3),
+                    "accuracy": round(ex / k * 100, 1),
+                    "over_rate": round(ov / k * 100, 1),
+                    "under_rate": round(un / k * 100, 1),
+                    "tendency": "후함" if ov > un * 1.5 else "엄격" if un > ov * 1.5 else "균형",
+                })
+
+            # ── Worst offenders: MAE 큰 순 top 5 항목 (어디서 가장 회귀하나) ──
+            worst_items = sorted(by_item, key=lambda x: -x["mae"])[:5]
+
+            score_agreement = {"exact": exact, "close": close, "wide": wide, "total": n}
+
+            # ── 검수자 수정률 (기존, confirmed + human_score 기반) ──
+            rev_rows = conn.execute(
+                """
+                SELECT ai_score, human_score
+                FROM human_reviews
+                WHERE status = 'confirmed' AND ai_score IS NOT NULL AND human_score IS NOT NULL
+                  AND created_at >= ?
+                """,
+                (cutoff,),
+            ).fetchall()
+            r_strong = r_weak = r_none = 0
+            for r in rev_rows:
+                delta = abs(float(r["ai_score"]) - float(r["human_score"]))
+                if delta >= 3: r_strong += 1
+                elif delta >= 1: r_weak += 1
+                else: r_none += 1
+            reviewer_revisions = {
+                "strong": r_strong, "weak": r_weak, "none": r_none,
+                "total": r_strong + r_weak + r_none,
+            }
+
+            # ── Tier 분포 (기존 유지) ──
+            tier_rows = conn.execute(
+                "SELECT substr(created_at, 6, 5) AS d, ai_confidence, force_t3 FROM human_reviews WHERE created_at >= ?",
+                (cutoff,),
+            ).fetchall()
+            tier_by_day: dict[str, dict[str, int]] = {}
+            for r in tier_rows:
+                d = r["d"]
+                bucket = tier_by_day.setdefault(d, {"T0": 0, "T1": 0, "T2": 0, "T3": 0})
+                if int(r["force_t3"] or 0) == 1:
+                    bucket["T3"] += 1; continue
+                conf = r["ai_confidence"]
+                if conf is None:
+                    bucket["T0"] += 1; continue
+                cv = float(conf)
+                if cv > 1.0: cv /= 5.0
+                if cv <= 0.4: bucket["T2"] += 1
+                elif cv <= 0.7: bucket["T1"] += 1
+                else: bucket["T0"] += 1
+            tier_history = []
+            for d in sorted(tier_by_day.keys(), reverse=True):
+                b = tier_by_day[d]
+                tot = sum(b.values()) or 1
+                tier_history.append({
+                    "date": d,
+                    "T0": round(b["T0"] / tot * 100),
+                    "T1": round(b["T1"] / tot * 100),
+                    "T2": round(b["T2"] / tot * 100),
+                    "T3": round(b["T3"] / tot * 100),
+                })
+
+        # ★ 2026-05-07: gt_score 없는 행은 human_score 로 fallback 했으므로 빈 상태 판정도 통합.
+        empty = len(gt_rows) == 0
+        return JSONResponse({
+            "summary": summary,
+            "gap_distribution": gap_distribution,
+            "mae_trend": mae_trend,
+            "by_model": by_model,
+            "by_item": by_item,
+            "worst_items": worst_items,
+            "score_agreement": score_agreement,
+            "reviewer_revisions": reviewer_revisions,
+            "tier_history": tier_history,
+            "empty": empty,
+            "period_days": period_days,
+            "total_reviews": total_reviews,
+            "total_with_gt": total_with_gt,
+            "total_with_human": ref_kind_count["human"],
+            "total_compared": len(gt_rows),  # gt + human fallback 합계
+            "total_confirmed": total_confirmed,
+        })
+    except Exception as e:
+        logger.exception("drift stats 조회 실패")
+        return JSONResponse({"error": "stats_failed", "detail": str(e)}, status_code=500)
+
+
 def _resolve_hitl_edits_root():
     """사람 수정 결과 스냅샷 루트. env `QA_HITL_EDITS_ROOT` 우선, 기본 `~/Desktop/QA평가결과/HITL_수정`.
     `/v2/review/{id}/confirm` 이 매 확정 시 해당 상담의 전체 검토 행을 이 폴더에 JSON 으로 덮어씀.
@@ -2692,6 +3475,55 @@ def _load_item_meta_by_number(consultation_id: str) -> dict[int, dict[str, Any]]
     return out
 
 
+def _load_full_transcript_for_cid(consultation_id: str) -> str | None:
+    """결과 JSON 에서 상담 전체 파싱 원문 추출 — md_exporter 의 full_transcript 인자용.
+
+    ★ 2026-04-30: HITL MD 의 임베딩 input 정렬을 위한 핵심 헬퍼.
+    검색 시 run_debate 가 보내는 transcript 와 동일 의미공간 만들기 위해
+    payload.preprocessing.parsed_dialogue / turns / payload.transcript 순으로 시도.
+    못 찾으면 None — md_exporter 가 기존 짧은 발화 발췌만 색인 (KNN 정렬 약함).
+    """
+    safe_cid = str(consultation_id).replace("/", "_").replace("\\", "_") or "unknown"
+    target = _resolve_result_json_root() / f"{safe_cid}.json"
+    if not target.exists():
+        return None
+    try:
+        payload = json.loads(target.read_text(encoding="utf-8"))
+    except Exception as exc:
+        logger.warning("full_transcript 로드 실패 cid=%s — %s", consultation_id, exc)
+        return None
+    if not isinstance(payload, dict):
+        return None
+
+    # Path 1: payload.transcript (raw text) — hitl_queue_populator 가 저장하는 경우
+    raw = payload.get("transcript")
+    if isinstance(raw, str) and raw.strip():
+        return raw.strip()
+
+    # Path 2: payload.preprocessing.parsed_dialogue / turns — turn list 를 합쳐서 transcript 재구성
+    prep = payload.get("preprocessing") if isinstance(payload, dict) else None
+    if isinstance(prep, dict):
+        for key in ("parsed_dialogue", "turns", "dialogue"):
+            turns = prep.get(key)
+            if isinstance(turns, list) and turns:
+                lines: list[str] = []
+                for t in turns:
+                    if not isinstance(t, dict):
+                        continue
+                    speaker = str(t.get("speaker") or t.get("role") or "").strip()
+                    text = str(t.get("text") or t.get("utterance") or "").strip()
+                    if not text:
+                        continue
+                    if speaker:
+                        lines.append(f"{speaker}: {text}")
+                    else:
+                        lines.append(text)
+                joined = "\n".join(lines).strip()
+                if joined:
+                    return joined
+    return None
+
+
 def _fetch_confirmed_review_rows(consultation_id: str) -> list[dict[str, Any]]:
     """해당 consultation 의 status='confirmed' 행 전체를 dict 리스트로 반환."""
     from v2.hitl import db as _hitl_db  # lazy import
@@ -2734,8 +3566,13 @@ def _export_confirmed_and_schedule_ingest(
         if not rows:
             return {"exported": 0, "scheduled": False, "skipped_reason": "no_confirmed_rows"}
         item_meta = _load_item_meta_by_number(consultation_id)
+        # ★ 2026-04-30: full_transcript 동봉 → MD body 에 전체 원문 추가, rag_ingester 임베딩 정렬.
+        full_tx = _load_full_transcript_for_cid(consultation_id)
         written = _md.export_consultation_confirmed(
-            consultation_id, review_rows=rows, item_meta_by_number=item_meta
+            consultation_id,
+            review_rows=rows,
+            item_meta_by_number=item_meta,
+            full_transcript=full_tx,
         )
         scheduled = False
         if background_tasks is not None:
@@ -3168,10 +4005,11 @@ async def review_export_xlsx(status: str = "all", consultation_id: str | None = 
 
 @app.get("/v2/result/full/{consultation_id}")
 async def result_full(consultation_id: str) -> JSONResponse:
-    """검토 큐 풀뷰용 — 파이프라인이 저장해 둔 결과 JSON 반환.
+    """검토 큐 풀뷰용 — 평가 결과 풀 페이로드 반환.
 
-    저장 위치: env `QA_RESULT_JSON_ROOT` (기본 `~/Desktop/QA평가결과/JSON/`)
-    파일명: `<consultation_id>.json` — report / gt_comparison / gt_evidence_comparison 포함.
+    ★ 2026-05-07: DB result_payloads 테이블 우선 조회. 없으면 JSON 파일 fallback.
+      - DB primary: human_reviews.db / result_payloads / consultation_id PK
+      - JSON 백업: env QA_RESULT_JSON_ROOT (기본 ~/Desktop/QA평가결과/JSON/{cid}.json)
     """
     import json as _json
     import os as _os
@@ -3182,6 +4020,22 @@ async def result_full(consultation_id: str) -> JSONResponse:
         if not safe_cid or safe_cid in (".", ".."):
             return JSONResponse({"error": "invalid_consultation_id"}, status_code=400)
 
+        # 1) DB 우선 — result_payloads 테이블
+        try:
+            _ensure_hitl_db()
+            from v2.hitl import db as _hitl_db
+            payload = _hitl_db.get_result_payload(consultation_id)
+            if payload is not None:
+                return JSONResponse({
+                    "ok": True,
+                    "consultation_id": consultation_id,
+                    "data": payload,
+                    "source": "db",
+                })
+        except Exception as exc:
+            logger.warning("result_full: DB 조회 실패 → JSON fallback (%s)", exc)
+
+        # 2) JSON 파일 fallback
         root_str = _os.environ.get("QA_RESULT_JSON_ROOT") or str(_Path.home() / "Desktop" / "QA평가결과" / "JSON")
         target = _Path(root_str) / f"{safe_cid}.json"
         if not target.exists():
@@ -3189,7 +4043,12 @@ async def result_full(consultation_id: str) -> JSONResponse:
                 {"error": "not_found", "consultation_id": consultation_id, "path": str(target)}, status_code=404
             )
         payload = _json.loads(target.read_text(encoding="utf-8"))
-        return JSONResponse({"ok": True, "consultation_id": consultation_id, "data": payload})
+        return JSONResponse({
+            "ok": True,
+            "consultation_id": consultation_id,
+            "data": payload,
+            "source": "json_file",
+        })
     except Exception as e:
         logger.exception("result full 로드 실패")
         return JSONResponse({"error": "load_failed", "detail": str(e)}, status_code=500)
@@ -3250,13 +4109,27 @@ def _truncate_transcript(transcript: str | None, limit: int = 6000) -> str:
     return s[:limit] + f"\n... [생략 — 총 {len(s)}자]"
 
 
-async def _invoke_judge_llm(system_prompt: str, user_prompt: str, max_tokens: int = 4000) -> str:
-    """Judge LLM 호출 — Bedrock Sonnet 4 기본. `nodes.llm.ainvoke_llm` 헬퍼 위임."""
+async def _invoke_judge_llm(
+    system_prompt: str,
+    user_prompt: str,
+    max_tokens: int = 4000,
+    *,
+    bedrock_model_id: str | None = None,
+) -> str:
+    """Judge LLM 호출 — `nodes.llm.ainvoke_llm` 헬퍼 위임.
+    ★ 2026-05-07: bedrock_model_id 인자 — 호출부에서 프론트 드롭다운 모델 전달.
+    """
     from langchain_core.messages import HumanMessage, SystemMessage  # type: ignore
     from nodes.llm import ainvoke_llm  # noqa: WPS433
 
     messages = [SystemMessage(content=system_prompt), HumanMessage(content=user_prompt)]
-    return await ainvoke_llm(messages, temperature=0.2, max_tokens=max_tokens, backend="bedrock")
+    return await ainvoke_llm(
+        messages,
+        temperature=0.2,
+        max_tokens=max_tokens,
+        backend="bedrock",
+        bedrock_model_id=bedrock_model_id,
+    )
 
 
 @app.post("/analyze-compare")
@@ -3324,7 +4197,13 @@ async def analyze_compare(request: Request) -> JSONResponse:
 
     try:
         t0 = time.time()
-        markdown = await _invoke_judge_llm(system_prompt, user_prompt, max_tokens=4000)
+        # ★ 2026-05-07: body 에서 bedrock_model_id 받음. 미지정 시 ainvoke_llm 이 env fallback.
+        markdown = await _invoke_judge_llm(
+            system_prompt,
+            user_prompt,
+            max_tokens=4000,
+            bedrock_model_id=body.get("bedrock_model_id"),
+        )
         elapsed = round(time.time() - t0, 2)
     except Exception as e:  # noqa: BLE001
         logger.exception("analyze-compare judge 실패")
@@ -3464,7 +4343,13 @@ async def analyze_manual_compare(request: Request) -> JSONResponse:
         )
         try:
             t0 = time.time()
-            raw = await _invoke_judge_llm(system_prompt, user_prompt, max_tokens=6000)
+            # ★ 2026-05-07: body 의 bedrock_model_id 가 있으면 이 모델로 호출 (드롭다운 통일).
+            raw = await _invoke_judge_llm(
+                system_prompt,
+                user_prompt,
+                max_tokens=6000,
+                bedrock_model_id=body.get("bedrock_model_id"),
+            )
             elapsed = round(time.time() - t0, 2)
             try:
                 from nodes.llm import parse_llm_json  # type: ignore
@@ -3702,6 +4587,408 @@ async def hitl_rag_recreate_index(request: Request) -> JSONResponse:
     except Exception as e:
         logger.exception("hitl-rag recreate-index 실패")
         return JSONResponse({"error": "recreate_failed", "detail": str(e)}, status_code=500)
+
+
+@app.post("/v2/hitl-rag/purge-all")
+async def hitl_rag_purge_all(request: Request) -> JSONResponse:
+    """HITL RAG 전체 삭제 — MD 파일 + AOSS 인덱스(orphan 포함) 모두 제거.
+
+    body 강제: ``{"confirm": "PURGE-ALL"}`` — 잘못 호출 방지 가드.
+
+    응답: ``{ok, md_deleted, index_dropped, orphan_dropped, errors[]}``.
+    """
+    try:
+        body = await request.json() if request.headers.get("content-length", "0") != "0" else {}
+    except Exception as e:
+        return JSONResponse({"error": "bad_request", "detail": str(e)}, status_code=400)
+
+    if (body or {}).get("confirm") != "PURGE-ALL":
+        return JSONResponse(
+            {
+                "error": "confirmation_required",
+                "detail": 'body must include {"confirm": "PURGE-ALL"}',
+            },
+            status_code=400,
+        )
+
+    errors: list[str] = []
+    md_deleted = 0
+
+    # ── 1) MD 파일 일괄 삭제 ───────────────────────────────────
+    try:
+        from v2.hitl import md_exporter as _md  # lazy import
+
+        root = _md.resolve_rag_root()
+        if root.exists():
+            for p in sorted(root.glob("*.md")):
+                try:
+                    p.unlink()
+                    md_deleted += 1
+                except Exception as exc:
+                    errors.append(f"unlink {p.name}: {exc}")
+    except Exception as exc:
+        errors.append(f"md scan: {exc}")
+
+    # ── 2) AOSS 인덱스 drop (orphan doc 카운트 포함) ─────────────
+    index_dropped = False
+    orphan_dropped = 0
+    try:
+        from v2.hitl import rag_ingester as _ing  # lazy import
+
+        client = _ing._client()
+        index_name = _ing.INDEX_NAME
+        if client.indices.exists(index=index_name):
+            try:
+                resp = client.count(index=index_name)
+                orphan_dropped = int(resp.get("count") or 0)
+            except Exception as exc:
+                orphan_dropped = -1
+                errors.append(f"count: {exc}")
+            client.indices.delete(index=index_name)
+            index_dropped = True
+    except NotImplementedError as exc:
+        return JSONResponse(
+            {"error": "opensearch_unavailable", "detail": str(exc)},
+            status_code=503,
+        )
+    except Exception as e:
+        logger.exception("hitl-rag purge-all 실패")
+        return JSONResponse(
+            {"error": "purge_failed", "detail": str(e)},
+            status_code=500,
+        )
+
+    logger.info(
+        "hitl-rag purge-all: md=%d idx_dropped=%s orphan=%d",
+        md_deleted,
+        index_dropped,
+        orphan_dropped,
+    )
+    return JSONResponse(
+        {
+            "ok": True,
+            "md_deleted": md_deleted,
+            "index_dropped": index_dropped,
+            "orphan_dropped": orphan_dropped,
+            "errors": errors,
+        }
+    )
+
+
+@app.get("/v2/hitl-rag/list")
+async def hitl_rag_list() -> JSONResponse:
+    """HITL RAG 전체 목록 — MD 파일 + AOSS 인덱스 상태 통합.
+
+    각 항목에 ``in_index`` / ``index_doc_count`` / ``drift`` 필드 포함.
+    AOSS 미연결 시 인덱스 관련 필드를 ``null`` 로 반환 (200 유지).
+
+    Response:
+      {
+        tenant, rag_root,
+        items: [{filename, consultation_id, item_number, item_name,
+                 ai_score, human_score, delta, score_signature,
+                 indexed_at, confirmed_at, size_bytes,
+                 in_index, index_doc_count, drift}],
+        orphan_indices: [{consultation_id, item_number, doc_count}],
+        stats: {md_total, indexed_total, missing_in_index, orphan_in_index}
+      }
+    """
+    try:
+        from v2.hitl import md_exporter as _md  # lazy import
+    except Exception as exc:
+        logger.exception("hitl-rag list: md_exporter import 실패")
+        return JSONResponse({"error": "module_load_failed", "detail": str(exc)}, status_code=500)
+
+    try:
+        from v2.hitl import rag_ingester as _ing  # lazy import
+
+        tenant = _ing._resolve_tenant()
+    except Exception:
+        tenant = ""
+
+    root = _md.resolve_rag_root()
+
+    # ── MD 파일 스캔 ──────────────────────────────────────────────────
+    md_map: dict[tuple[str, int], dict] = {}  # (cid, item) → item dict
+    md_items: list[dict] = []
+    if root.exists():
+        for p in sorted(root.glob("*.md"), key=lambda x: x.name):
+            try:
+                parsed = _md.parse_md_file(p)
+            except Exception:
+                continue
+            meta = parsed.get("meta") or {}
+            cid_raw = str(meta.get("consultation_id") or "").strip()
+            item_raw = meta.get("item_number")
+            if not cid_raw or item_raw is None:
+                continue
+            try:
+                item_no = int(item_raw)
+            except (TypeError, ValueError):
+                continue
+            try:
+                stat = p.stat()
+                size_bytes = stat.st_size
+            except Exception:
+                size_bytes = None
+
+            entry: dict = {
+                "filename": p.name,
+                "consultation_id": cid_raw,
+                "item_number": item_no,
+                "item_name": meta.get("item_name"),
+                "ai_score": meta.get("ai_score"),
+                "human_score": meta.get("human_score"),
+                "delta": meta.get("delta"),
+                "score_signature": meta.get("score_signature"),
+                "indexed_at": meta.get("indexed_at"),
+                "confirmed_at": meta.get("confirmed_at"),
+                "size_bytes": size_bytes,
+                # AOSS 정보 — 후속 단계에서 채움
+                "in_index": None,
+                "index_doc_count": None,
+                "drift": None,
+            }
+            md_items.append(entry)
+            md_map[(cid_raw, item_no)] = entry
+
+    # ── AOSS 인덱스 조회 (N+1, MD ≤ 200 기준) ─────────────────────────
+    # TODO: MD 200건 초과 시 composite aggregation 으로 전환 권고
+    aoss_available = False
+    aoss_cid_item_counts: dict[tuple[str, int], int] = {}  # (cid, item) → doc_count
+    try:
+        from v2.hitl import rag_ingester as _ing  # lazy import (이미 위에서 시도)
+
+        client = _ing._client()
+        aoss_available = True
+
+        # AOSS composite aggregation — (cid, item) 별 doc count 한 번에 가져오기
+        # AOSS Serverless 가 composite agg 미지원이면 except 로 N+1 방식 fallback
+        try:
+            agg_body = {
+                "size": 0,
+                "aggs": {
+                    "by_case": {
+                        "composite": {
+                            "size": 1000,
+                            "sources": [
+                                {"cid": {"terms": {"field": "consultation_id"}}},
+                                {"item": {"terms": {"field": "item_number"}}},
+                            ],
+                        }
+                    }
+                },
+            }
+            agg_resp = client.search(index=_ing.INDEX_NAME, body=agg_body)
+            buckets = (
+                (agg_resp.get("aggregations") or {}).get("by_case", {}).get("buckets") or []
+            )
+            for bucket in buckets:
+                k = bucket.get("key") or {}
+                b_cid = str(k.get("cid") or "").strip()
+                b_item_raw = k.get("item")
+                if not b_cid or b_item_raw is None:
+                    continue
+                try:
+                    b_item = int(b_item_raw)
+                except (TypeError, ValueError):
+                    continue
+                aoss_cid_item_counts[(b_cid, b_item)] = int(bucket.get("doc_count") or 0)
+        except Exception as agg_exc:
+            logger.info("hitl-rag list: composite agg 실패 — N+1 fallback: %s", agg_exc)
+            # N+1 fallback — MD 항목 당 1건 count query
+            for cid_k, item_k in md_map:
+                try:
+                    count_resp = client.count(
+                        index=_ing.INDEX_NAME,
+                        body={
+                            "query": {
+                                "bool": {
+                                    "filter": [
+                                        {"term": {"consultation_id": cid_k}},
+                                        {"term": {"item_number": item_k}},
+                                    ]
+                                }
+                            }
+                        },
+                    )
+                    aoss_cid_item_counts[(cid_k, item_k)] = int(count_resp.get("count") or 0)
+                except Exception:
+                    aoss_cid_item_counts[(cid_k, item_k)] = 0
+    except NotImplementedError:
+        aoss_available = False
+    except Exception as exc:
+        logger.warning("hitl-rag list: AOSS 조회 실패 (무시): %s", exc)
+        aoss_available = False
+
+    # ── in_index / drift 주입 ─────────────────────────────────────────
+    missing_in_index = 0
+    for entry in md_items:
+        if not aoss_available:
+            break
+        key = (entry["consultation_id"], entry["item_number"])
+        doc_count = aoss_cid_item_counts.get(key, 0)
+        entry["in_index"] = doc_count > 0
+        entry["index_doc_count"] = doc_count
+        if not entry["in_index"]:
+            entry["drift"] = "missing_in_index"
+            missing_in_index += 1
+
+    # ── orphan_indices (AOSS 에만 있고 MD 없음) ─────────────────────
+    orphan_indices: list[dict] = []
+    if aoss_available:
+        for (o_cid, o_item), o_count in aoss_cid_item_counts.items():
+            if (o_cid, o_item) not in md_map:
+                orphan_indices.append(
+                    {"consultation_id": o_cid, "item_number": o_item, "doc_count": o_count}
+                )
+        orphan_indices.sort(key=lambda x: (x["consultation_id"], x["item_number"]))
+
+    stats = {
+        "md_total": len(md_items),
+        "indexed_total": sum(1 for e in md_items if e.get("in_index") is True),
+        "missing_in_index": missing_in_index,
+        "orphan_in_index": len(orphan_indices),
+    }
+
+    return JSONResponse(
+        {
+            "tenant": tenant,
+            "rag_root": str(root),
+            "items": md_items,
+            "orphan_indices": orphan_indices,
+            "stats": stats,
+        }
+    )
+
+
+@app.delete("/v2/hitl-rag/case")
+async def hitl_rag_case_delete_by_params(
+    consultation_id: str,
+    item_number: int | None = None,
+    mode: str = "both",
+) -> JSONResponse:
+    """HITL RAG 사례 유연 삭제 — consultation_id + 선택적 item_number + mode.
+
+    Query params:
+      consultation_id — 필수
+      item_number     — 선택. 지정 시 해당 항목 1개만, 미지정 시 cid 전체.
+      mode            — "both" (기본) | "md_only" | "index_only"
+
+    AOSS:
+      delete_by_query 시도 → 실패 시 search + doc 단위 delete fallback.
+      ``fallback_used: true`` 로 응답에 명시.
+    """
+    if not (consultation_id or "").strip():
+        return JSONResponse({"error": "bad_request", "detail": "consultation_id required"}, status_code=400)
+    cid = consultation_id.strip()
+    valid_modes = {"both", "md_only", "index_only"}
+    if mode not in valid_modes:
+        return JSONResponse(
+            {"error": "bad_request", "detail": f"mode must be one of {sorted(valid_modes)}"},
+            status_code=400,
+        )
+
+    md_deleted = 0
+    index_deleted = 0
+    fallback_used = False
+    errors: list[str] = []
+
+    # ── MD 파일 삭제 ──────────────────────────────────────────────────
+    if mode in ("both", "md_only"):
+        try:
+            from v2.hitl import md_exporter as _md  # lazy import
+
+            root = _md.resolve_rag_root()
+            if root.exists():
+                safe_cid = re.sub(r"[^A-Za-z0-9_\-]", "_", cid) or "unknown"
+                if item_number is not None:
+                    # 단건
+                    target = _md.md_path_for(cid, item_number)
+                    if target.exists():
+                        try:
+                            target.unlink()
+                            md_deleted += 1
+                        except Exception as exc:
+                            errors.append(f"md unlink 실패 {target.name}: {exc}")
+                    # not found 는 오류 아님 (이미 삭제됐을 수 있음)
+                else:
+                    # cid 전체 glob
+                    for p in list(root.glob(f"{safe_cid}_*.md")):
+                        try:
+                            p.unlink()
+                            md_deleted += 1
+                        except Exception as exc:
+                            errors.append(f"md unlink 실패 {p.name}: {exc}")
+        except Exception as exc:
+            errors.append(f"md_exporter 오류: {exc}")
+            logger.warning("hitl-rag delete by params: md 처리 실패 cid=%s — %s", cid, exc)
+
+    # ── AOSS 인덱스 삭제 ──────────────────────────────────────────────
+    if mode in ("both", "index_only"):
+        try:
+            from v2.hitl import rag_ingester as _ing  # lazy import
+
+            client = _ing._client()
+            index_name = _ing.INDEX_NAME
+
+            filter_clauses: list[dict] = [{"term": {"consultation_id": cid}}]
+            if item_number is not None:
+                filter_clauses.append({"term": {"item_number": int(item_number)}})
+            query_body = {"query": {"bool": {"filter": filter_clauses}}}
+
+            # delete_by_query 시도
+            try:
+                resp = client.delete_by_query(
+                    index=index_name, body=query_body, refresh=True, conflicts="proceed"
+                )
+                index_deleted = int(resp.get("deleted") or 0)
+            except Exception as dbq_exc:
+                logger.info(
+                    "hitl-rag delete by params: delete_by_query 실패 — search fallback: %s", dbq_exc
+                )
+                # fallback: search → 개별 doc delete
+                fallback_used = True
+                try:
+                    search_resp = client.search(
+                        index=index_name,
+                        body={**query_body, "size": 500, "_source": False},
+                    )
+                    hits = ((search_resp.get("hits") or {}).get("hits") or [])
+                    for hit in hits:
+                        hit_id = hit.get("_id")
+                        if not hit_id:
+                            continue
+                        try:
+                            client.delete(index=index_name, id=hit_id)
+                            index_deleted += 1
+                        except Exception as del_exc:
+                            errors.append(f"doc delete 실패 _id={hit_id}: {del_exc}")
+                except Exception as search_exc:
+                    errors.append(f"AOSS search fallback 실패: {search_exc}")
+                    logger.warning("hitl-rag delete by params: AOSS fallback 실패 — %s", search_exc)
+        except NotImplementedError:
+            errors.append("opensearch-py 미설치 — AOSS 인덱스 삭제 스킵")
+        except Exception as exc:
+            errors.append(f"AOSS 처리 오류: {exc}")
+            logger.warning("hitl-rag delete by params: AOSS 오류 cid=%s — %s", cid, exc)
+
+    logger.info(
+        "hitl-rag delete by params: cid=%s item=%s mode=%s md=%d idx=%d fallback=%s errors=%d",
+        cid, item_number, mode, md_deleted, index_deleted, fallback_used, len(errors),
+    )
+    return JSONResponse(
+        {
+            "ok": True,
+            "consultation_id": cid,
+            "item_number": item_number,
+            "mode": mode,
+            "md_deleted": md_deleted,
+            "index_deleted": index_deleted,
+            "fallback_used": fallback_used,
+            "errors": errors,
+        }
+    )
 
 
 @app.get("/v2/hitl-rag/cases")

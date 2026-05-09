@@ -18,48 +18,47 @@ export interface GroupNodeData extends Record<string, unknown> {
 
 /* ── Accent palette — modern muted saturation ──
    각 Layer 에 고유한 hue 를 부여해 파이프라인 흐름이 시각적으로 읽힘.
-   bg: 10% 불투명 tinted 배경 (glassmorphism 느낌)
-   border: 1.5px 주 강조
-   labelBg: 라벨 pill 배경 — 같은 hue 진한 버전
+   ★ 2026-05-08: zIndex: -1 로 group 이 edges 뒤로 빠졌으므로 alpha 를 다시 진하게 (0.32)
+   복원해도 박스 traveler 가 가려지지 않음. grad 도 살짝 복원하여 layered 느낌 유지.
 */
 const ACCENT_TONES: Record<
   GroupDef["accent"],
   { bg: string; border: string; label: string; labelBg: string; grad: string }
 > = {
   layer1: {
-    bg: "rgba(233, 239, 248, 0.4)",
+    bg: "rgba(233, 239, 248, 0.32)",
     border: "#c8d4e8",
     label: "#2d4a73",
     labelBg: "#dfe8f5",
-    grad: "linear-gradient(135deg, rgba(200,212,232,0.35) 0%, rgba(200,212,232,0) 60%)",
+    grad: "linear-gradient(135deg, rgba(200,212,232,0.22) 0%, rgba(200,212,232,0) 60%)",
   },
   layer2a: {
-    bg: "rgba(249, 241, 231, 0.45)",
+    bg: "rgba(249, 241, 231, 0.36)",
     border: "#e8d4b2",
     label: "#8c6529",
     labelBg: "#f5e7cf",
-    grad: "linear-gradient(135deg, rgba(232,212,178,0.4) 0%, rgba(232,212,178,0) 60%)",
+    grad: "linear-gradient(135deg, rgba(232,212,178,0.26) 0%, rgba(232,212,178,0) 60%)",
   },
   layer2b: {
-    bg: "rgba(250, 241, 236, 0.45)",
+    bg: "rgba(250, 241, 236, 0.36)",
     border: "#e8cec0",
     label: "#8c503d",
     labelBg: "#f5dfd2",
-    grad: "linear-gradient(135deg, rgba(232,206,192,0.4) 0%, rgba(232,206,192,0) 60%)",
+    grad: "linear-gradient(135deg, rgba(232,206,192,0.26) 0%, rgba(232,206,192,0) 60%)",
   },
   layer3: {
-    bg: "rgba(234, 245, 238, 0.45)",
+    bg: "rgba(234, 245, 238, 0.36)",
     border: "#bfdec9",
     label: "#2e6b42",
     labelBg: "#d4ebdd",
-    grad: "linear-gradient(135deg, rgba(191,222,201,0.4) 0%, rgba(191,222,201,0) 60%)",
+    grad: "linear-gradient(135deg, rgba(191,222,201,0.26) 0%, rgba(191,222,201,0) 60%)",
   },
   layer4: {
-    bg: "rgba(245, 238, 249, 0.45)",
+    bg: "rgba(245, 238, 249, 0.36)",
     border: "#d6c3e0",
     label: "#5d3c7d",
     labelBg: "#e7d8ee",
-    grad: "linear-gradient(135deg, rgba(214,195,224,0.4) 0%, rgba(214,195,224,0) 60%)",
+    grad: "linear-gradient(135deg, rgba(214,195,224,0.26) 0%, rgba(214,195,224,0) 60%)",
   },
 };
 

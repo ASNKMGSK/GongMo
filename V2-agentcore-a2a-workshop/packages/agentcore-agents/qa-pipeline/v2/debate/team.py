@@ -29,27 +29,40 @@ from v2.debate.schemas import DEFAULT_MAX_ROUNDS, DebateRequest
 logger = logging.getLogger(__name__)
 
 
-# Cross-region inference profile 사용 — Sonnet 4 는 on-demand throughput 미지원,
-# `us.` 접두사가 붙은 inference profile 만 호출 가능 (CLAUDE.md 기본값과 일치).
-DEFAULT_MODEL_ID = "us.anthropic.claude-sonnet-4-20250514-v1:0"
+# Cross-region inference profile 사용 — Sonnet 4.6 (`us.` 접두사 = US geo cross-region).
+# ★ 2026-05-07: Sonnet 4 → 4.6 전환. TPM 200K → 6M (30배), 가격 동일.
+DEFAULT_MODEL_ID = "us.anthropic.claude-sonnet-4-6"
 DEFAULT_REGION = "us-east-1"
 DEFAULT_TEMPERATURE = 0.3
 
 
-def build_llm_config() -> dict[str, Any]:
+def build_llm_config(bedrock_model_id: str | None = None) -> dict[str, Any]:
     """Bedrock LLMConfig 를 AG2 가 기대하는 dict 포맷으로 빌드.
 
     AG2 v0.9.7 은 ``LLMConfig(api_type="bedrock", ...)`` 또는 동등한 dict 를 수용한다.
     dict 반환이 더 호환성이 넓어 테스트/fallback 에 유리.
+
+    ★ 2026-05-07: 모델 우선순위 — 인자 (request override) → BEDROCK_MODEL_ID env → DEFAULT_MODEL_ID.
+    프론트 드롭다운 선택값을 토론에도 동일하게 적용하기 위함.
     """
+    # ★ 2026-05-07: 페르소나 응답 길이 캡 (env QA_DEBATE_MAX_TOKENS, 기본 800).
+    # 토론 발언이 장문화되어 토큰/시간 비대해지는 것 방지. JSON {score, reasoning, deductions[], evidence[]}
+    # 정도면 600~800 으로 충분. 0/음수면 미지정 (모델 기본).
+    _max_tokens_raw = os.getenv("QA_DEBATE_MAX_TOKENS", "800").strip()
+    try:
+        _max_tokens = int(_max_tokens_raw)
+    except (TypeError, ValueError):
+        _max_tokens = 800
+    resolved_model = bedrock_model_id or os.getenv("BEDROCK_MODEL_ID", DEFAULT_MODEL_ID)
+    cfg_entry: dict[str, Any] = {
+        "api_type": "bedrock",
+        "model": resolved_model,
+        "aws_region": os.getenv("AWS_REGION", os.getenv("AWS_DEFAULT_REGION", DEFAULT_REGION)),
+    }
+    if _max_tokens > 0:
+        cfg_entry["max_tokens"] = _max_tokens
     return {
-        "config_list": [
-            {
-                "api_type": "bedrock",
-                "model": os.getenv("BEDROCK_MODEL_ID", DEFAULT_MODEL_ID),
-                "aws_region": os.getenv("AWS_REGION", os.getenv("AWS_DEFAULT_REGION", DEFAULT_REGION)),
-            }
-        ],
+        "config_list": [cfg_entry],
         "cache_seed": None,
         "temperature": float(os.getenv("QA_DEBATE_TEMPERATURE", str(DEFAULT_TEMPERATURE))),
     }
@@ -177,6 +190,19 @@ def _attach_event_hook(
                     keep = max(6, (len(PERSONA_ORDER) * 2))
                     if len(votes_list) > keep:
                         del votes_list[:-keep]
+                    # ★ 2026-04-30 S7 fix: 라운드 합의 즉시 마킹 (1턴 over-shoot 방지).
+                    # 마지막 persona 발화 후 hook 이 실행되는 시점에 vbr[cur_round] 가 완성됨.
+                    # _is_termination 이 호출 순서 race 로 다음 라운드 첫 persona 까지 발화시키는
+                    # 케이스를 막기 위해 hook 안에서 명시 플래그로 마킹.
+                    if len(round_votes) >= len(PERSONA_ORDER):
+                        if len(set(round_votes.values())) == 1:
+                            round_tracker["should_terminate_consensus"] = True
+                            logger.info(
+                                "[AG2][item=#%s] 라운드 %d 합의 감지 (전원 %s) — 종료 플래그 마킹",
+                                req.item_number,
+                                cur_round,
+                                next(iter(set(round_votes.values()))),
+                            )
                 reasoning = str(parsed.get("reasoning") or content[:500])
                 rebuttal = parsed.get("rebuttal") or None
 
@@ -251,7 +277,9 @@ def build_debate_team(
     (manager, personas)
         personas 는 PERSONA_ORDER 순서.
     """
-    llm_config = build_llm_config()
+    # ★ 2026-05-07: req.bedrock_model_id (프론트 드롭다운) 를 AG2 LLMConfig 에 주입.
+    # 페르소나 + Manager LLM 모두 같은 모델 사용 → 사용자 선택 모델로 통일.
+    llm_config = build_llm_config(getattr(req, "bedrock_model_id", None))
 
     personas: list[AssistantAgent] = []
     # round_tracker 를 persona 간 공유 — 같은 persona 두 번째 발화 시 round 증가
@@ -276,19 +304,21 @@ def build_debate_team(
         )
         personas.append(agent)
 
-    # max_round = persona 수 × 최대 라운드 수 + 약간의 여유.
-    # req.max_rounds 기본 2 (사용자 정책 2026-04-27), personas 3명 → 6턴. 여유 +3 → 9턴 상한.
-    # 즉, 사용자가 설정한 max_rounds 를 초과해서 polling 돌지 않도록 strict cap.
+    # max_round = persona 수 × 최대 라운드 수 (★ 2026-04-30: fallback 여유 제거).
+    # 이전 공식 `_max_rounds * persona_count + persona_count` 는 1라운드 정책이어도 합의 미도달 시
+    # +1라운드 더 진행하여 사실상 2라운드까지 도는 문제 발생. 사용자 정책상 strict 1라운드 정책이므로
+    # 합의 못 하면 라운드 1 후 즉시 종료 → 판사 결정 단계로 이행.
     persona_count = max(1, len(PERSONA_ORDER))
     _max_rounds = max(1, int(getattr(req, "max_rounds", DEFAULT_MAX_ROUNDS) or DEFAULT_MAX_ROUNDS))
-    max_round = _max_rounds * persona_count + persona_count  # + 1라운드 여유 (fallback)
+    max_round = _max_rounds * persona_count  # strict cap — 사용자 설정 라운드 그대로
 
-    # speaker_selection_method — env 로 토글 가능. 기본 round_robin (Bedrock TPM 절감용).
-    #   round_robin: persona 순서대로 발언. Manager hidden speaker-selection LLM 호출 없음 → 토큰 ~50% 절감.
-    #   auto       : Manager 가 매 턴 다음 발언자 LLM 선택. 자유 토론 자연스러움 ↑, 토큰/Throttling 위험 ↑.
-    selection_method = os.getenv("QA_DEBATE_SPEAKER_SELECTION", "round_robin").strip().lower()
+    # speaker_selection_method — env 로 토글 가능.
+    # ★ 2026-05-07: Sonnet 4.6 (TPM 6M) 전환으로 default round_robin → auto 변경.
+    #   auto       : Manager 가 매 턴 다음 발언자 LLM 선택. 자유 토론 자연스러움 ↑.
+    #   round_robin: persona 순서 고정. 토큰 ~50% 절감하지만 페르소나가 서로 반박/동의 자연성 ↓.
+    selection_method = os.getenv("QA_DEBATE_SPEAKER_SELECTION", "auto").strip().lower()
     if selection_method not in ("round_robin", "auto", "random", "manual"):
-        selection_method = "round_robin"
+        selection_method = "auto"
 
     groupchat_kwargs: dict[str, Any] = dict(
         agents=[*personas],
@@ -317,23 +347,39 @@ def build_debate_team(
     #    "라운드 다 진행하고 서로 점수가 맞으면 그때 종료" — 라운드1 후반 + 라운드2 초반
     #    일치로 라운드2 중간에 끊으면 UI 상 부분 라운드로 어색함.)
     def _is_termination(msg: dict[str, Any]) -> bool:
+        # ★ 2026-04-30 S7 fix: hook 이 미리 마킹한 플래그 우선 검사.
+        # hook 안에서 라운드 완성 시점에 should_terminate_consensus=True 로 마킹되므로
+        # is_termination_msg 호출 순서와 무관하게 결정적으로 종료.
+        if round_tracker.get("should_terminate_consensus"):
+            return True
         content = (msg.get("content") or "") if isinstance(msg, dict) else ""
         upper = content.upper()
+        # ★ 2026-05-07: 신/구 두 경로 모두 지원
+        #   신 경로: JSON 의 final_vote: true 필드 (debate_rules.md 6번 룰)
+        #   구 경로: reasoning 본문에 "VOTE_FINAL"/"CONSENSUS" 토큰 (LLM 이 따르지 않을 때)
         if "CONSENSUS" in upper or "VOTE_FINAL" in upper:
             return True
-        # 라운드별 투표 맵: {round: {persona: score}}
+        try:
+            import json as _json, re as _re
+            mb = _re.search(r"\{[\s\S]*\}", content)
+            if mb:
+                obj = _json.loads(mb.group(0))
+                if isinstance(obj, dict) and obj.get("final_vote") is True:
+                    return True
+        except Exception:
+            pass
+        # 라운드별 투표 맵: {round: {persona: score}} — fallback (구 경로, 호환성 유지)
         vbr: dict[int, dict[str, int]] = round_tracker.get("votes_by_round") or {}
         if not vbr:
             return False
-        # 가장 최근 라운드만 본다 — 더 오래된 라운드는 이미 미합의로 진행된 라운드.
         latest_round = max(vbr.keys())
         votes = vbr[latest_round]
         if len(votes) < persona_count:
-            return False  # 라운드 아직 진행 중 — 경계 아님
+            return False
         scores_in_round = set(votes.values())
         if len(scores_in_round) == 1:
             logger.info(
-                "debate: round-consensus 감지 — 라운드 %d 전원 동일 점수 %s, 종료",
+                "debate: round-consensus fallback 감지 — 라운드 %d 전원 동일 점수 %s, 종료",
                 latest_round,
                 next(iter(scores_in_round)),
             )

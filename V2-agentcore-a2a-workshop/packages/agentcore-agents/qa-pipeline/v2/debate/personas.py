@@ -95,6 +95,7 @@ def build_speak_user_message(
     prev_turns: list[dict],
     persona: str | None = None,
     persona_details: dict[str, dict] | None = None,
+    hitl_cases: list[dict] | None = None,
 ) -> str:
     """사용자 메시지 — 평가 컨텍스트 + 1차 평가 결과 (3명 모두) + 이전 발언 삽입.
 
@@ -102,6 +103,9 @@ def build_speak_user_message(
     1차 평가 결과 (점수·판정·감점·근거) 를 모두 노출. 본인 키는 "[당신]" 으로,
     다른 페르소나는 "[페르소나 X]" 로 표기. 본인 의견 + 다른 의견을 동시에 보고
     동의/반박/수정 자유 — Round 1 부터 진짜 토론 양상.
+
+    ★ 2026-04-30: HITL 사례 주입 — 판사가 아닌 페르소나 토론 단계에서 사용 (사용자 정책).
+    `hitl_cases` 가 있으면 user message 에 [과거 휴먼 검증 사례] 섹션으로 추가.
 
     합쳐진 ``ai_judgment`` (legacy 필드) 는 미주입 — persona_details 가 더 풍부한 정보 제공.
     """
@@ -114,6 +118,51 @@ def build_speak_user_message(
     ]
     if rag_context:
         parts.append(f"\n[관련 규정/가이드]\n{rag_context.strip()}\n")
+
+    # ★ 골든셋 RAG 사례 주입 — 페르소나가 토론 시 사람 검수 정답을 참고할 수 있게.
+    # 골든셋은 HITL (사람 검수 누적 데이터) 등 여러 출처를 포함. 각 사례의 source 필드로 출처 식별.
+    # ★ 2026-04-30: 자기상담(is_self_match) 사례가 있으면 anchor 룰 강제 발동 — 그 사람 점수를
+    # ground truth 로 채택 (debate_rules.md §7). 없으면 기존 약한 참고 톤 유지 (§8).
+    if hitl_cases:
+        try:
+            from v2.hitl.rag_retriever import format_human_cases_for_prompt
+            formatted = format_human_cases_for_prompt(hitl_cases)
+        except Exception as exc:
+            logger.warning("페르소나 골든셋 사례 포맷 실패 — 사례 섹션 생략: %s", exc)
+            formatted = ""
+        if formatted:
+            self_cases = [c for c in hitl_cases if c.get("is_self_match")]
+            if self_cases:
+                # 가장 최근(confirmed_at 내림차순) 자기상담 사례의 사람 점수를 anchor 로 명시.
+                latest_self = max(
+                    self_cases, key=lambda c: str(c.get("confirmed_at") or "")
+                )
+                anchor_score = latest_self.get("human_score")
+                # ★ 2026-05-07: anchor 룰 완화 — 점수 수렴은 유지하되 페르소나 차별화 강제.
+                # 이전엔 셋 다 똑같은 시작 문구 강제 + 같은 점수 → reasoning 본문 거의 동일.
+                # 변경: 시작 문구 자유, 단 본인 페르소나 고유 관점에서만 anchor 동의/수정 사유 작성.
+                guidance = (
+                    f"\n⚠ **anchor 참고** — 위 사례 중 🔁 동일 상담 표시가 있는 것은 "
+                    f"현재 평가 중인 원문 자체의 사람 검수 정답 (휴먼 {anchor_score}점) 입니다. "
+                    f"강력한 근거지만 **자동 채택 금지** — 본인 페르소나 정체성으로 동의/수정 판단할 것. "
+                    f"score 는 anchor 기준 ±1 단계에서 자유 조정 (±2 이상 차이 시 anchor 로 수렴).\n"
+                    f"\n작성 시 주의:\n"
+                    f"- 본인 페르소나 정체성 (system prompt 에 정의된 시각) 으로 자연스럽게 reasoning. 강제 템플릿 X.\n"
+                    f"- 다른 페르소나 본문을 그대로 복붙 금지 (같은 발화 인용은 OK, 본인 관점 해석으로 다르게 쓸 것).\n"
+                    f"- anchor 점수는 메타로 짧게만 (\"anchor {anchor_score}점에 동의\" 정도), 본문은 본인 평가 근거.\n"
+                    f"- \"VOTE_FINAL / CONSENSUS / 모든 페르소나 합의\" 같은 메타 발언 금지."
+                )
+            else:
+                guidance = (
+                    "\n위 사례들은 유사 상담의 사람 검수 정답입니다 (자기상담 없음 — anchor 강제 미적용). "
+                    "본인 페르소나 정체성으로 자율 판단. 다른 페르소나 본문 복붙 금지 (같은 발화 인용 시 본인 관점으로 다르게)."
+                )
+            parts.append(
+                f"\n[골든셋 사례 — 사람 검수 정답 (평가 항목 #{item_number}, 총 {len(hitl_cases)}건)]\n"
+                + formatted
+                + guidance
+                + "\n"
+            )
 
     # 첫 발언이면 모든 페르소나의 1차 평가 결과 노출 — 토론 출발점
     if not prev_turns and isinstance(persona_details, dict) and persona_details:

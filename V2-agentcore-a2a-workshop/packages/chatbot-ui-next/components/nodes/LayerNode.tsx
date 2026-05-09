@@ -8,10 +8,13 @@ import { memo, useEffect, useRef, useState } from "react";
 
 import type { NodeDef, NodeState } from "@/lib/pipeline";
 import { useTenantFlashKey } from "@/lib/tenantFlash";
+import { useFlashOnChange } from "@/lib/useAnimations";
 
 export interface LayerNodeData extends Record<string, unknown> {
   def: NodeDef;
   state: NodeState;
+  /** ★ 2026-05-07: Layer/agent 노드도 score 받을 수 있도록 — KMS 등 동적 점수. */
+  score?: number;
   elapsed?: number;
   /** 평균 LLM confidence (0~1) — layer1/layer3/layer4 agent 노드에도 표시. */
   confidence?: number;
@@ -24,6 +27,11 @@ export interface LayerNodeData extends Record<string, unknown> {
   };
   /** 테넌트 전환으로 새로 추가된 노드 — 1.6초 sparkle 애니메이션 */
   isNewlyAdded?: boolean;
+  /** 동적 sub 텍스트 override — 결과 들어오면 def.sub 보다 우선 표시.
+   *  KMS 노드의 검출 인텐트 ("교환, 반품") 등에 사용. */
+  dynamicSub?: string;
+  /** ★ 2026-05-07: 명시적 "📋 상세" 액션 버튼 → NodeDrawer 오픈. */
+  onOpenDetail?: (nodeId: string) => void;
 }
 
 /* ── Modern token palette ───────────────────────────────
@@ -35,75 +43,103 @@ const STATE_TOKENS: Record<
   { dot: string; ring: string; border: string; bg: string; glow: string }
 > = {
   pending: {
-    dot: "#c3beaf",
+    dot: "var(--ink-subtle)",
     ring: "transparent",
-    border: "#ece8d8",
-    bg: "#ffffff",
-    glow: "none",
+    border: "var(--border)",
+    bg: "var(--surface)",
+    glow: "var(--shadow-subtle)",
   },
   active: {
-    dot: "#c96442",
-    ring: "rgba(201,100,66,0.14)",
-    border: "#c96442",
-    bg: "#ffffff",
-    glow: "0 0 0 4px rgba(201,100,66,0.12), 0 1px 2px rgba(0,0,0,0.04), 0 8px 24px rgba(201,100,66,0.12)",
+    dot: "var(--accent)",
+    ring: "var(--accent-ring)",
+    border: "var(--accent)",
+    bg: "var(--surface)",
+    glow: "0 0 0 4px var(--accent-ring), 0 2px 4px rgba(0,0,0,0.04), 0 12px 28px var(--accent-ring)",
   },
   done: {
-    dot: "#2e7d4f",
+    dot: "var(--success)",
     ring: "transparent",
-    border: "#a8d4b9",
-    bg: "linear-gradient(180deg, #f0faf4 0%, #e8f5ed 100%)",
-    glow: "0 0 0 1px rgba(46,125,79,0.08), 0 2px 8px rgba(46,125,79,0.1)",
+    border: "var(--success-border)",
+    bg: "var(--surface)",
+    glow: "var(--shadow-subtle)",
   },
   error: {
-    dot: "#b03a2e",
+    dot: "var(--danger)",
     ring: "rgba(176,58,46,0.12)",
-    border: "#e7c9c4",
-    bg: "#fdf6f4",
+    border: "var(--danger-border)",
+    bg: "var(--danger-bg)",
     glow: "0 1px 2px rgba(176,58,46,0.08)",
   },
   "gate-failed": {
-    dot: "#b03a2e",
+    dot: "var(--danger)",
     ring: "rgba(176,58,46,0.12)",
-    border: "#e7c9c4",
-    bg: "#fdf6f4",
+    border: "var(--danger-border)",
+    bg: "var(--danger-bg)",
     glow: "0 1px 2px rgba(176,58,46,0.08)",
   },
   skipped: {
-    dot: "#bfbaa8",
+    dot: "var(--ink-subtle)",
     ring: "transparent",
-    border: "#e7e3d4",
-    bg: "#f7f5ed",
+    border: "var(--border-subtle)",
+    bg: "var(--surface-muted)",
     glow: "none",
   },
   aborted: {
-    dot: "#806328",
+    dot: "var(--warn)",
     ring: "transparent",
-    border: "#e2d5b3",
-    bg: "#fbf7e8",
+    border: "var(--warn-border)",
+    bg: "var(--warn-bg)",
     glow: "0 1px 2px rgba(128,99,40,0.08)",
   },
 };
 
 function LayerNodeImpl({ data }: NodeProps) {
   const d = data as LayerNodeData;
-  const { def, state, elapsed, confidence, tenantContext, isNewlyAdded } = d;
+  const {
+    def,
+    state,
+    score,
+    elapsed,
+    confidence,
+    tenantContext,
+    isNewlyAdded,
+    dynamicSub,
+  } = d;
   const disabled = !!def.disabled;
   const tok = STATE_TOKENS[state] ?? STATE_TOKENS.pending;
   const isData = def.type === "data";
   const isTenantConfig = def.id === "tenant_config";
   const confColor =
     confidence == null
-      ? "#9a9583"
+      ? "var(--ink-subtle)"
       : confidence >= 0.8
-        ? "#2e7d4f"
+        ? "var(--success)"
         : confidence >= 0.6
-          ? "#c96442"
-          : "#b03a2e";
+          ? "var(--accent)"
+          : "var(--danger)";
+
+  const scoreRatio = def.score && score !== undefined ? score / def.score : 0;
+  const scoreColor =
+    state !== "done"
+      ? "var(--ink-subtle)"
+      : scoreRatio >= 0.8
+        ? "var(--success)"
+        : scoreRatio >= 0.5
+          ? "var(--accent)"
+          : "var(--danger)";
+
+  // ★ 2026-05-07: 라이브 이벤트 도착 액션 — dynamicSub / score 가 바뀔 때 1.4초 강조 flash.
+  // KMS 노드: 인텐트 검출 + 인텐트별 점수 산출마다 플래시 → "방금 백엔드에서 결과 도착" 시각 신호.
+  const subFlash = useFlashOnChange(dynamicSub, 1100);
+  const scoreFlash = useFlashOnChange(score, 1100);
+  const liveFlash = subFlash || scoreFlash;
+
 
   // tenant_config 노드는 sub 텍스트 자리에 현재 site·channel·department 를 노출.
-  const subText =
-    isTenantConfig && tenantContext
+  // dynamicSub 가 있으면 (예: KMS 의 검출 인텐트) 가장 우선 표시.
+  const subText = dynamicSub
+    ? dynamicSub
+    : isTenantConfig && tenantContext
       ? `${tenantContext.siteId} · ${tenantContext.channel} · ${tenantContext.department}`
       : def.sub;
 
@@ -123,17 +159,31 @@ function LayerNodeImpl({ data }: NodeProps) {
 
   return (
     <div
-      className={sparkle ? "tenant-config-sparkle" : undefined}
+      className={[
+        sparkle ? "tenant-config-sparkle" : "",
+        liveFlash ? "kms-live-flash" : "",
+      ]
+        .filter(Boolean)
+        .join(" ") || undefined}
       title={disabled ? "현재 비활성 (테넌트 설정에서 비활성화됨)" : undefined}
       style={{
         width: def.w,
         height: def.h,
-        background: isData
-          ? "linear-gradient(180deg, #fffdf4 0%, #fbf7e8 100%)"
-          : tok.bg,
-        border: `1px solid ${isData ? "#e6dbb4" : tok.border}`,
-        borderRadius: 14,
-        boxShadow: state === "active" ? tok.glow : "0 1px 2px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.03)",
+        background: liveFlash
+          ? "var(--accent-bg)"
+          : isData
+            ? "var(--surface-muted)"
+            : tok.bg,
+        border: `${liveFlash ? "2px" : "1.5px"} solid ${
+          liveFlash ? "var(--accent)" : isData ? "var(--border-strong)" : tok.border
+        }`,
+        borderRadius: "var(--radius)",
+        // boxShadow 와 transform 은 .kms-live-flash 클래스가 키프레임으로 박동 → inline 비움.
+        boxShadow: liveFlash
+          ? undefined
+          : state === "active"
+            ? tok.glow
+            : "var(--shadow-subtle)",
         padding: "12px 16px",
         display: "flex",
         flexDirection: "column",
@@ -142,7 +192,11 @@ function LayerNodeImpl({ data }: NodeProps) {
         position: "relative",
         opacity: disabled ? 0.45 : 1,
         filter: disabled ? "grayscale(0.7)" : undefined,
-        transition: "box-shadow 0.22s cubic-bezier(0.2,0,0,1), border-color 0.22s cubic-bezier(0.2,0,0,1), background 0.22s cubic-bezier(0.2,0,0,1), opacity 0.3s ease",
+        cursor: "pointer",
+        zIndex: liveFlash ? 50 : undefined,
+        transition: liveFlash
+          ? undefined
+          : "box-shadow 0.3s cubic-bezier(0.2,0,0,1), border-color 0.3s ease, background 0.3s ease, opacity 0.3s ease",
         fontFamily:
           "var(--font-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
       }}
@@ -199,10 +253,11 @@ function LayerNodeImpl({ data }: NodeProps) {
             right: 10,
             fontSize: 9,
             fontWeight: 700,
-            color: "#8c7738",
-            background: "#faf2d4",
-            padding: "2px 6px",
-            borderRadius: 4,
+            color: "var(--warn)",
+            background: "var(--warn-bg)",
+            border: "1px solid var(--warn-border)",
+            padding: "2px 8px",
+            borderRadius: "var(--radius-pill)",
             letterSpacing: "0.08em",
             textTransform: "uppercase",
           }}
@@ -211,7 +266,7 @@ function LayerNodeImpl({ data }: NodeProps) {
         </span>
       )}
 
-      {/* ✓ Done 체크마크 — 완료 상태 피드백 */}
+      {/* ✓ Done 체크마크 */}
       {state === "done" && (
         <span
           style={{
@@ -221,14 +276,13 @@ function LayerNodeImpl({ data }: NodeProps) {
             width: 18,
             height: 18,
             borderRadius: "50%",
-            background: "#2e7d4f",
-            color: "#ffffff",
+            background: "var(--success)",
+            color: "var(--bg)",
             display: "inline-flex",
             alignItems: "center",
             justifyContent: "center",
             fontSize: 11,
             fontWeight: 800,
-            boxShadow: "0 1px 3px rgba(46,125,79,0.3)",
           }}
           aria-label="완료"
         >
@@ -238,12 +292,13 @@ function LayerNodeImpl({ data }: NodeProps) {
 
       <div
         style={{
-          fontSize: 13,
-          fontWeight: 600,
-          color: "#14110d",
-          letterSpacing: "-0.01em",
+          fontSize: 14,
+          fontWeight: 500,
+          color: "var(--ink-display)",
+          letterSpacing: "-0.02em",
           lineHeight: 1.25,
           paddingLeft: 10,
+          fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
         }}
       >
         {def.label}
@@ -251,19 +306,64 @@ function LayerNodeImpl({ data }: NodeProps) {
       {subText && (
         <div
           style={{
-            fontSize: 10.5,
-            color: isTenantConfig && tenantContext ? "#5a4f33" : "#7a7567",
+            fontSize: 11,
+            color: dynamicSub
+              ? "var(--accent-strong)"
+              : isTenantConfig && tenantContext
+                ? "var(--ink-soft)"
+                : "var(--ink-muted)",
             lineHeight: 1.35,
             paddingLeft: 10,
-            fontFamily: isTenantConfig && tenantContext
-              ? "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)"
-              : undefined,
-            fontWeight: isTenantConfig && tenantContext ? 600 : 400,
+            fontFamily:
+              isTenantConfig && tenantContext
+                ? "var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace)"
+                : undefined,
+            fontWeight: dynamicSub || (isTenantConfig && tenantContext) ? 600 : 400,
+            display: "-webkit-box",
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: "vertical",
+            overflow: "hidden",
           }}
         >
           {subText}
         </div>
       )}
+
+      {/* KMS 노드 전용 점수 칩 — 우상단. layer2 평가 노드들처럼 "—/100" placeholder + 결과 시 갱신 */}
+      {def.id === "kms" && def.score !== undefined && (
+        <span
+          title="KMS 평가 — 인텐트별 점수의 평균"
+          style={{
+            position: "absolute",
+            top: 8,
+            right: state === "done" ? 32 : 10,
+            display: "inline-flex",
+            alignItems: "baseline",
+            gap: 3,
+            fontSize: 12,
+            fontWeight: 700,
+            color: scoreColor,
+            background: "var(--surface)",
+            border: `1px solid ${typeof score === "number" ? scoreColor : "var(--border)"}`,
+            padding: "1px 8px",
+            borderRadius: "var(--radius-pill)",
+            fontVariantNumeric: "tabular-nums",
+            fontFamily: "'Mark For MC', var(--font-sans), sans-serif",
+          }}
+        >
+          <span style={{ fontSize: 13 }}>
+            {typeof score === "number"
+              ? Number.isInteger(score)
+                ? score
+                : score.toFixed(1)
+              : "—"}
+          </span>
+          <span style={{ color: "var(--ink-subtle)", fontWeight: 400, fontSize: 10 }}>
+            / {def.score}
+          </span>
+        </span>
+      )}
+
       {elapsed !== undefined && state === "done" && (
         <div
           style={{
@@ -271,14 +371,14 @@ function LayerNodeImpl({ data }: NodeProps) {
             bottom: 6,
             right: 10,
             fontSize: 10,
-            color: "#9a9583",
+            color: "var(--ink-subtle)",
             fontVariantNumeric: "tabular-nums",
           }}
         >
           {elapsed.toFixed(1)}s
         </div>
       )}
-      {/* LLM Confidence 배지 — 좌하단 (elapsed 와 겹치지 않게). */}
+      {/* LLM Confidence 배지 — 좌하단 */}
       {confidence != null && (
         <div
           title={`LLM 평균 confidence · ${(confidence * 100).toFixed(1)}%`}
@@ -289,14 +389,14 @@ function LayerNodeImpl({ data }: NodeProps) {
             display: "inline-flex",
             alignItems: "center",
             gap: 3,
-            padding: "1px 6px",
+            padding: "1px 7px",
             fontSize: 9.5,
             fontWeight: 700,
             letterSpacing: "0.02em",
             color: confColor,
-            background: `${confColor}14`,
-            border: `1px solid ${confColor}3a`,
-            borderRadius: 9999,
+            background: "var(--surface-muted)",
+            border: "1px solid var(--border)",
+            borderRadius: "var(--radius-pill)",
             fontVariantNumeric: "tabular-nums",
           }}
         >
@@ -328,9 +428,12 @@ function layerNodePropsEqual(prev: NodeProps, next: NodeProps): boolean {
   return (
     a.def === b.def &&
     a.state === b.state &&
+    a.score === b.score &&
     a.elapsed === b.elapsed &&
     a.confidence === b.confidence &&
     a.isNewlyAdded === b.isNewlyAdded &&
+    a.dynamicSub === b.dynamicSub &&
+    a.onOpenDetail === b.onOpenDetail &&
     tcEqual &&
     prev.selected === next.selected &&
     prev.dragging === next.dragging

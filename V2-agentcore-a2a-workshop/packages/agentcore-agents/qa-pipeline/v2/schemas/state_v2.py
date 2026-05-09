@@ -130,6 +130,12 @@ class QAStateV2(TypedDict, total=False):
     # report_generator_v2 가 pydantic 모델 → dict 로 덤프해서 저장.
     report: dict[str, Any]
 
+    # ★ 2026-05-08: report_narrator 가 LLM 으로 작성하는 자연어 마무리 결론·코칭.
+    # 구조: {narrative, strengths[], improvements[], coaching_points[{category, priority, title, detail}]}
+    # 기존 report.summary (결정적 조립) 는 그대로 유지하고, 본 필드는 보고서 끝에
+    # "AI 마무리 총평" 섹션으로 추가 노출. 실패/skip 시 부재 → 결정적 보고서만 표시.
+    report_llm_summary: dict[str, Any]
+
     # GT 비교 (gt_sample_id 가 주입된 경우만 활성).
     # gt_comparison: 점수 비교 — Layer 4 후속, gt_comparison_node 가 채움.
     # gt_evidence_comparison: 근거 LLM 비교 — gt_evidence_comparison_node 가 채움.
@@ -158,6 +164,25 @@ class QAStateV2(TypedDict, total=False):
     #   "summary": str,
     # }
     ksqi_report: dict[str, Any]
+
+    # =====================================================================
+    # [KMS — 인텐트별 KMS 데이터 평가 (2026-05-06 추가)]
+    # =====================================================================
+    # Layer 1 직후 *가장 먼저* 실행. 인텐트 분류 (Step 1) → 인텐트별 md 평가 (Step 2).
+    # 결과는 sub-agent 들과 분리 — 별도 KmsReportCard 표시.
+    # 구조: {
+    #   "available": bool,
+    #   "reason": str?,
+    #   "detected_intents": list[str],
+    #   "classification_rationale": str,
+    #   "evaluations_by_intent": {intent: {score, reasoning, applied_branches, tab_evaluations, summary}},
+    #   "used_tabs": list[str],
+    # }
+    kms_evaluation: dict[str, Any]
+
+    # KMS 인텐트 분류 모드 — "llm" (Sonnet 4.6 Tool Use, 기본) | "linear_rag" (Tri-Graph 대안).
+    # 프론트 토글에서 사용자가 선택. server_v2._build_initial_state 가 body.kms_intent_mode 를 매핑.
+    kms_intent_mode: str
 
     # 통합 최종 보고서 — 두 분기 (기존 #1~#18 / KSQI 9) 모두 종료 후 한 artifact 로 묶음.
     # 두 보고서는 채점 체계가 다르므로 sub-section 으로 분리 보존, 상위에 메타·요약 추가.

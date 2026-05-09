@@ -43,6 +43,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import os
 import re
 from langchain_core.messages import HumanMessage, SystemMessage
 from nodes.llm import LLMTimeoutError, get_chat_model, invoke_and_parse
@@ -58,6 +59,45 @@ from typing import Any
 
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# 운영 토글 — 노드 일시 비활성 (회색 처리용)
+# ---------------------------------------------------------------------------
+# 환경변수 QA_DISABLED_NODES (콤마 구분). 기본 "work_accuracy".
+# 비활성 시: LLM 호출 / regex 분석 모두 skip, score=max 의 placeholder 반환.
+# evaluation_mode="disabled" 로 표시되어 frontend 가 회색 처리.
+# 다시 활성: QA_DISABLED_NODES="" 또는 work_accuracy 제거.
+
+
+def _is_node_disabled(node_name: str = "work_accuracy") -> bool:
+    raw = os.environ.get("QA_DISABLED_NODES", "work_accuracy")
+    disabled = {n.strip() for n in raw.split(",") if n.strip()}
+    return node_name in disabled
+
+
+def _build_disabled_result(item_number: int, item_name: str, max_score: int) -> dict[str, Any]:
+    """work_accuracy 비활성 시 반환할 placeholder 결과.
+
+    score=max (점수 합산 영향 0), evaluation_mode="disabled" 로 표시.
+    frontend 가 evaluation_mode 인지하여 회색 처리.
+    """
+    return {
+        "status": "success",
+        "agent_id": "work-accuracy-agent",
+        "evaluation": {
+            "item_number": item_number,
+            "item_name": item_name,
+            "max_score": max_score,
+            "score": max_score,
+            "evaluation_mode": "disabled",
+            "judgment": "[DISABLED] 노드 비활성 상태 — 채점 미수행 (운영 토글로 일시 비활성)",
+            "evidence": [],
+            "deductions": [],
+            "confidence": 1.0,
+            "flag": "node_disabled",
+        },
+    }
 
 # Scorer instance for rule-based score validation per qa_rules.py
 _scorer = Scorer()
@@ -219,6 +259,16 @@ async def work_accuracy_node(state: QAState, ctx: NodeContext) -> dict[str, Any]
 
     Returns {"evaluations": [result1, result2]} for operator.add merge.
     """
+    # --- 운영 토글 — 노드 비활성 시 LLM 호출 skip + placeholder 반환 ---
+    if _is_node_disabled("work_accuracy"):
+        logger.info("work_accuracy_node: 비활성 상태 — placeholder 결과 반환 (회색 처리용)")
+        return {
+            "evaluations": [
+                _build_disabled_result(15, "정확한 안내", 10),
+                _build_disabled_result(16, "필수 안내 이행", 5),
+            ]
+        }
+
     # --- 선별 턴 할당 우선 사용, 폴백으로 전체 transcript ---
     # NOTE: assignment 우선 패턴 보존 — ctx.transcript 미사용
     assignment = state.get("agent_turn_assignments", {}).get("work_accuracy", {})

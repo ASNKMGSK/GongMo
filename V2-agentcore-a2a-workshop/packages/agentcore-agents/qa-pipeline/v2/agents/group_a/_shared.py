@@ -15,7 +15,8 @@ from __future__ import annotations
 import asyncio
 import logging
 import time
-from typing import Any, Literal
+from datetime import UTC, datetime
+from typing import Any, Callable, Literal
 
 from nodes.skills.reconciler import normalize_fallback_deductions
 from v2.contracts.preprocessing import Preprocessing, RulePreVerdict, item_key
@@ -24,6 +25,129 @@ from v2.schemas.enums import CATEGORY_META, FORCE_T3_ITEMS, CategoryKey, Evaluat
 
 
 logger = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# RAG hits 라이브 SSE emitter (2026-05-08)
+# ---------------------------------------------------------------------------
+#
+# 목적: Sub-agent 가 RAG 검색을 끝낸 직후 (LLM 평가/토론 시작 전) 프론트에
+# `rag_hits_ready` SSE 이벤트로 hits 를 즉시 흘려서 NodeDrawer 가 토론
+# 종료를 기다리지 않고 표시할 수 있게 한다.
+#
+# 콜백 채널: `state["_debate_on_event"]` — server_v2.py 가 주입한 sync callable.
+# 이 콜백은 server_v2 의 `_rt_event_queue` 에 (event_name, payload) 푸시하고
+# SSE generator 가 클라이언트로 흘림. 토론용 채널이지만 같은 채널을 재사용.
+#
+# 호환성: 콜백 미주입 (배치 실행 등) 환경에서는 silently no-op.
+
+def emit_rag_hits_ready(
+    on_event: Callable[[str, dict[str, Any]], None] | None,
+    *,
+    node_id: str,
+    agent_id: str | None,
+    item_number: int,
+    phase: Literal["layer2", "debate"] = "layer2",
+    fewshot: list[dict[str, Any]] | None = None,
+    fewshot_query: str | None = None,
+    intent: str | None = None,
+) -> None:
+    """RAG fewshot 검색 직후 SSE 이벤트 emit.
+
+    Sub-agent / debate 양쪽에서 동일 시그니처로 호출. 콜백이 None 이거나
+    호출 자체가 실패해도 silently 흡수 — 평가 본 흐름 절대 중단 X.
+
+    Parameters
+    ----------
+    on_event : callable | None
+        `state["_debate_on_event"]` (server_v2 주입). None 이면 no-op.
+    node_id : str
+        프론트 NodeDrawer 매칭 키 (예: "greeting", "listening_comm",
+        "language", "needs", "explanation", "proactiveness",
+        "work_accuracy", "privacy").
+    agent_id : str | None
+        진단용 agent_id (선택). None 이면 node_id 사용.
+    item_number : int
+        평가 항목 번호.
+    phase : "layer2" | "debate"
+        호출 시점. "layer2" = sub-agent RAG, "debate" = 토론 시작 전 골든셋.
+    fewshot : list[dict] | None
+        `safe_retrieve_fewshot` 의 list[dict] 또는 동등 형식. None → [].
+    fewshot_query : str | None
+        진단용 검색 쿼리. 너무 길면 잘라서 전송 (1000자 상한).
+    intent : str | None
+        intent_type (e.g. "주문배송", "general_inquiry").
+    """
+    if on_event is None:
+        return
+    try:
+        # fewshot raw → make_rag_evidence 와 동일한 직렬화 (프론트 호환)
+        fewshot_details: list[dict[str, Any]] = []
+        for ex in fewshot or []:
+            if not isinstance(ex, dict):
+                continue
+            ex_id = ex.get("example_id")
+            if not ex_id:
+                continue
+            rater = ex.get("rater_meta") or {}
+            if not isinstance(rater, dict):
+                rater = {}
+            fewshot_details.append({
+                "example_id": str(ex_id),
+                "item_number": ex.get("item_number"),
+                "score": ex.get("score"),
+                "score_bucket": ex.get("score_bucket"),
+                "intent": ex.get("intent"),
+                # 2026-05-08: 사용자 요청 — 검색 원문 truncation 폐지. 프론트 토글로 접음.
+                "segment_text": ex.get("segment_text") or "",
+                "rationale": ex.get("rationale") or "",
+                "rationale_tags": ex.get("rationale_tags") or [],
+                # 평가항목별로 파싱된 골든셋 원문 (긴 문맥). 프론트 카드 토글 표시.
+                # 2026-05-08: 2000자 cap 제거 — 사용자가 토글로 펼쳐 전체 확인.
+                "parsed_text": ex.get("parsed_text") or "",
+                "rater_type": rater.get("rater_type"),
+                "rater_source": rater.get("source"),
+                "similarity": rater.get("similarity"),
+                "rrf_score": rater.get("rrf_score"),
+                "bm25_score": rater.get("bm25_score"),
+                "cosine_score": rater.get("cosine_score"),
+                "bm25_rank": rater.get("bm25_rank"),
+                "knn_rank": rater.get("knn_rank"),
+                "cohere_rerank_score": rater.get("cohere_rerank_score"),
+                "reranked": bool(rater.get("reranked")),
+                "rerank_provider": rater.get("rerank_provider"),
+            })
+        payload: dict[str, Any] = {
+            "node_id": node_id,
+            "agent_id": agent_id or node_id,
+            "item_number": int(item_number),
+            "phase": phase,
+            "fewshot": fewshot_details,
+            # 2026-05-08: 사용자 요청 — 검색어 원문 truncation 4000자로 확장.
+            # 프론트 NodeDrawer "검색어 · sub-agent fewshot" 박스가 원문 더 보여줌.
+            "fewshot_query": (fewshot_query or "")[:4000] if fewshot_query else "",
+            "intent": intent or "",
+            "reranked": any(d.get("reranked") for d in fewshot_details),
+            "ts": datetime.now(tz=UTC).isoformat(timespec="seconds"),
+        }
+        on_event("rag_hits_ready", payload)
+        # ★ 2026-05-08: cos/rrf/rerank 칩 빠짐 디버깅용 — rater_meta 채워졌는지 hit 별 점수 노출.
+        # 빈 rater_meta 가 많이 보이면 AOSS 폴백 (jaccard) 또는 reranker 호출 실패 의심.
+        score_summary = [
+            {
+                "id": d.get("example_id"),
+                "cos": d.get("cosine_score"),
+                "rrf": d.get("rrf_score"),
+                "rr": d.get("cohere_rerank_score"),
+            }
+            for d in fewshot_details[:3]
+        ]
+        logger.info(
+            "[rag_hits_ready emit] node=%s item=%d phase=%s hits=%d scores=%s",
+            node_id, item_number, phase, len(fewshot_details), score_summary,
+        )
+    except Exception:  # pragma: no cover — emit 실패가 평가 중단시키면 안 됨
+        logger.warning("rag_hits_ready emit 실패 (node=%s item=%s)", node_id, item_number, exc_info=True)
 
 
 # ---------------------------------------------------------------------------
@@ -135,9 +259,13 @@ def make_rag_evidence(
                 "score": ex.get("score"),
                 "score_bucket": ex.get("score_bucket"),
                 "intent": ex.get("intent"),
-                "segment_text": (ex.get("segment_text") or "")[:300],
-                "rationale": (ex.get("rationale") or "")[:300],
+                # 2026-05-08: 사용자 요청 — 검색 원문 truncation 폐지. 프론트 토글로 접음.
+                "segment_text": ex.get("segment_text") or "",
+                "rationale": ex.get("rationale") or "",
                 "rationale_tags": ex.get("rationale_tags") or [],
+                # 평가항목별로 파싱된 골든셋 원문 (긴 문맥). 프론트 카드 토글 표시.
+                # 2026-05-08: 2000자 cap 제거 — 사용자가 토글로 펼쳐 전체 확인.
+                "parsed_text": ex.get("parsed_text") or "",
                 "rater_type": rater.get("rater_type"),
                 "rater_source": rater.get("source"),
                 # similarity = 기존 호환 필드 (RRF score)
@@ -148,6 +276,9 @@ def make_rag_evidence(
                 "cosine_score": rater.get("cosine_score"),
                 "bm25_rank": rater.get("bm25_rank"),
                 "knn_rank": rater.get("knn_rank"),
+                "cohere_rerank_score": rater.get("cohere_rerank_score"),
+                "reranked": bool(rater.get("reranked")),
+                "rerank_provider": rater.get("rerank_provider"),
             })
         else:
             ex_id = getattr(ex, "example_id", None)
@@ -162,9 +293,13 @@ def make_rag_evidence(
                 "score": getattr(ex, "score", None),
                 "score_bucket": getattr(ex, "score_bucket", None),
                 "intent": getattr(ex, "intent", None),
-                "segment_text": (getattr(ex, "segment_text", "") or "")[:300],
-                "rationale": (getattr(ex, "rationale", "") or "")[:300],
+                # 2026-05-08: 사용자 요청 — 검색 원문 truncation 폐지.
+                "segment_text": getattr(ex, "segment_text", "") or "",
+                "rationale": getattr(ex, "rationale", "") or "",
                 "rationale_tags": getattr(ex, "rationale_tags", None) or [],
+                # 평가항목별로 파싱된 골든셋 원문 (긴 문맥). 프론트 카드 토글 표시.
+                # 2026-05-08: parsed_text truncation 폐지 — 프론트 토글로 전체 표시.
+                "parsed_text": getattr(ex, "parsed_text", "") or "",
                 "rater_type": rater_dict.get("rater_type"),
                 "rater_source": rater_dict.get("source"),
                 "similarity": rater_dict.get("similarity"),
@@ -173,6 +308,9 @@ def make_rag_evidence(
                 "cosine_score": rater_dict.get("cosine_score"),
                 "bm25_rank": rater_dict.get("bm25_rank"),
                 "knn_rank": rater_dict.get("knn_rank"),
+                "cohere_rerank_score": rater_dict.get("cohere_rerank_score"),
+                "reranked": bool(rater_dict.get("reranked")),
+                "rerank_provider": rater_dict.get("rerank_provider"),
             })
 
     reasoning_details: list[dict[str, Any]] = []
@@ -195,9 +333,10 @@ def make_rag_evidence(
                 "example_id": str(ex_id),
                 "item_number": item_num,
                 "score": score_val,
-                "rationale": rationale[:300],
+                # 2026-05-08: truncation 폐지 — 프론트 토글로 처리.
+                "rationale": rationale,
                 "rationale_tags": tags,
-                "quote_example": (quote_example or "")[:300],
+                "quote_example": quote_example or "",
                 "evaluator_id": evaluator_id,
                 "similarity": similarity,
                 "rrf_score": rater_dict_r.get("rrf_score"),
@@ -205,6 +344,9 @@ def make_rag_evidence(
                 "cosine_score": rater_dict_r.get("cosine_score"),
                 "bm25_rank": rater_dict_r.get("bm25_rank"),
                 "knn_rank": rater_dict_r.get("knn_rank"),
+                "cohere_rerank_score": rater_dict_r.get("cohere_rerank_score"),
+                "reranked": bool(rater_dict_r.get("reranked")),
+                "rerank_provider": rater_dict_r.get("rerank_provider"),
             })
 
     knowledge_details: list[dict[str, Any]] = []
@@ -219,6 +361,8 @@ def make_rag_evidence(
                 "tags": getattr(ch, "tags", None) if not isinstance(ch, dict) else ch.get("tags") or [],
                 "source_ref": getattr(ch, "source_ref", None) if not isinstance(ch, dict) else ch.get("source_ref"),
                 "text": ((getattr(ch, "text", "") if not isinstance(ch, dict) else ch.get("text", "")) or "")[:400],
+                # 2026-05-08: rerank() 호출 시점의 provider ("cohere" | "llm") — UI chip 표시용.
+                "rerank_provider": getattr(ch, "rerank_provider", None) if not isinstance(ch, dict) else ch.get("rerank_provider"),
             })
 
     def _trim(s: str | None, n: int = 2000) -> str | None:
@@ -349,7 +493,11 @@ def build_item_verdict(
         signals["rag_stdev"] = float(rag_stdev)
 
     verdict: dict[str, Any] = {
+        # ★ 2026-04-30 fix: report_generator_v2 + group_b 가 "item_name" 키를 표준으로 사용.
+        # 이전엔 group_a 만 "item" 키로 저장해서 report 가 fallback "항목 N" 표시.
+        # 양쪽 키 모두 채워 backward-compat 유지하되 item_name 을 canonical 로 통일.
         "item": item_name,
+        "item_name": item_name,
         "item_number": item_number,
         "max_score": max_score,
         "score": score,
@@ -516,6 +664,7 @@ def safe_retrieve_fewshot(
                 "score": ex.score, "score_bucket": ex.score_bucket,
                 "intent": ex.intent,
                 "segment_text": ex.segment_text, "rationale": ex.rationale,
+                "parsed_text": getattr(ex, "parsed_text", "") or "",
                 "rationale_tags": ex.rationale_tags,
                 "rater_meta": ex.rater_meta or {},
             }

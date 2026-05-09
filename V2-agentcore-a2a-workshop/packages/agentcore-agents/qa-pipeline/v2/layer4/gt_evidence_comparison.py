@@ -91,7 +91,16 @@ JSON 으로만 응답 (다른 텍스트 금지):
 def _build_user_message(item: dict[str, Any]) -> str:
     ai_lines = item.get("ai_evidence") or []
     gt_note = item.get("note") or ""
+    gt_excerpt = item.get("gt_evidence_excerpt") or ""
     ai_text = "\n".join(f"  - {ln}" for ln in ai_lines) if ai_lines else "  (없음)"
+    # ★ 2026-05-07: GT STT 발췌 (col 7) — "T 구간에서..." 의 T 가 어떤 발화인지 LLM 에 전달.
+    # 사람 QA 의 코멘트(note) 가 turn 좌표만 언급할 때 발화 본문이 빠져 비교 정합성 저하.
+    gt_excerpt_block = ""
+    if gt_excerpt:
+        gt_excerpt_block = (
+            f"\n## (A') 사람 QA 가 참조한 STT 발화 (xlsx STT 원문)\n"
+            f"{gt_excerpt}\n"
+        )
     return (
         f"## 평가 항목\n"
         f"#{item.get('item_number')} {item.get('item_name') or ''}  (배점 {item.get('max_score')})\n\n"
@@ -99,7 +108,8 @@ def _build_user_message(item: dict[str, Any]) -> str:
         f"- 사람 QA: {item.get('gt_score')}\n"
         f"- AI    : {item.get('ai_score')}\n\n"
         f"## (A) 사람 QA 정답 근거 (xlsx 비고)\n"
-        f"{gt_note or '(없음)'}\n\n"
+        f"{gt_note or '(없음)'}\n"
+        f"{gt_excerpt_block}\n"
         f"## (B) AI 평가 근거 (evidence)\n"
         f"{ai_text}\n\n"
         "## (B) AI 판정 요약\n"
@@ -156,6 +166,8 @@ async def _judge_item(
         "ai_evidence": item.get("ai_evidence") or [],
         "ai_judgment": item.get("ai_judgment") or "",
         "gt_note": item.get("note") or "",
+        # ★ 2026-05-07: GT col 7 STT 원문 발췌 — 프론트가 "사람 QA가 본 발화" 칸에 노출.
+        "gt_evidence_excerpt": item.get("gt_evidence_excerpt") or "",
     }
 
     has_ai = bool(base["ai_evidence"]) or bool(base["ai_judgment"])

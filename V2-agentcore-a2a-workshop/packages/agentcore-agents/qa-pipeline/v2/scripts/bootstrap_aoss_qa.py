@@ -99,6 +99,10 @@ def _count_golden_total(tenant_id: str) -> int:
     dir_ = _TENANTS_DIR / tenant_id / "golden_set"
     if not dir_.exists():
         return 0
+    # md 파일 우선 (1 파일 = 1 chunk). 없으면 legacy JSON.
+    md_files = [p for p in dir_.glob("*.md") if not p.name.startswith("_")]
+    if md_files:
+        return len(md_files)
     n = 0
     for path in sorted(dir_.glob("*.json")):
         if path.name.startswith("_"):
@@ -106,6 +110,135 @@ def _count_golden_total(tenant_id: str) -> int:
         data = _load_json(path)
         n += len(data.get("examples", []))
     return n
+
+
+# ---------------------------------------------------------------------------
+# md 파서 — `# [item_NN] 항목명 — sample SID` 헤더 + 4 섹션 (파싱 원문 / 점수 / 이유 / 근거)
+# ---------------------------------------------------------------------------
+
+import re as _re_md  # local alias
+
+_MD_HEADER_RE = _re_md.compile(r"^#\s*\[item_(\d+)\]\s*(.+?)\s*—\s*sample\s+(\S+)\s*$")
+_MD_SCORE_RE = _re_md.compile(r"\*\*(\d+)점\*\*\s*/\s*(\d+)점\s*\((\w+)\)")
+_MD_SECTION_RE = _re_md.compile(r"^##\s+(.+?)\s*$")
+# dash/equal/star/underscore 만으로 이루어진 구분 줄 — GT 엑셀 작성자가 발췌 사이 끼워넣은
+# 시각 구분자가 임베딩 노이즈 + 화면 노이즈로 작용해서 정화 대상.
+_DASH_SEPARATOR_RE = _re_md.compile(r"^[\-=*_~·•·\s]{3,}$")
+
+
+def _strip_separator_lines(text: str) -> str:
+    """text 내부의 dash 전용 구분줄 제거 + 연속 빈 줄 압축."""
+    if not text:
+        return ""
+    out: list[str] = []
+    for raw in text.splitlines():
+        stripped = raw.strip()
+        if stripped and _DASH_SEPARATOR_RE.match(stripped):
+            continue
+        out.append(raw.rstrip())
+    compact: list[str] = []
+    prev_blank = False
+    for line in out:
+        is_blank = not line.strip()
+        if is_blank and prev_blank:
+            continue
+        compact.append(line)
+        prev_blank = is_blank
+    return "\n".join(compact).strip()
+
+
+def _parse_golden_md(path) -> dict | None:
+    """md 1파일 → JSON example 형식 dict 1개로 반환. 형식 안 맞으면 None.
+
+    추출:
+      item_number, sample_id, item_name (헤더)
+      score, max_score, score_bucket (## 점수 섹션)
+      rationale (## 이유 섹션)
+      segment_text (## 근거 섹션 코드블록)
+      parsed_text (## 파싱 원문 섹션 코드블록 — 임베딩 보강용)
+    """
+    try:
+        text = path.read_text(encoding="utf-8")
+    except Exception as e:  # noqa: BLE001
+        logger.warning("md 읽기 실패 %s: %s", path, e)
+        return None
+
+    lines = text.splitlines()
+    if not lines:
+        return None
+
+    # 헤더 파싱
+    header_m = None
+    for ln in lines[:5]:
+        m = _MD_HEADER_RE.match(ln.strip())
+        if m:
+            header_m = m
+            break
+    if not header_m:
+        return None
+    item_number = int(header_m.group(1))
+    item_name = header_m.group(2).strip()
+    sample_id = header_m.group(3).strip()
+
+    # 섹션 분리 (코드블록 인식 — 코드블록 내부의 ## 는 무시)
+    sections: dict[str, list[str]] = {}
+    current: str | None = None
+    in_code = False
+    for ln in lines:
+        stripped = ln.strip()
+        if stripped.startswith("```"):
+            in_code = not in_code
+            if current is not None:
+                sections[current].append(ln)
+            continue
+        if not in_code:
+            sm = _MD_SECTION_RE.match(stripped)
+            if sm:
+                current = sm.group(1).strip()
+                sections[current] = []
+                continue
+        if current is not None:
+            sections[current].append(ln)
+
+    def _section_text(prefix: str) -> str:
+        for k, v in sections.items():
+            if k.startswith(prefix):
+                # 코드블록 ``` 라인 제거하고 join
+                body = [ln for ln in v if not ln.strip().startswith("```")]
+                return "\n".join(body).strip()
+        return ""
+
+    score_block = _section_text("점수")
+    rationale = _strip_separator_lines(_section_text("이유"))
+    segment_text = _strip_separator_lines(_section_text("근거"))
+    parsed_text = _strip_separator_lines(_section_text("파싱 원문"))
+
+    score = None
+    max_score = None
+    score_bucket = "unknown"
+    sm = _MD_SCORE_RE.search(score_block)
+    if sm:
+        score = int(sm.group(1))
+        max_score = int(sm.group(2))
+        score_bucket = sm.group(3)
+
+    return {
+        "example_id": f"GS-{item_number:02d}-{sample_id}",
+        "_item_number": item_number,
+        "_item_name": item_name,
+        "score": score,
+        "score_bucket": score_bucket,
+        "intent": "*",
+        "segment_text": segment_text,
+        "rationale": rationale,
+        "parsed_text": parsed_text,  # 임베딩 추가 신호
+        "rationale_tags": [],
+        "rater_meta": {
+            "rater_type": "single_expert",
+            "source": "md_chunk",
+            "sample_id": sample_id,
+        },
+    }
 
 
 def _count_reasoning_total(tenant_id: str) -> int:
@@ -160,6 +293,7 @@ def _index_golden(
     *,
     concurrency: int = DEFAULT_EMBED_CONCURRENCY,
     batch_size: int = DEFAULT_BULK_BATCH,
+    item_filter: list[int] | None = None,
 ) -> tuple[int, int]:
     dir_ = _TENANTS_DIR / tenant_id / "golden_set"
     if not dir_.exists():
@@ -168,20 +302,51 @@ def _index_golden(
     total = _count_golden_total(tenant_id)
     _emit_progress(tenant_id, "golden", total=total, current=0, status="start")
 
-    # 1) 모든 example 을 메모리에 수집
+    # 1) 모든 example 을 메모리에 수집 — md 우선, 없으면 legacy JSON
     examples: list[dict] = []
-    for path in sorted(dir_.glob("*.json")):
-        if path.name.startswith("_"):
-            continue
-        data = _load_json(path)
-        if not data:
-            continue
-        item_no = data.get("item_number")
-        for ex in data.get("examples", []):
-            if not ex.get("example_id"):
+    md_files = sorted(p for p in dir_.glob("*.md") if not p.name.startswith("_"))
+    if md_files:
+        for path in md_files:
+            ex = _parse_golden_md(path)
+            if ex is None:
+                logger.warning("md 파싱 실패 — skip: %s", path.name)
                 continue
-            ex["_item_number"] = item_no
             examples.append(ex)
+        logger.info("golden md 모드: %d 청크 로드 (tenant=%s)", len(examples), tenant_id)
+    else:
+        for path in sorted(dir_.glob("*.json")):
+            if path.name.startswith("_"):
+                continue
+            data = _load_json(path)
+            if not data:
+                continue
+            item_no = data.get("item_number")
+            for ex in data.get("examples", []):
+                if not ex.get("example_id"):
+                    continue
+                ex["_item_number"] = item_no
+                examples.append(ex)
+
+    # 2) 항목별 빌드 모드 — item_filter 지정 시 해당 item_number 만 남김 + 기존 docs 삭제
+    if item_filter:
+        before_n = len(examples)
+        examples = [ex for ex in examples if ex.get("_item_number") in item_filter]
+        logger.info(
+            "항목별 빌드: %s 항목으로 필터 — %d → %d 청크",
+            item_filter, before_n, len(examples),
+        )
+        # 기존 doc 삭제 (해당 항목만) — 중복 누적 방지
+        if not dry_run:
+            for item_no in item_filter:
+                try:
+                    n = store.delete_by_item(tenant_id, item_no)
+                    logger.info("기존 doc 삭제 완료 tenant=%s item=%d → %d docs",
+                                tenant_id, item_no, n)
+                except Exception as e:  # noqa: BLE001
+                    logger.warning(
+                        "delete_by_item 실패 (계속 진행 — 중복 가능) tenant=%s item=%d: %s",
+                        tenant_id, item_no, e,
+                    )
 
     if not examples:
         _emit_progress(tenant_id, "golden", total=0, current=0, status="empty")
@@ -192,7 +357,14 @@ def _index_golden(
     chunk = max(batch_size, concurrency)
     for start in range(0, len(examples), chunk):
         batch = examples[start:start + chunk]
-        texts = [f"{ex.get('segment_text','')} | {ex.get('rationale','')}" for ex in batch]
+        # 임베딩 텍스트: segment_text + rationale + parsed_text (md 모드 시)
+        texts = []
+        for ex in batch:
+            base = f"{ex.get('segment_text','')} | {ex.get('rationale','')}"
+            ptext = ex.get("parsed_text", "")
+            if ptext:
+                base = f"{base} | {ptext}"
+            texts.append(base)
         vecs = _embed_many_parallel(texts, concurrency=concurrency, dry_run=dry_run)
         docs: list[tuple[str, dict]] = []
         for ex, vec in zip(batch, vecs):
@@ -223,6 +395,9 @@ def _index_golden(
                 "rater_type": rater.get("rater_type"),
                 "rater_source": rater.get("source"),
             }
+            # md 모드: 파싱 원문 추가 필드 (검색 결과 컨텍스트로 LLM 에 전달 가능)
+            if ex.get("parsed_text"):
+                doc["parsed_text"] = ex["parsed_text"]
             # external_id = tenant:example_id:hash — 내용 변경 시 자동으로 새 external_id
             docs.append((f"{tenant_id}:{ex.get('example_id')}:{chash}", doc))
 
@@ -502,7 +677,22 @@ def main() -> int:
         "--batch-size", type=int, default=DEFAULT_BULK_BATCH,
         help=f"AOSS _bulk 배치당 문서 수 (기본 {DEFAULT_BULK_BATCH})",
     )
+    ap.add_argument(
+        "--item-numbers",
+        type=str,
+        default="",
+        help="항목별 빌드 — 콤마 분리 (예: '10,11,12'). 지정 시 해당 item_number 만 인덱싱 (golden_set + reasoning_index). 비어있으면 전체.",
+    )
     args = ap.parse_args()
+    # item_numbers 파싱
+    item_filter: list[int] | None = None
+    if args.item_numbers and args.item_numbers.strip():
+        try:
+            item_filter = sorted({int(x.strip()) for x in args.item_numbers.split(",") if x.strip()})
+        except ValueError:
+            logger.error("--item-numbers 파싱 실패: %s", args.item_numbers)
+            return 1
+        logger.info("항목별 빌드 모드 — item_numbers=%s", item_filter)
 
     if get_backend() != "titan":
         logger.error("QA_RAG_EMBEDDING=titan 이 아님 — bootstrap 은 Titan 필요. env 설정 후 재실행.")
@@ -555,6 +745,7 @@ def main() -> int:
         g_ok, g_fail = _index_golden(
             golden, t, args.dry_run,
             concurrency=args.concurrency, batch_size=args.batch_size,
+            item_filter=item_filter,
         )
         r_ok, r_fail = _index_reasoning(
             reasoning, t, args.dry_run,

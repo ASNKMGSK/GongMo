@@ -36,3 +36,9 @@ httpx>=0.27.0
 
 # YAML / TOML
 pyyaml>=6.0.1
+
+# AOSS (OpenSearch Serverless) — RAG 4종 인덱스 client
+# v2/rag/aoss_store.py · v2/hitl/rag_retriever.py · v2/hitl/rag_ingester.py
+# 부재 시 모든 AOSS 호출 silent fail → RAG Admin "미빌드" 표시.
+opensearch-py>=2.6.0
+requests-aws4auth>=1.2.3

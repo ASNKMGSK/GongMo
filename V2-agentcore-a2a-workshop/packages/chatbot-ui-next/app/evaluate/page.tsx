@@ -11,6 +11,10 @@ export const metadata = {
   title: "평가 · QA Pipeline V3",
 };
 
+// /evaluate 는 SSE 스트리밍 + useSearchParams 사용 → 정적 prerender 불가.
+// force-dynamic 으로 빌드 시 prerender 단계 자체를 우회 (Next.js 16 missing-suspense-with-csr-bailout 회피).
+export const dynamic = "force-dynamic";
+
 function TabsFallback() {
   return (
     <div className="empty-state">

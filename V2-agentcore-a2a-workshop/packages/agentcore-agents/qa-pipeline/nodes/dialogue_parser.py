@@ -287,9 +287,15 @@ def _detect_segments(turns: list[dict[str, Any]]) -> dict[str, list[int]]:
     add_inq_start = _last_group_start(add_inquiry_indices)
     farewell_start = _last_group_start(farewell_indices)
 
-    candidates = [c for c in (add_inq_start, farewell_start) if c >= 0]
-    if candidates:
-        closing_start_idx = max(candidates)
+    # ★ 2026-04-30 fix: 추가문의 우선 (주석 의도 — ISSUE-E-003).
+    # 이전엔 max(candidates) 라서 "추가문의 → 끝인사" 시퀀스에서 끝인사 (later) 가 선택돼
+    # "추가적으로 더 문의사항 있으실까요" 턴이 closing 에 안 들어감 → LLM 이 못 보고
+    # 끝인사 (#2) 평가에서 "추가문의 확인 누락" 으로 잘못 -2점.
+    # 사용자 보고 (668526): "원문이 짤려서 들어가서" — closing 구간 너무 좁게 잡힘.
+    if add_inq_start >= 0:
+        closing_start_idx = add_inq_start
+    elif farewell_start >= 0:
+        closing_start_idx = farewell_start
 
     # ISSUE-E-003: 둘 다 미탐지 시 보수적 보정 (마지막 3턴만, 본문 말미 흡수 최소화)
     if closing_start_idx >= total:

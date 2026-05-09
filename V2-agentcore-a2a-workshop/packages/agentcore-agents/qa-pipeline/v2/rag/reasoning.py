@@ -315,8 +315,51 @@ def retrieve_reasoning(
     반환 `ReasoningResult.stdev` 는 Dev5 Layer 4 에서 confidence 지표로 사용.
     본 반환값을 절대 점수 산출에 사용하지 말 것 (원칙 7.5 위반).
     """
+    # 전역 RAG 비활성 토글 — 빈 ReasoningResult 반환. Layer 4 의 rag_stdev 신호는 None.
+    from . import is_rag_disabled, is_reranker_enabled, rerank
+
+    if is_rag_disabled():
+        logger.info(
+            "[RAG reasoning] item #%d tenant=%s → SKIPPED (rag_disabled)",
+            item_number, tenant_id,
+        )
+        return ReasoningResult(
+            item_number=item_number,
+            examples=[],
+            stdev=0.0,
+            mean=0.0,
+            sample_size=0,
+            query_slice=transcript_slice or "",
+            match_reason="rag_disabled",
+        )
+
     engine = _get_engine(tenant_id)
-    result = engine.retrieve(item_number, transcript_slice, top_k=top_k)
+    # 사용자 지시 (2026-05-08): fetch_k 모두 10 으로 고정.
+    fetch_k = 10
+    result = engine.retrieve(item_number, transcript_slice, top_k=fetch_k)
+    if is_reranker_enabled() and len(result.examples) > top_k:
+        docs = [(ex.rationale or "") for ex in result.examples]
+        order, ok = rerank(transcript_slice or "", docs, top_n=top_k)
+        # 2026-05-08: rerank() 호출 시점의 provider — UI 가 chip 에 표시.
+        from . import get_reranker_provider as _get_provider
+        _provider_at_call = _get_provider()
+        if order and ok:
+            new_examples = []
+            for original_idx, score in order:
+                ex = result.examples[original_idx]
+                rater = dict(ex.rater_meta) if ex.rater_meta else {}
+                rater["cohere_rerank_score"] = score
+                rater["reranked"] = True
+                rater["rerank_provider"] = _provider_at_call
+                ex.rater_meta = rater
+                new_examples.append(ex)
+            result.examples = new_examples
+            result.match_reason = (result.match_reason or "") + " · reranked"
+        elif order and not ok:
+            # 폴백 — 입력 순서로 잘렸지만 reranked 마킹 안 함. UI 가 "🎯 rr 0.00" 안 보이도록.
+            new_examples = [result.examples[original_idx] for original_idx, _ in order]
+            result.examples = new_examples
+            result.match_reason = (result.match_reason or "") + " · reranker_fallback"
     if result.sample_size > 0:
         mean_val = getattr(result, "mean", None)
         logger.info(

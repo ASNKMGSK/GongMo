@@ -52,6 +52,19 @@ GateFactory = Callable[[str], "threading.Event"]
 
 
 # ---------------------------------------------------------------------------
+# RAG 미사용 항목 (LLM + 금지어 사전 등 — 골든셋 / HITL 컨텍스트 불필요).
+#
+# 포함 시:
+#   - 토론 시작 전 골든셋 / HITL retrieve 스킵
+#   - rag_hits_ready 이벤트는 빈 fewshot + ``rag_disabled_for_item=True`` 플래그로 emit
+#   - 프론트 NodeDrawer 가 해당 항목 카드에 "RAG 사용 안 함" 안내만 표시
+#
+# #6 정중한 표현: 금지어 사전 1차 필터 + LLM 맥락 판정 (사용자 정책 2026-05-08).
+# ---------------------------------------------------------------------------
+RAG_DISABLED_ITEMS: frozenset[int] = frozenset({6})
+
+
+# ---------------------------------------------------------------------------
 # 페르소나 메타 — 프론트 표시용 (discussion_started 이벤트 payload)
 # ---------------------------------------------------------------------------
 
@@ -140,8 +153,26 @@ def _now_iso() -> str:
 _JSON_BLOCK_RE = re.compile(r"\{[\s\S]*\}", re.MULTILINE)
 
 
+def _strip_meta_tokens(text: str) -> str:
+    """페르소나 reasoning/rebuttal 에서 내부 제어 토큰 제거.
+    ★ 2026-05-07: VOTE_FINAL / CONSENSUS 는 AG2 GroupChat 종료 신호용. 본문에 박혀
+    프론트에 노출되면 어색 ('갑자기 VOTE_FINAL 이 뭐?'). 백엔드에서 일괄 strip.
+    종료 detection 은 별도 로직 (`is_termination_msg`) 에서 raw content 로 판정.
+    """
+    if not text:
+        return text
+    import re as _re
+    # 패턴: "VOTE_FINAL:" / "VOTE_FINAL " / "VOTE_FINAL\n" / "[VOTE_FINAL]" 등
+    cleaned = _re.sub(r"\s*\[?\s*(VOTE_FINAL|CONSENSUS)\s*[:\]]?\s*", " ", text, flags=_re.IGNORECASE)
+    # 연속 공백 정리
+    cleaned = _re.sub(r"  +", " ", cleaned).strip()
+    return cleaned
+
+
 def _parse_persona_json(content: str, *, allowed_steps: list[int]) -> dict[str, Any] | None:
-    """persona 발언 JSON 추출. 실패 시 None."""
+    """persona 발언 JSON 추출. 실패 시 None.
+    ★ 2026-05-07: reasoning/rebuttal 에서 내부 메타 토큰 (VOTE_FINAL/CONSENSUS) 자동 strip.
+    """
     if not content:
         return None
     match = _JSON_BLOCK_RE.search(content)
@@ -160,6 +191,11 @@ def _parse_persona_json(content: str, *, allowed_steps: list[int]) -> dict[str, 
     if allowed_steps and int(score) not in allowed_steps:
         # snap 이 가능하지만 여기선 raw 를 보존하고 caller 가 스냅/스킵 결정
         pass
+    # 내부 메타 토큰 strip — UI 노출용 텍스트 정리
+    if isinstance(obj.get("reasoning"), str):
+        obj["reasoning"] = _strip_meta_tokens(obj["reasoning"])
+    if isinstance(obj.get("rebuttal"), str):
+        obj["rebuttal"] = _strip_meta_tokens(obj["rebuttal"])
     return obj
 
 
@@ -504,6 +540,228 @@ def run_debate(
         )
         return rec
 
+    # ★ 2026-05-08: RAG 미사용 항목 단축 경로.
+    # #6 정중한 표현 (LLM + 금지어 사전) 처럼 RAG 컨텍스트가 무의미한 항목은
+    # 골든셋/HITL/리랭커 모두 우회. 빈 hits_ready 이벤트만 1회 emit →
+    # 프론트 NodeDrawer 가 카드에 "RAG 사용 안 함" 안내만 표시.
+    rag_disabled_for_item: bool = int(req.item_number) in RAG_DISABLED_ITEMS
+    if rag_disabled_for_item:
+        _safe_event(on_event, "rag_hits_ready", {
+            "node_id": node_id,
+            "agent_id": node_id,
+            "item_number": int(req.item_number),
+            "phase": "debate",
+            "fewshot": [],
+            "fewshot_query": "",
+            "intent": "general_inquiry",
+            "reranked": False,
+            "rag_disabled_for_item": True,
+            "rag_disabled_reason": "이 항목은 'LLM + 금지어 사전' 으로 평가 — 골든셋/HITL/리랭커 미사용",
+            "ts": _now_iso(),
+        })
+        logger.info(
+            "debate #%d RAG 미사용 항목 — golden_set/HITL retrieve 스킵 (RAG_DISABLED_ITEMS)",
+            req.item_number,
+        )
+
+    # ★ 2026-04-30: 골든셋 (HITL) 사례 — 토론 시작 전 1회 retrieve 후 페르소나 broadcast 메시지에 주입.
+    # 판사는 RAG 미사용 정책. 골든셋은 페르소나 토론 단계에서만 보조 컨텍스트로 사용.
+    debate_hitl_cases: list[dict] = []
+    if not rag_disabled_for_item:
+        try:
+            from v2.hitl.rag_retriever import retrieve_human_cases
+            # ★ 2026-04-30: consultation_id 전달 — retriever 가 KNN 무관 자기상담 강제 매칭 + is_self_match 마킹.
+            # ★ 2026-05-08: sub-agent (1차 페르소나 평가) 가 쓴 segment_text 우선 사용 →
+            # 1차 평가 ↔ 토론 RAG evidence 일관성 보장. 미지정 시 transcript 폴백.
+            debate_hitl_cases = retrieve_human_cases(
+                item_number=req.item_number,
+                query_text=req.segment_text or req.transcript or req.item_name,
+                top_k=3,
+                consultation_id=req.consultation_id,
+            ) or []
+        except Exception as exc:
+            logger.warning(
+                "debate #%d 골든셋 retrieve 실패 — 사례 없이 진행: %s", req.item_number, exc,
+            )
+            debate_hitl_cases = []
+
+    # ★ 2026-04-30: 자기 자신 매칭 표시 — 현재 평가 중 상담의 골든셋이 검색되면 is_self_match=True.
+    # 사용자에게 "이 골든셋은 평가 중인 원문 자체의 사례" 임을 UI 에서 식별 가능하게.
+    current_cid = str(req.consultation_id or "").strip()
+    if current_cid:
+        for h in debate_hitl_cases:
+            if not isinstance(h, dict):
+                continue
+            case_cid = str(h.get("consultation_id") or "").strip()
+            if case_cid and case_cid == current_cid:
+                h["is_self_match"] = True
+
+    # ★ 2026-05-08: sub-agent (Layer 2) 가 이미 retrieve 한 fewshot 재사용 (중복 retrieve 제거).
+    # 같은 qa-golden-set 인덱스를 두 번 호출하던 비효율 + AI 평가자 ↔ 페르소나 evidence 불일치
+    # 문제 해결. precomputed_golden_set 가 비어있으면 폴백으로 retrieve.
+    # (이전: sub-agent 가 item-specific intent 로 retrieve → 토론에서 general_inquiry 로 재 retrieve.
+    #        같은 인덱스인데 query 달라 hits 가 미세하게 다름 → 토론 노이즈.)
+    debate_golden_cases: list[dict] = []
+    precomputed = getattr(req, "precomputed_golden_set", None) or []
+    if rag_disabled_for_item:
+        precomputed = []
+        debate_golden_cases = []
+    elif precomputed:
+        for ex in precomputed:
+            if not isinstance(ex, dict):
+                continue
+            debate_golden_cases.append({
+                "transcript_excerpt": ex.get("segment_text", ""),
+                "human_score": ex.get("score"),
+                "human_note": ex.get("rationale", ""),
+                # parsed_text 는 sub-agent fewshot_details (make_rag_evidence) 에서는 누락 —
+                # 빈 문자열로 둠. 폴백 retrieve 시에는 safe_retrieve_fewshot 가 채움.
+                "parsed_text": ex.get("parsed_text", ""),
+                "ai_score": None,
+                "ai_judgment": "",
+                # 진단용 — sub-agent fewshot_details 의 rrf_score 와 의미 호환.
+                "_knn_score": ex.get("rrf_score"),
+                "is_self_match": False,
+                "source": "golden_set",
+                "example_id": ex.get("example_id"),
+                "score_bucket": ex.get("score_bucket"),
+            })
+        logger.info(
+            "debate #%d 골든셋: sub-agent precomputed %d건 재사용 (retrieve 생략)",
+            req.item_number, len(debate_golden_cases),
+        )
+    else:
+        # 폴백 — sub-agent 결과 누락 시 (e.g., conditional 모드 unevaluable, evaluation 자체 skip,
+        # rag_evidence 미생성) 만 retrieve. 정상 경로에서는 도달 안 함.
+        try:
+            from v2.agents.group_a._shared import safe_retrieve_fewshot
+            golden_raw = safe_retrieve_fewshot(
+                item_number=req.item_number,
+                intent="general_inquiry",  # qa-golden-set 메타 intent="*" 라 모든 intent 매칭
+                # ★ 2026-05-08: segment_text 우선 (1차 평가 ↔ 토론 RAG 일관성).
+                segment_text=req.segment_text or req.transcript or "",
+                tenant_id=req.tenant_id or "kolon",
+                top_k=3,
+            ) or []
+            for ex in golden_raw:
+                if not isinstance(ex, dict):
+                    continue
+                debate_golden_cases.append({
+                    "transcript_excerpt": ex.get("segment_text", ""),
+                    "human_score": ex.get("score"),
+                    "human_note": ex.get("rationale", ""),
+                    # ★ 2026-05-07: md "## 파싱 원문" 본문 (Layer1 평가그룹별 분할 문맥).
+                    # 페르소나 broadcast 메시지 + 프론트 카드 표시. segment_text(=근거) 와 별개.
+                    "parsed_text": ex.get("parsed_text", ""),
+                    "ai_score": None,
+                    "ai_judgment": "",
+                    "_knn_score": None,
+                    "is_self_match": False,
+                    "source": "golden_set",
+                    "example_id": ex.get("example_id"),
+                    "score_bucket": ex.get("score_bucket"),
+                })
+            logger.warning(
+                "debate #%d 골든셋: precomputed 누락 — fallback retrieve %d건",
+                req.item_number, len(debate_golden_cases),
+            )
+        except Exception as exc:
+            logger.warning(
+                "debate #%d golden_set fallback retrieve 실패 — golden 사례 없이 진행: %s",
+                req.item_number, exc,
+            )
+            debate_golden_cases = []
+
+    # 두 출처 합쳐서 페르소나에 전달 — HITL 우선, golden 뒤. format 은 동일 함수 사용.
+    debate_hitl_cases = list(debate_hitl_cases) + debate_golden_cases
+    logger.info(
+        "debate #%d 골든셋 컨텍스트: HITL=%d + golden_set=%d (총 %d)",
+        req.item_number,
+        len(debate_hitl_cases) - len(debate_golden_cases),
+        len(debate_golden_cases),
+        len(debate_hitl_cases),
+    )
+
+    # 2026-05-08: 토론용 골든셋/HITL 사례 라이브 SSE — 페르소나 broadcast 직전.
+    # 프론트 NodeDrawer 가 토론 finalized 까지 기다리지 않고 즉시 표시.
+    # 페이로드 포맷: emit_rag_hits_ready 와 동일 (fewshot 배열).
+    # rag_disabled_for_item 인 경우는 위에서 빈 emit 1회 처리 — 여기 build/emit 모두 스킵.
+    if not rag_disabled_for_item:
+        debate_fewshot_for_emit: list[dict[str, Any]] = []
+        for c in debate_hitl_cases:
+            if not isinstance(c, dict):
+                continue
+            # HITL 케이스 (transcript_excerpt/human_score/human_note) → fewshot 포맷 매핑.
+            # golden_set 케이스도 같은 path — example_id 가 미리 채워져 있음.
+            ex_id = c.get("example_id") or f"hitl-{c.get('consultation_id', '')}"
+            debate_fewshot_for_emit.append({
+                "example_id": str(ex_id),
+                "score": c.get("human_score"),
+                "score_bucket": c.get("score_bucket"),
+                # 2026-05-08: 사용자 요청 — 검색 원문 truncation 폐지. 프론트 토글로 접음.
+                "segment_text": c.get("transcript_excerpt") or "",
+                "rationale": c.get("human_note") or "",
+                # parsed_text 도 같이 전달 (golden_set 사례면 source case 에 있음).
+                "parsed_text": c.get("parsed_text") or "",
+                "intent": "general_inquiry",
+                "rater_meta": {
+                    "rater_type": "human",
+                    "source": c.get("source") or "hitl",
+                },
+                "is_self_match": bool(c.get("is_self_match", False)),
+            })
+        _safe_event(on_event, "rag_hits_ready", {
+            "node_id": node_id,
+            "agent_id": node_id,
+            "item_number": int(req.item_number),
+            "phase": "debate",
+            "fewshot": debate_fewshot_for_emit,
+            "fewshot_query": (req.transcript or "")[:4000],
+            "intent": "general_inquiry",
+            "reranked": False,
+            "ts": _now_iso(),
+        })
+
+    # frontend 표시용 요약 — judge_agent._summarize_human_cases 와 동일 포맷 (200자 truncation)
+    persona_hitl_cases_summary: list[dict] = []
+    try:
+        from v2.judge_agent import _summarize_human_cases as _summ
+        persona_hitl_cases_summary = _summ(debate_hitl_cases)
+    except Exception:
+        # 요약 실패 시에도 toString 으로라도 노출
+        persona_hitl_cases_summary = [
+            {k: v for k, v in (h or {}).items() if k != "_knn_score"}
+            for h in debate_hitl_cases
+        ]
+
+    # ★ 2026-05-07: source 보존 — _summ 가 source 누락 시 entry 별 원본 source 로 patch.
+    # golden_set 사례가 hitl 로 둔갑하는 버그 방지.
+    try:
+        for src_case, summary in zip(debate_hitl_cases, persona_hitl_cases_summary):
+            if isinstance(src_case, dict) and isinstance(summary, dict):
+                orig_source = src_case.get("source")
+                if orig_source and summary.get("source") != orig_source:
+                    summary["source"] = orig_source
+                # example_id (golden_set 전용) 도 유지 — 표시에 활용
+                if src_case.get("example_id"):
+                    summary["example_id"] = src_case.get("example_id")
+                # ★ 2026-05-07: parsed_text (golden_set "## 파싱 원문") — _summ 가 채웠어도
+                # 누락 시 src 에서 다시 채우는 안전망. truncate 600자 cap.
+                if not summary.get("parsed_text") and src_case.get("parsed_text"):
+                    # 2026-05-08: parsed_text 전체 보존 — 프론트 토글로 처리.
+                    summary["parsed_text"] = src_case.get("parsed_text") or ""
+    except Exception:
+        pass
+
+    # 페르소나 RAG 검색에 쓴 query 원문 — 프론트 표시용.
+    # ★ 2026-05-08: sub-agent (1차 페르소나 평가) 가 쓴 segment_text 우선 사용 →
+    # 1차 평가 ↔ 토론 RAG evidence 일관성 보장. 미지정 시 transcript 폴백.
+    # cap 4000자 로 확장 (사용자 요청, 프론트가 동일 query 표시 시 sub-agent 1000자 와
+    # prefix 일치 검출하여 박스 통합 가능).
+    persona_rag_query_text: str = (
+        (req.segment_text or req.transcript or req.item_name or "")
+    )[:4000]
+
     # 발언 순서 보장 — AG2 round_robin 은 initiator 의 다음 agent 를 첫 발언자로 선택.
     # personas 가 PERSONA_ORDER 순서 (strict, neutral, loose) 일 때, 마지막 (loose) 가 initiate 하면
     # round_robin 이 wrap around 해서 strict 부터 발언 시작 → 라운드 1 순서가 PERSONA_ORDER 와 일치.
@@ -520,12 +778,61 @@ def run_debate(
             prev_turns=[],
             persona=None,  # broadcast 메시지 — "[당신]" 마킹 X, 모든 페르소나 동등 표시
             persona_details=req.persona_details,
+            hitl_cases=debate_hitl_cases,
         )
-        # personas[-1] (PERSONA_ORDER 마지막) 이 initiate → round_robin 이 personas[0] 부터 발언 시작
-        personas[-1].initiate_chat(manager, message=initial_msg, max_turns=max(1, req.max_rounds) * 4, silent=True)
+        # ★ 2026-05-07: ThrottlingException 시 지수백오프 재시도 (8s, 16s, 32s).
+        # 기존엔 첫 throttle 한 방에 _build_judge_only_record 로 fallback → 사용자 화면에서
+        # "AG2 토론 실패" 보고 median 폴백. node.py:565 의 outer retry 는 run_debate 가 예외를
+        # 삼키니까 동작 못함. 안쪽에서 직접 재시도.
+        # personas[-1] (PERSONA_ORDER 마지막) 이 initiate → round_robin 이 personas[0] 부터 발언 시작.
+        # Bedrock TPM throttle cooldown 은 30~60s 단위라 긴 backoff 필요.
+        # 4회 시도 (15s, 30s, 60s 누적 105s + 마지막 실패 = 105s 까지 대기 가능).
+        last_chat_exc: Exception | None = None
+        backoffs = [15.0, 30.0, 60.0]  # 4회 시도, 사이 backoff 3개
+        for chat_attempt in range(4):
+            try:
+                personas[-1].initiate_chat(
+                    manager,
+                    message=initial_msg,
+                    max_turns=max(1, req.max_rounds) * 4,
+                    silent=True,
+                )
+                last_chat_exc = None
+                if chat_attempt > 0:
+                    logger.info(
+                        "AG2 initiate_chat 재시도 성공 (attempt %d)", chat_attempt + 1
+                    )
+                break
+            except Exception as exc:
+                last_chat_exc = exc
+                msg = str(exc)
+                is_throttle = (
+                    "ThrottlingException" in msg
+                    or "Too many tokens" in msg
+                    or "Too many requests" in msg
+                    or "Rate exceeded" in msg
+                )
+                if not is_throttle or chat_attempt == 3:
+                    break
+                backoff = backoffs[chat_attempt]
+                logger.warning(
+                    "AG2 initiate_chat Throttling (attempt %d/4) → %.1fs 후 재시도",
+                    chat_attempt + 1,
+                    backoff,
+                )
+                time.sleep(backoff)
+                # 재시도 시 raw_turns 정리 — 부분 emit 된 이벤트가 _structure_rounds 에 섞이는 거 방지.
+                raw_turns.clear()
+        if last_chat_exc is not None:
+            logger.warning("AG2 initiate_chat 최종 실패 → 판사 단독 결정 시도: %s", last_chat_exc)
+            # AG2 실패 시에도 판사 호출 — 사용자 정책 (2026-04-29).
+            rec = _build_judge_only_record(
+                req=req, reason=f"initiate_chat_error:{type(last_chat_exc).__name__}",
+                elapsed_start=t0, on_event=on_event, discussion_id=discussion_id, node_id=node_id,
+            )
+            return rec
     except Exception as exc:
-        logger.warning("AG2 initiate_chat 실패 → 판사 단독 결정 시도: %s", exc)
-        # AG2 실패 시에도 판사 호출 — 사용자 정책 (2026-04-29).
+        logger.warning("AG2 initiate_chat 외 예외 → 판사 단독 결정 시도: %s", exc)
         rec = _build_judge_only_record(
             req=req, reason=f"initiate_chat_error:{type(exc).__name__}",
             elapsed_start=t0, on_event=on_event, discussion_id=discussion_id, node_id=node_id,
@@ -584,6 +891,9 @@ def run_debate(
         judge_deductions=judge_deductions,
         judge_evidence=judge_evidence,
         judge_human_cases=judge_human_cases,
+        # ★ 2026-04-30: 페르소나가 토론에서 참고한 HITL 사례 (판사 아님).
+        persona_hitl_cases=persona_hitl_cases_summary,
+        persona_rag_query=persona_rag_query_text or None,
         debate_stats={
             "elapsed_sec": round(time.perf_counter() - t0, 3),
             "raw_turn_count": len(raw_turns),
@@ -623,6 +933,10 @@ def run_debate(
             "judge_deductions": list(rec.judge_deductions or []),
             "judge_evidence": list(rec.judge_evidence or []),
             "judge_human_cases": list(rec.judge_human_cases or []),
+            # ★ 2026-04-30: 페르소나 HITL 사례 — frontend 노드 드로어에 표시.
+            "persona_hitl_cases": list(rec.persona_hitl_cases or []),
+            # ★ 2026-05-07: 검색에 사용된 원문 — 프론트가 "이 원문으로 검색됐다" 노출.
+            "persona_rag_query": rec.persona_rag_query,
         },
     )
     return rec
@@ -956,6 +1270,8 @@ def _invoke_post_debate_judge(
                 initial_positions=dict(req.initial_positions),
                 fallback_score=median_score,
                 fallback_reason=median_rationale[:120],
+                # ★ 2026-05-07: 판사 LLM 도 프론트 모델 드롭다운 적용.
+                bedrock_model_id=getattr(req, "bedrock_model_id", None),
             )
         )
     except Exception as exc:

@@ -203,6 +203,22 @@ def _build_request(
     else:
         max_score = max_score_of(item_no)
 
+    # ★ 2026-05-08: sub-agent (Layer 2) 가 이미 retrieve 한 qa-golden-set hits 추출.
+    # meta 자체가 evaluation inner dict (item_number 일치) 이므로 meta["rag_evidence"]
+    # 의 fewshot_details 가 곧 이 항목의 sub-agent 골든셋 결과. run_debate 가 페르소나
+    # broadcast 시 재사용해 중복 retrieve 제거 + AI 평가자/페르소나 evidence 일관성 확보.
+    rag_ev = meta.get("rag_evidence") if isinstance(meta.get("rag_evidence"), dict) else {}
+    precomputed_fewshot = rag_ev.get("fewshot_details") if isinstance(rag_ev, dict) else None
+    if not isinstance(precomputed_fewshot, list):
+        precomputed_fewshot = None
+    # ★ 2026-05-08: sub-agent RAG 검색어 (segment_text) 추출 — 페르소나 RAG 도 같은 query 사용.
+    # fewshot_query 가 곧 sub-agent 가 retrieve_fewshot 호출 시 넘긴 segment_text.
+    sub_agent_segment = rag_ev.get("fewshot_query") if isinstance(rag_ev, dict) else None
+    if isinstance(sub_agent_segment, str):
+        sub_agent_segment = sub_agent_segment.strip() or None
+    else:
+        sub_agent_segment = None
+
     return DebateRequest(
         consultation_id=str(state.get("consultation_id") or state.get("session_id") or "unknown"),
         item_number=item_no,
@@ -217,6 +233,13 @@ def _build_request(
         initial_positions=votes,
         max_rounds=max_rounds,
         consensus_threshold=0,
+        tenant_id=state.get("site_id") or state.get("tenant_id"),
+        # ★ 2026-05-07: 프론트 모델 드롭다운 → 토론 페르소나/Manager/판사 LLM 모두 적용.
+        bedrock_model_id=state.get("bedrock_model_id"),
+        # ★ 2026-05-08: sub-agent 가 이미 retrieve 한 골든셋 hits 재사용.
+        precomputed_golden_set=precomputed_fewshot,
+        # ★ 2026-05-08: sub-agent RAG 검색어 통일 — 페르소나 RAG 도 같은 segment_text.
+        segment_text=sub_agent_segment,
     )
 
 
@@ -234,8 +257,11 @@ def run_debates_for_evaluations(
     의 토론이 다른 sub-agent 대기 없이 즉시 시작/종료 가능. server_v2 가
     `state["_debate_on_event"]` 를 주입해놨으면 실시간 SSE 전파도 함께 일어남.
 
-    sub-agent 내부 병렬 토론은 하지 않음 — LangGraph Send fan-out 으로 이미
-    sub-agent 자체가 다른 sub-agent 와 병렬. sub-agent 내부에서 item 1~3개는 직렬로 충분.
+    ★ 2026-05-07: sub-agent 내부 1~3 토론 항목도 ThreadPoolExecutor 로 병렬 처리.
+    이전 정책 ("내부는 직렬로 충분") 변경 — understanding/proactiveness 같이 3 항목인
+    sub-agent 에서 직렬 토론 → 병렬 시 약 2~3배 단축. 외부 (sub-agent 간) 도 이미 병렬이라
+    이중 병렬화. 동시성 cap = QA_DEBATE_MAX_PARALLEL (기본 8) — 항목당 페르소나 호출이
+    이미 SAGEMAKER_MAX_CONCURRENT (32) 글로벌 세마포어로 보호됨.
     """
     if not is_debate_enabled():
         return {}, []
@@ -243,6 +269,7 @@ def run_debates_for_evaluations(
         return {}, []
 
     max_rounds = _int_env(ENV_MAX_ROUNDS, DEFAULT_MAX_ROUNDS)
+    inline_max_parallel = max(1, _int_env(ENV_MAX_PARALLEL, 8))
     # ★ 2026-04-27 사용자 정책: 무조건 토론 (threshold=0, 의견 차이 무관)
     candidates = _pick_candidates(evaluations, threshold=0, max_items=0)
     if not candidates:
@@ -266,33 +293,50 @@ def run_debates_for_evaluations(
             except Exception:
                 logger.exception("inline debate: external on_event 실패")
 
-    debates: dict[int, dict[str, Any]] = {}
+    # request 사전 빌드 (실패 항목은 skip — ThreadPool 에 안 올림)
+    reqs: list[tuple[int, DebateRequest]] = []
     for _ev, meta, votes in candidates:
         item_no = int(meta["item_number"])
         try:
             req = _build_request(state=state, meta=meta, votes=votes, max_rounds=max_rounds)
+            reqs.append((item_no, req))
         except Exception:
             logger.exception("inline debate [%s]: item=%s request build 실패 — skip", agent_name, item_no)
             continue
+
+    if not reqs:
+        return {}, events_buffer
+
+    debates_lock = threading.Lock()
+    debates: dict[int, dict[str, Any]] = {}
+
+    def _worker(item_no: int, req: DebateRequest) -> None:
+        tid = threading.current_thread().name
         logger.info(
-            "🎭 [inline-debate agent=%s item=#%s] 시작 · votes=%s max_rounds=%d", agent_name, item_no, votes, max_rounds
+            "🎭 [inline-debate agent=%s item=#%s thread=%s] 시작 · votes=%s max_rounds=%d",
+            agent_name, item_no, tid, req.initial_positions, max_rounds,
         )
         try:
             rec = run_debate(req, on_event=_on_event, auto_start=auto_start, gate_factory=gate_factory)
-            debates[item_no] = rec.model_dump()
+            with debates_lock:
+                debates[item_no] = rec.model_dump()
             logger.info(
-                "🎭 [inline-debate agent=%s item=#%s] 완료 · final=%s merge=%s rounds=%d",
-                agent_name,
-                item_no,
-                rec.final_score,
-                rec.merge_rule,
-                rec.rounds_used,
+                "🎭 [inline-debate agent=%s item=#%s thread=%s] 완료 · final=%s merge=%s rounds=%d",
+                agent_name, item_no, tid, rec.final_score, rec.merge_rule, rec.rounds_used,
             )
         except Exception as exc:
             logger.exception(
                 "inline debate [%s]: item=%s run_debate 실패 · %s", agent_name, item_no, type(exc).__name__
             )
-            continue
+
+    pool_size = min(inline_max_parallel, len(reqs))
+    with ThreadPoolExecutor(max_workers=pool_size, thread_name_prefix=f"qa-inline-{agent_name}") as pool:
+        futures = [pool.submit(_worker, item_no, req) for item_no, req in reqs]
+        for fut in as_completed(futures):
+            try:
+                fut.result()  # _worker 가 swallow 하지만 future 자체 예외 캡쳐
+            except Exception:  # pragma: no cover
+                logger.exception("inline debate worker future 예외")
 
     return debates, events_buffer
 
@@ -359,6 +403,10 @@ def apply_debate_to_evaluations(
             "judge_deductions": debate_rec.get("judge_deductions") or [],
             "judge_evidence": debate_rec.get("judge_evidence") or [],
             "judge_human_cases": debate_rec.get("judge_human_cases") or [],
+            # ★ 2026-04-30: 페르소나 토론에서 참조한 HITL 사례 (frontend 노드 드로어 표시용).
+            "persona_hitl_cases": debate_rec.get("persona_hitl_cases") or [],
+            # ★ 2026-05-07: 페르소나 RAG 검색 query — 프론트 "어떤 원문으로 검색했나" 노출.
+            "persona_rag_query": debate_rec.get("persona_rag_query"),
         }
         out.append({**ev, "evaluation": merged_inner})
     return out
@@ -387,13 +435,12 @@ def debate_node(state: dict[str, Any]) -> dict[str, Any]:
 
     max_rounds = _int_env(ENV_MAX_ROUNDS, DEFAULT_MAX_ROUNDS)
     max_items = _int_env(ENV_MAX_ITEMS, 0)  # 0 = 무제한
-    # Bedrock ThrottlingException 회피 — 기본값 1 (직렬). 한 debate 당 persona 3명 +
-    # moderator-manager = 최소 4 Bedrock 호출/턴, max_turns=12 면 48 호출/debate.
-    # parallel>1 이면 TPS / TPM quota 초과로 ThrottlingException 속출.
-    # 고쿼터 환경에서만 env 로 상향: QA_DEBATE_MAX_PARALLEL=2~4
-    max_parallel = max(1, _int_env(ENV_MAX_PARALLEL, 1))
-    # worker 간 시작 stagger (초) — 동시 출발을 어긋나게 해 Bedrock TPS burst 완화.
-    stagger_sec = max(0.0, float(os.getenv("QA_DEBATE_STAGGER_SEC", "3.0")))
+    # ★ 2026-05-07: Sonnet 4.6 (TPM 6M) 전환으로 default 1 → 8 상향.
+    # 한 평가의 토론 항목 7~8 개를 모두 동시에 처리. burst 시 TPM ~1.5M (한도 25%).
+    # 더 낮추려면 env QA_DEBATE_MAX_PARALLEL=4 등으로 강제.
+    max_parallel = max(1, _int_env(ENV_MAX_PARALLEL, 8))
+    # worker 간 시작 stagger (초) — burst 완화. 4.6 환경에선 0.5초로 충분.
+    stagger_sec = max(0.0, float(os.getenv("QA_DEBATE_STAGGER_SEC", "0.5")))
 
     evaluations = state.get("evaluations") or []
     # ★ Option A — sub-agent 에서 이미 inline debate 실행한 item 은 skip.

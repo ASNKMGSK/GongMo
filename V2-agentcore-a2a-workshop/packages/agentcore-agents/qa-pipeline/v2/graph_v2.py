@@ -187,6 +187,15 @@ def _load_sub_agents() -> dict[str, Callable]:
             len(SUB_AGENT_NAMES), len(DEPT_SUB_AGENT_NAMES),
         )
 
+    # 운영 토글 — disabled sub-agents 는 disabled placeholder 로 교체 (회색 처리).
+    disabled_set = _get_disabled_sub_agents()
+    if disabled_set:
+        for name in disabled_set:
+            if name in registry:
+                registry[name] = _disabled_sub_agent_factory(name)
+        logger.info("_load_sub_agents: %d sub-agent(s) disabled by env QA_DISABLED_SUB_AGENTS — %s",
+                    len(disabled_set), sorted(disabled_set))
+
     return registry
 
 
@@ -220,6 +229,10 @@ def _adapt_group_a(name: str, fn: Callable) -> Callable:
         # tenant_id 는 sub agent 가 인자로 받는 경우에만 전달 (구버전 호환).
         if not param_names or "tenant_id" in param_names:
             kwargs["tenant_id"] = state.get("tenant_id", "generic")
+        # 2026-05-08: sub-agent 가 on_event 인자를 받으면 SSE callback 전달
+        # → RAG 검색 직후 `rag_hits_ready` 이벤트로 hits 를 라이브 스트림.
+        if not param_names or "on_event" in param_names:
+            kwargs["on_event"] = state.get("_debate_on_event")
         try:
             result = await fn(**kwargs)
         except Exception:  # pragma: no cover — skeleton 회복성
@@ -263,6 +276,9 @@ def _adapt_group_b(name: str, fn: Callable) -> Callable:
             # tenant_id 누락 시 work_accuracy 의 retrieve_knowledge 가 default "generic" 으로 폴백
             # → kolon manual.md 못 보고 #15 unevaluable 로 떨어지는 버그 방지.
             "tenant_id": state.get("tenant_id", "generic"),
+            # 2026-05-08: Sub-agent 가 on_event 인자를 받으면 SSE callback 전달
+            # → RAG 검색 직후 `rag_hits_ready` 이벤트로 hits 를 라이브 스트림.
+            "on_event": state.get("_debate_on_event"),
         }
         for k, v in candidates.items():
             if not param_names or k in param_names:
@@ -423,6 +439,83 @@ def _unwrap_response(name: str, response: Any) -> dict[str, Any]:
     return {"evaluations": evaluations}
 
 
+# ===========================================================================
+# Disabled sub-agent 토글 (운영 일시 비활성화 — 회색 처리용)
+# ===========================================================================
+# 환경변수 QA_DISABLED_SUB_AGENTS (콤마 구분) 으로 토글.
+# 기본 = 빈 문자열 (Layer 2 모두 활성, 사용자 지시 2026-05-06 재활성화).
+# 비활성화 시 노드는 graph 에 등록되지만 disabled placeholder 로 동작
+# — evaluation_mode="disabled" 로 표시, frontend 가 회색 처리.
+#   QA_DISABLED_SUB_AGENTS=""              → 모두 활성 (default, 정상 운영)
+#   QA_DISABLED_SUB_AGENTS="work_accuracy" → work_accuracy 만 비활성
+#   QA_DISABLED_SUB_AGENTS="greeting,..."  → 명시한 노드들 비활성
+
+_DEFAULT_DISABLED_SUB_AGENTS = ""
+
+
+def _get_disabled_sub_agents() -> set[str]:
+    raw = os.environ.get("QA_DISABLED_SUB_AGENTS", _DEFAULT_DISABLED_SUB_AGENTS)
+    if not raw.strip():
+        return set()
+    return {n.strip() for n in raw.split(",") if n.strip()}
+
+
+def _disabled_sub_agent_factory(name: str) -> Callable:
+    """비활성화된 Sub Agent placeholder.
+
+    각 담당 항목에 대해 evaluation_mode="disabled" 로 evaluations 에 append.
+    score 는 max 로 설정 (점수 합산 영향 0 — frontend 회색 처리만).
+    재활성화 시 환경변수 QA_DISABLED_SUB_AGENTS 에서 제거.
+    """
+    from v2.schemas.enums import CATEGORY_META
+
+    _name_to_category = {
+        "greeting": "greeting_etiquette",
+        "listening_comm": "listening_communication",
+        "language": "language_expression",
+        "needs": "needs_identification",
+        "explanation": "explanation_delivery",
+        "proactiveness": "proactiveness",
+        "work_accuracy": "work_accuracy",
+        "privacy": "privacy_protection",
+    }
+    category_key = _name_to_category.get(name)
+    if not category_key or category_key not in CATEGORY_META:
+        item_numbers: list[int] = []
+    else:
+        item_numbers = list(CATEGORY_META[category_key]["items"])  # type: ignore[assignment]
+
+    async def _disabled(state: dict[str, Any]) -> dict[str, Any]:
+        from v2.contracts.rubric import max_score_of
+        logger.info("disabled_sub_agent[%s]: 노드 비활성 — placeholder 반환 (items=%s)",
+                    name, item_numbers)
+        evaluations = []
+        for item_num in item_numbers:
+            max_s = max_score_of(item_num)
+            evaluations.append({
+                "status": "success",
+                "agent_id": f"{name}-agent",
+                "evaluation": {
+                    "item_number": item_num,
+                    "item_name": f"disabled_{item_num}",
+                    "max_score": max_s,
+                    "score": max_s,
+                    "evaluation_mode": "disabled",
+                    "judgment": "[DISABLED] 노드 비활성 상태 — 채점 미수행 (운영 토글로 일시 비활성)",
+                    "evidence": [],
+                    "deductions": [],
+                    "confidence": 1.0,
+                    "flag": "node_disabled",
+                    "mandatory_human_review": False,
+                    "force_t3": False,
+                },
+            })
+        return {"evaluations": evaluations}
+
+    _disabled.__name__ = f"disabled_{name}"
+    return _disabled
+
+
 def _mock_sub_agent_factory(name: str) -> Callable:
     """구현 미완료 Sub Agent 의 placeholder. skeleton smoke 용.
 
@@ -508,20 +601,31 @@ def _load_layer4_node() -> Callable:
 
 
 def _route_after_layer1(state: dict[str, Any]) -> list[Send] | str:
-    """Layer 1 직후 라우팅.
+    """Layer 1 직후 라우팅 — KMS 단일 진입 (가장 먼저 실행).
 
     - quality.unevaluable=True → Layer 4 직결 (Layer 2/3 skip)
-    - 그 외 → 활성 Sub Agent 들로 Send fan-out (tenant + team 기반 동적 결정)
+    - 그 외 → KMS 단일 실행 → kms 후 Layer 2 sub-agent fan-out
     """
     preprocessing = state.get("preprocessing") or {}
     if preprocessing.get("quality", {}).get("unevaluable"):
         logger.info("_route_after_layer1: unevaluable=True → short-circuit to layer4")
         return "layer4"
 
+    logger.info("_route_after_layer1: → kms (가장 먼저 실행, sub-agent 보다 선행)")
+    return [Send("kms", state)]
+
+
+def _route_after_kms(state: dict[str, Any]) -> list[Send]:
+    """KMS 노드 후 — Layer 2 sub-agent (base + dept) fan-out.
+
+    KMS 는 가장 먼저 실행되고, 결과는 state.kms_evaluation 에 적재되어 자연스럽게
+    combined_report 에 포함됨 (별도 KmsReportCard 로 표시). sub-agent 들은 KMS 결과를
+    *참조하지 않음* — 단지 실행 순서만 KMS 다음으로 결정됨.
+    """
     active = _resolve_active_sub_agents(state)
     logger.info(
-        "_route_after_layer1: fan-out to %d sub-agents (tenant=%s team=%s) → %s",
-        len(active), state.get("tenant_id"), state.get("team_id"), active,
+        "_route_after_kms: fan-out to %d sub-agents → %s",
+        len(active), active,
     )
     return [Send(name, state) for name in active]
 
@@ -530,10 +634,7 @@ def _route_after_layer2_barrier(state: dict[str, Any]) -> list[str]:
     """Layer 2 barrier 후 라우팅 — 두 갈래 병렬 fan-out.
 
     1. `layer3` — 기존 4-Layer 파이프라인 (debate → layer4 → gt → hitl)
-    2. `ksqi_orchestrator` — 신규 KSQI 9개 항목 평가 그룹
-
-    두 분기는 별도 종료점 (각각 END) 으로 향하며, LangGraph 가 양쪽 모두 완료되어야
-    전체 graph 가 종료된다. KSQI 결과는 ksqi_report 가 별도 ksqi_report state 필드로 출력.
+    2. `ksqi_orchestrator` — KSQI 9개 항목 평가 그룹
     """
     return ["layer3", "ksqi_orchestrator"]
 
@@ -594,6 +695,10 @@ def build_graph_v2():
     # Layer 2 barrier (Send 수렴점)
     builder.add_node("layer2_barrier", _make_tracked_node("layer2_barrier", _layer2_barrier))
 
+    # KMS 노드 — 인텐트별 xlsx 탭 기반 LLM 평가 (layer2_barrier 직후, layer3 직전)
+    from v2.nodes.kms_node import kms_node
+    builder.add_node("kms", _make_tracked_node("kms", kms_node))
+
     # Layer 3 (tracked)
     builder.add_node("layer3", _make_tracked_node("layer3", layer3_node))
 
@@ -605,6 +710,15 @@ def build_graph_v2():
     # Layer 4 (tracked — optional)
     layer4_node = _load_layer4_node()
     builder.add_node("layer4", _make_tracked_node("layer4", layer4_node))
+
+    # ★ 2026-05-08: Report Narrator — layer4 산출 보고서를 LLM 으로 자연어 마무리 결론 + 코칭 작성.
+    # 기존 SummaryBlock 은 그대로 두고, state.report_llm_summary 에 별도 보조 필드로 저장 →
+    # 프론트가 보고서 끝에 "AI 마무리 총평·코칭" 섹션으로 추가 표시.
+    from v2.layer4.report_narrator import report_narrator_node
+    builder.add_node(
+        "report_narrator",
+        _make_tracked_node("report_narrator", report_narrator_node),
+    )
 
     # GT Comparison (tracked — Layer 4 후속, AI vs GT 점수 비교)
     from v2.layer4.gt_comparison import gt_comparison_node
@@ -659,13 +773,23 @@ def build_graph_v2():
     # === 엣지 ===
     builder.add_edge(START, "layer1")
 
-    # Layer 1 → (Layer 2 fan-out | layer4)
-    # base 8 + 부서특화 노드 모두 fan-out 후보로 등록 — 실제 활성은 router 에서 결정
+    # Layer 1 → KMS 단일 (가장 먼저 실행) | unevaluable → layer4 short-circuit
     _all_sub_agents: tuple[str, ...] = SUB_AGENT_NAMES + DEPT_SUB_AGENT_NAMES
     builder.add_conditional_edges(
         "layer1",
         _route_after_layer1,
-        {**{name: name for name in _all_sub_agents}, "layer4": "layer4"},
+        {
+            "kms": "kms",
+            "layer4": "layer4",
+        },
+    )
+
+    # KMS → fan-out [base 8 + dept] sub-agents (KMS 결과는 state.kms_evaluation 에만 적재,
+    # sub-agent 들은 참조하지 않음 — 단지 실행 순서만 KMS 다음).
+    builder.add_conditional_edges(
+        "kms",
+        _route_after_kms,
+        {name: name for name in _all_sub_agents},
     )
 
     # 각 Sub Agent → Layer 2 barrier (base + dept)
@@ -690,8 +814,12 @@ def build_graph_v2():
     builder.add_edge("ksqi_barrier", "ksqi_report")
     builder.add_edge("ksqi_report", "combined_report")
 
-    # combined_report → END (양쪽 분기 모두 도착해야 진행됨)
-    builder.add_edge("combined_report", END)
+    # combined_report → report_narrator → END
+    # narrator 는 그래프 끝에 위치해 layer4 / gt_comparison / gt_evidence_comparison /
+    # hitl_queue_populator / ksqi_report / combined_report 등 모든 노드 결과를 종합해
+    # LLM 자연어 결론 + 코칭을 작성. 결과는 state.report_llm_summary 에 저장.
+    builder.add_edge("combined_report", "report_narrator")
+    builder.add_edge("report_narrator", END)
 
     # Layer 3 → debate (토론 노드는 무조건 1회 경유. QA_DEBATE_ENABLED=false 또는 spread 미달 시
     # 내부에서 즉시 반환 — graph 경로는 동일 유지).
@@ -707,6 +835,7 @@ def build_graph_v2():
     )
 
     # Layer 4 → GT Comparison → GT Evidence Comparison → HITL Queue Populator → combined_report
+    # narrator 는 위에서 정의한 대로 combined_report 직후 (그래프 끝) 에 위치.
     builder.add_edge("layer4", "gt_comparison")
     builder.add_edge("gt_comparison", "gt_evidence_comparison")
     builder.add_edge("gt_evidence_comparison", "hitl_queue_populator")
@@ -714,10 +843,12 @@ def build_graph_v2():
 
     graph = builder.compile()
     logger.info(
-        "V2 graph compiled: START → layer1 → [fan-out %d base + %d dept sub-agents] → layer2_barrier "
+        "V2 graph compiled: START → layer1 → kms → [fan-out %d base + %d dept sub-agents] → layer2_barrier "
         "→ {layer3 → debate → layer4 → gt_comparison → gt_evidence_comparison → hitl_queue_populator | "
         "ksqi_orchestrator → [fan-out 9 KSQI nodes] → ksqi_barrier → ksqi_report} "
-        "→ END (parallel branches). short-circuit: unevaluable, skip_phase_c_and_reporting. "
+        "→ combined_report → END. KMS 는 layer1 직후 *가장 먼저* 실행 (인텐트 분류 + 인텐트별 KMS 평가), "
+        "결과는 state.kms_evaluation 에 적재 → frontend KmsReportCard 별도 표시. "
+        "short-circuit: unevaluable → layer4, skip_phase_c_and_reporting → combined_report. "
         "debate node: spread-gated via QA_DEBATE_ENABLED / QA_DEBATE_SPREAD_THRESHOLD. "
         "dept routing: tenant_id=shinhan + team_id 매칭 시 *_accuracy 등 부서특화 노드 fan-out.",
         len(SUB_AGENT_NAMES), len(DEPT_SUB_AGENT_NAMES),

@@ -25,7 +25,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import ReviewItemCard from "@/components/ReviewItemCard";
 import { fetchReviewQueue } from "@/lib/api";
-import type { CategoryItem, Report, ReviewItem } from "@/lib/types";
+import type { CategoryItem, GtComparison, Report, ReviewItem } from "@/lib/types";
 
 interface TranscriptTurn {
   turn_id?: number;
@@ -44,6 +44,12 @@ interface Props {
   transcript: string | null;
   /** preprocessing.turns — 있으면 항목 카드에서 파싱 원문 렌더. */
   turns?: TranscriptTurn[] | null;
+  /**
+   * ★ 2026-04-30: GT xlsx 의 사람 점수(gt_comparison.items[].gt_score) — HITL 큐 row 가
+   * 미생성 / human_score=null 일 때 ReviewItemCard 에 fallback 으로 흘려준다.
+   * 우선순위: hitlRow.human_score > gt_score > "—"
+   */
+  gtComparison?: GtComparison | null;
 }
 
 /** preprocessing 필드에서 turns 배열을 안전하게 추출. 다양한 스키마 변화 대응. */
@@ -110,6 +116,7 @@ export default function PostRunReviewModal({
   evaluationsFallback,
   transcript,
   turns,
+  gtComparison,
 }: Props) {
   const [hitlRows, setHitlRows] = useState<ReviewItem[]>([]);
   const [hitlLoading, setHitlLoading] = useState(false);
@@ -144,6 +151,19 @@ export default function PostRunReviewModal({
     for (const r of hitlRows) m.set(Number(r.item_number), r);
     return m;
   }, [hitlRows]);
+
+  // ★ 2026-04-30: GT xlsx 사람 점수 → item_number 맵. HITL 큐 미생성/미검수 항목의 fallback.
+  // gt_comparison.enabled=false (gt_sample_id 미주입) 면 빈 맵.
+  const gtScoreByNum = useMemo(() => {
+    const m = new Map<number, number>();
+    const items = gtComparison?.items;
+    if (!Array.isArray(items)) return m;
+    for (const it of items) {
+      if (typeof it.item_number !== "number") continue;
+      if (typeof it.gt_score === "number") m.set(it.item_number, it.gt_score);
+    }
+    return m;
+  }, [gtComparison]);
 
   const loadHitl = useCallback(async (): Promise<number> => {
     if (!consultationId) return 0;
@@ -575,6 +595,7 @@ export default function PostRunReviewModal({
                   item={it}
                   category={it.category}
                   hitlRow={hitlByNum.get(Number(it.item_number))}
+                  gtScore={gtScoreByNum.get(Number(it.item_number)) ?? null}
                   transcript={transcript}
                   turns={turns}
                   consultationId={consultationId}

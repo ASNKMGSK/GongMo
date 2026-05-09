@@ -565,7 +565,13 @@ async def invoke_and_parse(llm: BaseChatModel, messages: list) -> dict:
     import asyncio as _asyncio
     from langchain_core.messages import SystemMessage
 
-    cache_key = _response_cache_key(messages, None, None, 0)
+    # ★ 2026-04-30 S5 fix: cache key 에 model/backend/max_tokens 포함.
+    # 이전엔 (None, None, 0) 으로 messages 만 키 → 모델 전환(Sonnet→Haiku 또는 다른 max_tokens)
+    # 시 첫 응답이 잘못 캐시 hit 되는 correctness 버그.
+    model_id = getattr(llm, "model_id", None) or getattr(llm, "model", "?")
+    backend_proxy = type(llm).__name__  # ChatBedrockConverse / ChatSageMaker 등
+    max_tok = int(getattr(llm, "max_tokens", 0) or 0)
+    cache_key = _response_cache_key(messages, backend_proxy, str(model_id), max_tok)
     cached = _get_cached_response(cache_key)
     if cached is not None:
         logger.info("🔁 LLM cache HIT key=%s", cache_key[:12])
@@ -580,7 +586,6 @@ async def invoke_and_parse(llm: BaseChatModel, messages: list) -> dict:
     except Exception:
         total_chars = -1
     req_id = cache_key[:8]
-    model_id = getattr(llm, "model_id", None) or getattr(llm, "model", "?")
     task_name = _asyncio.current_task().get_name() if _asyncio.current_task() else "-"
     logger.info(
         "⬆️ LLM REQ [%s] model=%s msgs=%d total_chars=%d task=%s",

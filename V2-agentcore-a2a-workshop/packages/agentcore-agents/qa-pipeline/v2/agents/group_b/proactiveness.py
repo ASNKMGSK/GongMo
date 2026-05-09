@@ -28,7 +28,7 @@ from v2.agents.group_b.base import (
     convert_llm_raw_to_item_verdict,
     extract_wiki_updates,
 )
-from v2.agents.group_a._shared import make_rag_evidence
+from v2.agents.group_a._shared import emit_rag_hits_ready, make_rag_evidence
 from v2.judge_agent import reconcile_hybrid
 from v2.rag import retrieve_fewshot, retrieve_reasoning
 from v2.rag.types import RAGError
@@ -58,6 +58,7 @@ async def proactiveness_agent(
     tenant_id: str = "generic",
     llm_backend: str = "bedrock",
     bedrock_model_id: str | None = None,
+    on_event: Any = None,
 ) -> tuple[SubAgentResponse, dict[str, Any]]:
     """#12, #13, #14 평가 — 실 Bedrock 호출 (병렬 3 항목).
 
@@ -87,6 +88,15 @@ async def proactiveness_agent(
             fewshots[n] = res
         else:
             reasonings[n] = res
+
+    # 라이브 SSE — RAG hits 도착 즉시 프론트 NodeDrawer 가 표시 (LLM/토론 대기 없이)
+    for n in target_items:
+        emit_rag_hits_ready(
+            on_event, node_id="proactiveness", agent_id="proactiveness-agent",
+            item_number=n, phase="layer2",
+            fewshot=_fewshot_to_dict_list(fewshots.get(n)),
+            fewshot_query=segment_text, intent=intent,
+        )
 
     eval_tasks = []
     for n in target_items:
@@ -371,6 +381,33 @@ def _build_segment_text(assigned_turns: list[dict], fallback: str) -> str:
     return "\n".join(
         f"{t.get('speaker', '')}: {t.get('text', '')}" for t in assigned_turns
     )[:2800]
+
+
+def _fewshot_to_dict_list(fewshot: Any) -> list[dict[str, Any]]:
+    """`retrieve_fewshot` FewshotResult.examples → emit_rag_hits_ready 호환 dict list."""
+    if fewshot is None:
+        return []
+    examples = getattr(fewshot, "examples", None) or []
+    out: list[dict[str, Any]] = []
+    for ex in examples:
+        ex_id = getattr(ex, "example_id", None)
+        if not ex_id:
+            continue
+        rater = getattr(ex, "rater_meta", None) or {}
+        if not isinstance(rater, dict):
+            rater = {}
+        out.append({
+            "example_id": str(ex_id),
+            "item_number": getattr(ex, "item_number", None),
+            "score": getattr(ex, "score", None),
+            "score_bucket": getattr(ex, "score_bucket", None),
+            "intent": getattr(ex, "intent", None),
+            "segment_text": getattr(ex, "segment_text", "") or "",
+            "rationale": getattr(ex, "rationale", "") or "",
+            "rationale_tags": getattr(ex, "rationale_tags", None) or [],
+            "rater_meta": rater,
+        })
+    return out
 
 
 def _safe_fewshot(item_number: int, intent: str, segment_text: str, tenant_id: str):

@@ -24,6 +24,7 @@ from v2.agents.group_a._shared import (
     attach_persona_meta,
     build_item_verdict,
     build_sub_agent_response,
+    emit_rag_hits_ready,
     format_fewshot_block,
     get_assigned_turns,
     get_intent,
@@ -43,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = "language-expression-agent"
 CATEGORY_KEY = "language_expression"
+NODE_ID = "language"
 
 
 async def language_sub_agent(
@@ -51,6 +53,7 @@ async def language_sub_agent(
     llm_backend: str | None = None,
     bedrock_model_id: str | None = None,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     with Stopwatch() as sw:
         if is_quality_unevaluable(preprocessing):
@@ -68,13 +71,13 @@ async def language_sub_agent(
         if should_bypass_llm(rv6):
             resolved[6] = _build_bypass_item_6(rv6)
         else:
-            tasks.append((6, _llm_evaluate_item_6(preprocessing, rv6, llm_backend, bedrock_model_id, tenant_id=tenant_id)))
+            tasks.append((6, _llm_evaluate_item_6(preprocessing, rv6, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event)))
 
         refusal_count = int(((rv7 or {}).get("elements") or {}).get("refusal_count", 0) or 0)
         if refusal_count == 0:
             resolved[7] = _build_skipped_full_item_7(rv7)
         else:
-            tasks.append((7, _llm_evaluate_item_7(preprocessing, rv7, llm_backend, bedrock_model_id, tenant_id=tenant_id)))
+            tasks.append((7, _llm_evaluate_item_7(preprocessing, rv7, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event)))
 
         if tasks:
             keys, coros = zip(*tasks)
@@ -135,6 +138,7 @@ async def _llm_evaluate_item_6(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt
@@ -156,6 +160,24 @@ async def _llm_evaluate_item_6(
     # #6 정중한 표현 은 "LLM + 금지어 사전" 항목 — RAG (Few-shot / Reasoning) 미사용.
     # Pre-Analysis 의 profanity/sigh/language/mild count 가 금지어 사전 1차 필터로 작동,
     # LLM 은 맥락 판정만 담당.
+    # ★ 2026-05-08: 프론트가 토론 시작 전부터 "RAG 사용 안 함" 안내를 표시할 수 있게
+    # 빈 fewshot + rag_disabled_for_item 플래그로 layer2 emit (1회).
+    if on_event is not None:
+        try:
+            on_event("rag_hits_ready", {
+                "node_id": NODE_ID,
+                "agent_id": AGENT_ID,
+                "item_number": 6,
+                "phase": "layer2",
+                "fewshot": [],
+                "fewshot_query": "",
+                "intent": get_intent(preprocessing) or "",
+                "reranked": False,
+                "rag_disabled_for_item": True,
+                "rag_disabled_reason": "이 항목은 'LLM + 금지어 사전' 으로 평가 — 골든셋/HITL/리랭커 미사용",
+            })
+        except Exception:
+            logger.warning("item #6 rag_disabled emit 실패", exc_info=True)
     user_message = (
         f"## 상담사 발화\n{agent_turns_text}\n\n"
         "## Pre-Analysis\n"
@@ -215,6 +237,7 @@ async def _llm_evaluate_item_7(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt
@@ -237,6 +260,11 @@ async def _llm_evaluate_item_7(
     fewshot, reasoning = await asyncio.gather(
         async_safe_retrieve_fewshot(7, intent, numbered, top_k=4, tenant_id=tenant_id),
         async_safe_retrieve_reasoning_evidence(7, numbered, top_k=7, tenant_id=tenant_id),
+    )
+    # 라이브 SSE — RAG hits 도착 즉시 프론트 NodeDrawer 가 표시
+    emit_rag_hits_ready(
+        on_event, node_id=NODE_ID, agent_id=AGENT_ID, item_number=7,
+        phase="layer2", fewshot=fewshot, fewshot_query=numbered, intent=intent,
     )
     fewshot_block = format_fewshot_block(fewshot)
     rag_stdev = reasoning["stdev"]

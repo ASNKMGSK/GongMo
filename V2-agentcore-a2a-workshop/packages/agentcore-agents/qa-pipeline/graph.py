@@ -111,7 +111,12 @@ def _record_trace(name: str, t0: float, input_snapshot: dict[str, Any], result: 
 
     Shared by both the async and sync branches of ``_make_tracked_node``
     so only the ``await`` differs between the two.
+
+    ★ 2026-04-30 S1 fix: 기본 slim trace (키 목록 + 메타). 풀 trace 는 QA_FULL_TRACE=1
+    env 시에만. 8 sub-agent fan-out × 깊이 walk × 다수 KSQI 노드 → 2~5MB node_traces
+    누적이 SSE idle disconnect 직접 원인 (CLAUDE.md 명시 in-process batch 우회 사유).
     """
+    import os
     import time
 
     elapsed = round(time.time() - t0, 2)
@@ -121,10 +126,39 @@ def _record_trace(name: str, t0: float, input_snapshot: dict[str, Any], result: 
     result.setdefault("completed_nodes", [])
     result["completed_nodes"] = result["completed_nodes"] + [name]
     result["node_timings"] = [{"node": name, "elapsed": elapsed}]
+
+    full_trace = os.getenv("QA_FULL_TRACE", "0").lower() in ("1", "true", "yes")
+    if full_trace:
+        trace_output: Any = _sanitize_trace_output(result)
+    else:
+        # slim trace — 키 목록 + 사이즈 메타만. 풀 데이터는 state.evaluations / state.report 에 그대로 보존.
+        trace_output = _slim_trace_output(result)
     result["node_traces"] = [
-        {"node": name, "elapsed": elapsed, "input": input_snapshot, "output": _sanitize_trace_output(result)}
+        {"node": name, "elapsed": elapsed, "input": input_snapshot, "output": trace_output}
     ]
     return result
+
+
+def _slim_trace_output(result: dict[str, Any]) -> dict[str, Any]:
+    """Slim trace — 키 목록 + 길이/타입 메타만. mem 누적 방지."""
+    _EXCLUDE = {"completed_nodes", "node_timings", "node_traces"}
+    summary: dict[str, Any] = {}
+    for k, v in result.items():
+        if k in _EXCLUDE:
+            continue
+        if isinstance(v, str):
+            summary[k] = {"_type": "str", "_len": len(v), "_preview": v[:200] + ("…" if len(v) > 200 else "")}
+        elif isinstance(v, list):
+            summary[k] = {"_type": "list", "_len": len(v)}
+        elif isinstance(v, dict):
+            summary[k] = {"_type": "dict", "_keys": list(v.keys())[:50], "_size": len(v)}
+        elif v is None:
+            summary[k] = None
+        elif isinstance(v, (int, float, bool)):
+            summary[k] = v
+        else:
+            summary[k] = {"_type": type(v).__name__}
+    return summary
 
 
 def _accepts_ctx(fn) -> bool:

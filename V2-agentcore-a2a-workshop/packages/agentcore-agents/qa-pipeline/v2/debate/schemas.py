@@ -55,6 +55,35 @@ class DebateRequest(BaseModel):
         description=f"최대 토론 라운드 (기본 {DEFAULT_MAX_ROUNDS} — schemas.DEFAULT_MAX_ROUNDS SSoT)",
     )
     consensus_threshold: int = Field(0, ge=0, description="합의 판정 임계값 — 최대-최소 점수 차이 <= 이 값이면 합의")
+    tenant_id: str | None = Field(
+        None,
+        description="qa-golden-set 인덱스 retrieve 용 tenant — 미지정 시 'generic' 사용. site_id alias.",
+    )
+    bedrock_model_id: str | None = Field(
+        None,
+        description=(
+            "★ 2026-05-07: 프론트 모델 드롭다운 override. 미지정 시 BEDROCK_MODEL_ID env. "
+            "AG2 페르소나/Manager/판사 LLM 모두 이 값 사용 — 사용자 선택 모델로 전체 통일."
+        ),
+    )
+    # ★ 2026-05-08: sub-agent (Layer 2) 가 이미 retrieve 한 qa-golden-set hits 재사용용.
+    # Sub-agent 가 item-specific intent 로 검색한 fewshot_details 를 그대로 페르소나 broadcast
+    # 컨텍스트에 주입하면 1) AOSS 호출 절감 (~50-100ms) + 2) AI 평가자 ↔ 페르소나 evidence
+    # 일관성 보장 (같은 골든셋인데 query 가 달라 hits 가 살짝 다른 노이즈 제거).
+    # 미지정/빈값 시 run_debate.py 가 폴백으로 `safe_retrieve_fewshot` 직접 호출.
+    precomputed_golden_set: list[dict] | None = Field(
+        None,
+        description=(
+            "Sub-agent rag_evidence.fewshot_details 재사용. None/empty 시 폴백 retrieve."
+        ),
+    )
+    # ★ 2026-05-08: Layer 1 평가항목별 파싱 segment_text — sub-agent 가 RAG 검색어로 쓴 것.
+    # 페르소나 RAG (HITL/golden_set) 검색어로도 동일하게 사용해 sub-agent ↔ 페르소나 evidence
+    # 일관성 보장. 미지정 시 run_debate.py 가 transcript[:500] 폴백 (post-2026-05-07 동작).
+    segment_text: str | None = Field(
+        None,
+        description="평가항목별 파싱 segment_text. 페르소나 RAG 검색어로 통일 사용.",
+    )
 
 
 class PersonaTurn(BaseModel):
@@ -149,7 +178,15 @@ class DebateRecord(BaseModel):
     judge_failure_reason: str | None = None  # 판사 호출 실패 사유 (성공 시 None)
     judge_deductions: list[dict] = Field(default_factory=list)
     judge_evidence: list[dict] = Field(default_factory=list)
-    # 판사가 인용한 HITL 인간 검수 사례 — frontend 노드 드로어에 표시 (2026-04-30).
-    # 각 entry: {consultation_id, item_number, ai_score, human_score, delta, confirmed_at,
-    #            external_id, knn_score, transcript_excerpt, human_note, ai_judgment}
+    # 판사가 인용한 HITL 인간 검수 사례 — DEPRECATED (2026-04-30: 판사 RAG 미사용).
+    # 새 평가에서는 빈 배열. 과거 데이터 호환을 위해 필드는 유지.
     judge_human_cases: list[dict] = Field(default_factory=list)
+    # ★ 2026-04-30: HITL 데이터를 판사 → 페르소나로 이전. 토론 시작 전 retrieve 후
+    # 모든 페르소나에게 broadcast 메시지로 주입된 사례. frontend 노드 드로어에 표시.
+    # 각 entry: {consultation_id, item_number, ai_score, human_score, delta, confirmed_at,
+    #            external_id, knn_score, transcript_excerpt, human_note, ai_judgment, source}
+    # source 는 "hitl" (qa-hitl-cases) 또는 "golden_set" (qa-golden-set) — 프론트가 분리 렌더.
+    persona_hitl_cases: list[dict] = Field(default_factory=list)
+    # ★ 2026-05-07: 페르소나 RAG 검색에 사용된 query 원문 (truncated) — 프론트가 "어떤 원문으로
+    # 검색했나" 표시. 두 인덱스 (qa-hitl-cases / qa-golden-set) 모두 동일 query 사용.
+    persona_rag_query: str | None = None

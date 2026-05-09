@@ -25,6 +25,7 @@ from v2.agents.group_a._shared import (
     attach_persona_meta,
     build_item_verdict,
     build_sub_agent_response,
+    emit_rag_hits_ready,
     format_fewshot_block,
     get_assigned_turns,
     get_intent,
@@ -43,6 +44,7 @@ logger = logging.getLogger(__name__)
 
 AGENT_ID = "needs-identification-agent"
 CATEGORY_KEY = "needs_identification"
+NODE_ID = "needs"
 
 
 async def needs_sub_agent(
@@ -51,6 +53,7 @@ async def needs_sub_agent(
     llm_backend: str | None = None,
     bedrock_model_id: str | None = None,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     with Stopwatch() as sw:
         if is_quality_unevaluable(preprocessing):
@@ -62,8 +65,8 @@ async def needs_sub_agent(
         # 양쪽 모두 LLM verify 필수 (Dev1 합의 확정) — asyncio.gather 로 병렬화 (옵션 A)
         # return_exceptions=False — LLMTimeoutError 는 상위로 전파
         item_8, item_9 = await asyncio.gather(
-            _llm_evaluate_item_8(preprocessing, rv8, llm_backend, bedrock_model_id, tenant_id=tenant_id),
-            _llm_evaluate_item_9(preprocessing, rv9, llm_backend, bedrock_model_id, tenant_id=tenant_id),
+            _llm_evaluate_item_8(preprocessing, rv8, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event),
+            _llm_evaluate_item_9(preprocessing, rv9, llm_backend, bedrock_model_id, tenant_id=tenant_id, on_event=on_event),
             return_exceptions=False,
         )
 
@@ -92,6 +95,7 @@ async def _llm_evaluate_item_8(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt
@@ -114,6 +118,11 @@ async def _llm_evaluate_item_8(
     fewshot, reasoning = await asyncio.gather(
         async_safe_retrieve_fewshot(8, intent, numbered, top_k=4, tenant_id=tenant_id),
         async_safe_retrieve_reasoning_evidence(8, numbered, top_k=7, tenant_id=tenant_id),
+    )
+    # 라이브 SSE — RAG hits 도착 즉시 프론트 NodeDrawer 가 표시
+    emit_rag_hits_ready(
+        on_event, node_id=NODE_ID, agent_id=AGENT_ID, item_number=8,
+        phase="layer2", fewshot=fewshot, fewshot_query=numbered, intent=intent,
     )
     fewshot_block = format_fewshot_block(fewshot)
     rag_stdev = reasoning["stdev"]
@@ -183,6 +192,7 @@ async def _llm_evaluate_item_9(
     bedrock_model_id: str | None,
     *,
     tenant_id: str = "generic",
+    on_event: Any = None,
 ) -> dict[str, Any]:
     from nodes.llm import LLMTimeoutError
     from v2.prompts.group_a import load_prompt

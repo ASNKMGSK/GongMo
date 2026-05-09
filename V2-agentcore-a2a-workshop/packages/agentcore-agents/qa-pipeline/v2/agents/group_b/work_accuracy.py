@@ -15,7 +15,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from typing import Any
-from v2.agents.group_a._shared import make_rag_evidence
+from v2.agents.group_a._shared import emit_rag_hits_ready, make_rag_evidence
 from v2.agents.group_b._llm import LLMTimeoutError, call_bedrock_json, load_group_b_prompt
 from v2.agents.group_b.base import (
     ITEM_MAX_SCORE,
@@ -54,6 +54,7 @@ async def work_accuracy_agent(
     tenant_id: str = "generic",
     llm_backend: str = "bedrock",
     bedrock_model_id: str | None = None,
+    on_event: Any = None,
 ) -> tuple[SubAgentResponse, dict[str, Any]]:
     """#15, #16 평가."""
     verdicts_bundle = (rule_pre_verdicts or {}).get("verdicts") or {}
@@ -67,6 +68,16 @@ async def work_accuracy_agent(
     knowledge, fewshot_16 = await asyncio.gather(
         asyncio.to_thread(retrieve_knowledge, intent=primary_intent, query=query_text, tenant_id=tenant_id, top_k=3),
         asyncio.to_thread(_safe_fewshot, 16, primary_intent, segment_text, tenant_id),
+    )
+
+    # 라이브 SSE — #16 fewshot hits 도착 즉시 프론트 NodeDrawer 가 표시.
+    # #15 는 fewshot 대신 knowledge 기반 — 현 시점 NodeDrawer 의 ragHitsByAgent 가
+    # fewshot/reasoning 만 partial 로 다루므로 #15 는 emit 생략 (knowledge 는 verdict 확정 후 노출).
+    emit_rag_hits_ready(
+        on_event, node_id="work_accuracy", agent_id="work-accuracy-agent",
+        item_number=16, phase="layer2",
+        fewshot=_fewshot_to_dict_list(fewshot_16),
+        fewshot_query=segment_text, intent=primary_intent,
     )
 
     # #15 분기 결정
@@ -555,6 +566,33 @@ def _build_segment_text(assigned_turns: list[dict], fallback: str) -> str:
     if not assigned_turns:
         return fallback[:2800]
     return "\n".join(f"{t.get('speaker', '')}: {t.get('text', '')}" for t in assigned_turns)[:2800]
+
+
+def _fewshot_to_dict_list(fewshot: Any) -> list[dict[str, Any]]:
+    """`retrieve_fewshot` FewshotResult.examples → emit_rag_hits_ready 호환 dict list."""
+    if fewshot is None:
+        return []
+    examples = getattr(fewshot, "examples", None) or []
+    out: list[dict[str, Any]] = []
+    for ex in examples:
+        ex_id = getattr(ex, "example_id", None)
+        if not ex_id:
+            continue
+        rater = getattr(ex, "rater_meta", None) or {}
+        if not isinstance(rater, dict):
+            rater = {}
+        out.append({
+            "example_id": str(ex_id),
+            "item_number": getattr(ex, "item_number", None),
+            "score": getattr(ex, "score", None),
+            "score_bucket": getattr(ex, "score_bucket", None),
+            "intent": getattr(ex, "intent", None),
+            "segment_text": getattr(ex, "segment_text", "") or "",
+            "rationale": getattr(ex, "rationale", "") or "",
+            "rationale_tags": getattr(ex, "rationale_tags", None) or [],
+            "rater_meta": rater,
+        })
+    return out
 
 
 def _safe_fewshot(item_number: int, intent: str, segment_text: str, tenant_id: str):

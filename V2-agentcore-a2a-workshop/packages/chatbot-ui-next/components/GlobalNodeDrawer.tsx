@@ -7,13 +7,21 @@ import { useCallback, useEffect } from "react";
 
 import NodeDrawer from "@/components/results/NodeDrawer";
 import { useAppState } from "@/lib/AppStateContext";
+import { useNodeDrawerUrlSync } from "@/lib/useNodeDrawerUrlSync";
 
 /**
  * GlobalNodeDrawer — AppStateContext.openNodeId 가 세팅되면 어느 탭에서든 NodeDrawer 가 열림.
  * Pipeline 탭에서 PipelineFlow.onNodeClick 으로 열어도, Results 탭 전환 후에도 유지.
+ *
+ * ★ 2026-05-07: useNodeDrawerUrlSync — `?node={id}&item={N}` query 와 양방향 동기화.
+ *   - URL 직접 입력 / 새로고침 / 공유 링크 시 자동 NodeDrawer 오픈
+ *   - 닫으면 URL 에서 query 제거
+ *   - back/forward 버튼으로 드로어 열림/닫힘 추적
  */
 export default function GlobalNodeDrawer() {
   const { state, setOpenNode } = useAppState();
+  // URL ↔ openNodeId 양방향 sync (shallow URL update — RSC re-fetch 없음).
+  useNodeDrawerUrlSync();
   const close = useCallback(() => setOpenNode(null), [setOpenNode]);
 
   // openNodeId 가 열렸을 때 body scroll 잠금

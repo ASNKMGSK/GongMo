@@ -108,6 +108,7 @@ async function computeFlatLayout(
   effectiveDefs: Record<string, NodeDef>,
   effectiveGroups: Record<string, GroupDef>,
   effectiveEdges: EdgeDef[],
+  layer2Children: string[],
 ): Promise<LayoutResult> {
   const elkNodes: ElkNode[] = Object.values(effectiveDefs).map((def) => ({
     id: def.id,
@@ -140,7 +141,51 @@ async function computeFlatLayout(
     h: c.height || DEFAULT_NODE_H,
   }));
 
-  // input_data + tenant_config 를 layer1 중심 y 에 맞춰 vertical center 정렬
+  // ★ 2026-05-08: 사용자 보고 — input_stt / tenant_config / layer1 (preprocessing) /
+  // kms 등 단일-노드 swimlane 이 evaluation (Layer 2 sub-agents) 노드들과 vertical
+  // center 가 어긋나 직각 정렬이 깨짐.
+  //
+  // 원인: ELK layered LR + NETWORK_SIMPLEX 는 단일 노드 lane 의 y 를 multi-fanout
+  //       lane 중심에 자동 정렬하지 않음 (edge length 최소화에만 집중).
+  //
+  // 해결: Layer 2 sub-agents 들의 vertical bbox 중심 (evalCenterY) 을 reference 로 잡고,
+  //       동일 swimlane 의 single-row 노드들 (layer1 / kms / layer2_barrier / layer3 /
+  //       confidence / tier_router / evidence_refiner / layer4 / gt_evidence_comparison /
+  //       layer5 / report_generator) 의 y 를 모두 evalCenterY 에 정렬.
+  //       input_data + tenant_config 는 layer1 (이제 evalCenterY 에 정렬됨) 기준으로
+  //       위/아래 stacked 정렬 → 자동으로 evaluation center 와 동일 라인.
+  // 단일 통합 그룹으로 묶여도 fan-out swimlane vertical alignment 는 sub-agent (eval) 노드 기준.
+  // KMS 는 같은 layer 영역에 있지만 sub-agent 가 아니므로 layer2Children 에서 제외 (이미 그렇게 산출됨).
+  const layer2ChildIds = layer2Children;
+  const layer2ChildNodes = nodes.filter((n) => layer2ChildIds.includes(n.id));
+  if (layer2ChildNodes.length > 0) {
+    const evalMinY = Math.min(...layer2ChildNodes.map((n) => n.y));
+    const evalMaxY = Math.max(...layer2ChildNodes.map((n) => n.y + n.h));
+    const evalCenterY = (evalMinY + evalMaxY) / 2;
+    const SINGLE_LANE_IDS = [
+      "layer1",
+      "kms",
+      "layer2_barrier",
+      "layer3",
+      "confidence",
+      "tier_router",
+      "evidence_refiner",
+      "layer4",
+      "gt_comparison",
+      "gt_evidence_comparison",
+      "layer5",
+      "report_generator",
+    ];
+    for (const id of SINGLE_LANE_IDS) {
+      const n = nodes.find((nn) => nn.id === id);
+      if (!n) continue;
+      n.y = evalCenterY - n.h / 2;
+    }
+  }
+
+  // input_data + tenant_config 를 layer1 중심 y 에 맞춰 vertical center 정렬.
+  // 위 single-lane 정렬로 layer1.y 가 evalCenterY 기준으로 이동했으므로, 이 두 노드도
+  // 자동으로 evaluation 노드들과 같은 vertical 라인에 정렬됨.
   const layer1 = nodes.find((n) => n.id === "layer1");
   const inputNode = nodes.find((n) => n.id === "input_data");
   const tenantNode = nodes.find((n) => n.id === "tenant_config");
@@ -237,6 +282,12 @@ export interface PipelineFlowProps {
   personaMode?: "single" | "ensemble";
   debateStatusByNode?: Record<string, "idle" | "running" | "done">;
   debateRoundByNode?: Record<string, { round: number; max: number }>;
+  /** 항목별 토론 완료 플래시 — 멀티 항목 노드에서 각 item_number 가 finalized 될 때
+   *  부모가 4초간 채워줌. 노드 우상단 satellite 배지로 "✓ #N · 점수 토론완료" 표시. */
+  debateFinishFlashByNode?: Record<
+    string,
+    { item_number: number; score: number | null; at: number }
+  >;
   onDebateOpen?: (nodeId: string) => void;
   /** node-level LLM 평균 confidence (1~5) — V2 qa_pipeline_reactflow.html 의
    *  aggregateConfidenceByAgent 결과. Sub-agent 노드 좌하단 chip 으로 표시. */
@@ -251,6 +302,10 @@ export interface PipelineFlowProps {
   };
   /** 테넌트별 effective pipeline config — 미지정 시 default (KSQI 활성, 모두 표시). */
   tenantPipelineConfig?: TenantPipelineConfig;
+  /** 노드별 *동적* sub 텍스트 override.
+   *  KMS 노드의 검출 인텐트 (예: "교환, 반품") 처럼 결과 들어오면 sub 라인 동적 변경.
+   *  미지정/빈 문자열이면 NODE_DEFS 의 정적 sub 사용. */
+  nodeSubOverrides?: Record<string, string>;
 }
 
 function PipelineFlowImpl({
@@ -262,10 +317,12 @@ function PipelineFlowImpl({
   personaMode = "single",
   debateStatusByNode,
   debateRoundByNode,
+  debateFinishFlashByNode,
   onDebateOpen,
   nodeConfidence,
   tenantContext,
   tenantPipelineConfig,
+  nodeSubOverrides,
 }: PipelineFlowProps) {
   const [layout, setLayout] = useState<LayoutResult | null>(null);
 
@@ -286,7 +343,7 @@ function PipelineFlowImpl({
     let alive = true;
     // setLayout(null) 호출하지 않음 — 이전 layout 유지하면서 새 layout 비동기 계산 후 교체.
     // 평가 진행 중 또는 SSE 이벤트 폭주 중에 layout=null 로 잠시 비워지는 깜빡임 방지.
-    computeFlatLayout(effective.defs, effective.groups, effective.edges)
+    computeFlatLayout(effective.defs, effective.groups, effective.edges, effective.layer2Children)
       .then((res) => {
         if (alive) setLayout(res);
       })
@@ -346,18 +403,27 @@ function PipelineFlowImpl({
   // fitView 는 그래프 전체 중앙을 맞추므로 확대 시 중간만 보이고 시작부가 잘림.
   // React Flow 좌표계: screenX(world.x) = world.x * zoom + viewport.x.
   //   따라서 viewport.x = leftPad - inputNode.x * zoom 이면 inputNode 왼쪽이 leftPad 위치에 옴.
-  const initialViewport = useMemo(() => {
-    const DEFAULT = { x: 0, y: 0, zoom: 0.85 };
-    if (!layout) return DEFAULT;
+  //
+  // ★ 2026-05-08: 사용자 보고 — 모델 선택 (Haiku 등) / 토글 변경 후 viewport 가 reset 됨.
+  // 원인: ReactFlow `defaultViewport` prop 이 새 ref 가 되면 (layout 재계산 etc.) 내부적으로
+  // viewport 를 그 새 값으로 다시 적용하는 동작. 사용자가 수동으로 옮긴 viewport 가 무효화.
+  // 해결: 첫 layout 도착 시 1회만 ref 로 캡처 → 이후 어떤 prop 변경에도 같은 ref 유지.
+  //       ReactFlow defaultViewport 가 referentially stable → viewport reset 발생 안 함.
+  const initialViewportRef = useRef<{ x: number; y: number; zoom: number } | null>(null);
+  if (layout && initialViewportRef.current === null) {
     const inputNode = layout.nodes.find((n) => n.id === "input_data");
-    if (!inputNode) return DEFAULT;
-    const zoom = 0.85; // 시각적 품질(텍스트 선명)과 정보 밀도 사이 타협점
-    const padLeft = 32;
-    const containerH = 760;
-    const x = padLeft - inputNode.x * zoom;
-    const y = containerH / 2 - (inputNode.y + inputNode.h / 2) * zoom;
-    return { x, y, zoom };
-  }, [layout]);
+    if (inputNode) {
+      const zoom = 0.85; // 시각적 품질(텍스트 선명)과 정보 밀도 사이 타협점
+      const padLeft = 32;
+      const containerH = 760;
+      const x = padLeft - inputNode.x * zoom;
+      const y = containerH / 2 - (inputNode.y + inputNode.h / 2) * zoom;
+      initialViewportRef.current = { x, y, zoom };
+    } else {
+      initialViewportRef.current = { x: 0, y: 0, zoom: 0.85 };
+    }
+  }
+  const initialViewport = initialViewportRef.current ?? { x: 0, y: 0, zoom: 0.85 };
 
   const nodes: Node[] = useMemo(() => {
     if (!layout) return [];
@@ -383,7 +449,9 @@ function PipelineFlowImpl({
           },
           draggable: false,
           selectable: false,
-          zIndex: 0,
+          // ★ 2026-05-08: group 을 edges layer 보다 뒤로 — fan-out 박스 traveler 가
+          // group 의 반투명 배경 위에서 또렷하게 보이도록.
+          zIndex: -1,
           style: {
             width: g.w,
             height: g.h,
@@ -409,6 +477,7 @@ function PipelineFlowImpl({
           nodeType === "evaluation" && isDebateCapableNode(def.id);
         const debateStatus = debateStatusByNode?.[def.id] ?? "idle";
         const debateRoundInfo = debateRoundByNode?.[def.id];
+        const debateFinishFlash = debateFinishFlashByNode?.[def.id];
 
         return {
           id: def.id,
@@ -424,11 +493,16 @@ function PipelineFlowImpl({
             debateStatus,
             debateRound: debateRoundInfo?.round,
             debateMaxRounds: debateRoundInfo?.max,
+            debateFinishFlash,
             onDebateOpen,
+            // ★ 2026-05-07: 명시적 "📋 상세" 액션 버튼 — onNodeClick 과 동일 효과지만 affordance.
+            onOpenDetail: onNodeClick,
             // tenant_config 노드에만 현재 테넌트 정보 + 변경 트리거 전달.
             tenantContext: def.id === "tenant_config" ? tenantContext : undefined,
             // 테넌트 전환으로 새로 추가된 노드 — 1.6초 sparkle 애니메이션
             isNewlyAdded: newlyAddedIds.has(def.id),
+            // 동적 sub override — KMS 의 검출 인텐트 등. 빈 값이면 def.sub fallback.
+            dynamicSub: nodeSubOverrides?.[def.id] || undefined,
           },
           draggable: false,
           // ⚠ React Flow 최근 버전에서 selectable:false 면 onNodeClick 미발사. 자식 노드는
@@ -452,15 +526,19 @@ function PipelineFlowImpl({
     personaMode,
     debateStatusByNode,
     debateRoundByNode,
+    debateFinishFlashByNode,
     onDebateOpen,
+    onNodeClick,
     tenantContext,
     newlyAddedIds,
+    nodeSubOverrides,
   ]);
 
   // 동적 fan-out targets — effective Layer 2 노드 set (base + extras).
   // 신한 부서특화 노드도 BusEdge 로 렌더되어 base sub-agent 와 동일 trunk 공유 (이중 간선 방지).
+  // group_layer2 안의 sub-agent 만 fan-out 트렁크 대상 (Layer 1/3/4 노드는 제외).
   const fanOutTargets = useMemo(
-    () => new Set(effective.groups.group_layer2?.children || []),
+    () => new Set(effective.layer2Children),
     [effective],
   );
 
@@ -477,11 +555,12 @@ function PipelineFlowImpl({
     };
 
     // ── 공유 trunk X 좌표 — 모든 fan-out/fan-in BusEdge 가 동일 trunk 정렬.
-    // layer1 우측 + 45 / layer2_barrier 좌측 - 45. 신한 dept 노드도 base 8 과 같은 trunk 사용.
+    // KMS 우측 + 45 (fan-out 트렁크) / layer2_barrier 좌측 - 45 (fan-in 트렁크).
+    // 새 토폴로지: layer1 → kms → [8 sub-agents fan-out] → layer2_barrier.
     const layoutNodes = layout?.nodes || [];
-    const layer1Pos = layoutNodes.find((n) => n.id === "layer1");
-    const fanOutTrunkX = layer1Pos
-      ? layer1Pos.x + layer1Pos.w + 45
+    const kmsPos = layoutNodes.find((n) => n.id === "kms");
+    const fanOutTrunkX = kmsPos
+      ? kmsPos.x + kmsPos.w + 45
       : undefined;
     const barrierPos = layoutNodes.find((n) => n.id === "layer2_barrier");
     const fanInTrunkX = barrierPos ? barrierPos.x - 45 : undefined;
@@ -498,8 +577,8 @@ function PipelineFlowImpl({
       const done = state === "done";
       const skipped = state === "skipped";
       const isShortCircuit = SHORT_CIRCUIT_EDGES.has(k);
-      // Layer 2 fan-out: layer1 → 모든 active L2 노드 (base + 부서특화 extras)
-      const isFanOut = e.from === "layer1" && fanOutTargets.has(e.to);
+      // Layer 2 fan-out: kms → 모든 active L2 노드 (base + 부서특화 extras)
+      const isFanOut = e.from === "kms" && fanOutTargets.has(e.to);
       // Layer 2 fan-in: 모든 active L2 노드 → layer2_barrier
       const isFanIn = fanOutTargets.has(e.from) && e.to === "layer2_barrier";
       const useBus = isFanOut || isFanIn;
@@ -691,6 +770,11 @@ function arePropsEqual(prev: PipelineFlowProps, next: PipelineFlowProps): boolea
     prev.debateRoundByNode ?? {},
     next.debateRoundByNode ?? {},
   );
+  // debateFinishFlashByNode 는 {item_number, score, at} 객체 — at 타임스탬프가 핵심 변경 신호.
+  const debateFinishFlashSame = areDebateFinishFlashEqual(
+    prev.debateFinishFlashByNode ?? {},
+    next.debateFinishFlashByNode ?? {},
+  );
   return (
     areRecordEqual(prev.nodeStates, next.nodeStates) &&
     areRecordEqual(prev.nodeScores, next.nodeScores) &&
@@ -705,8 +789,43 @@ function arePropsEqual(prev: PipelineFlowProps, next: PipelineFlowProps): boolea
       (prev.debateStatusByNode ?? {}) as Record<string, string>,
       (next.debateStatusByNode ?? {}) as Record<string, string>,
     ) &&
-    debateRoundSame
+    debateRoundSame &&
+    debateFinishFlashSame &&
+    areRecordEqual(
+      (prev.nodeSubOverrides ?? {}) as Record<string, string>,
+      (next.nodeSubOverrides ?? {}) as Record<string, string>,
+    )
   );
+}
+
+function areDebateFinishFlashEqual(
+  a: Record<
+    string,
+    { item_number?: number; score?: number | null; at?: number } | undefined
+  >,
+  b: Record<
+    string,
+    { item_number?: number; score?: number | null; at?: number } | undefined
+  >,
+): boolean {
+  if (a === b) return true;
+  const ak = Object.keys(a);
+  const bk = Object.keys(b);
+  if (ak.length !== bk.length) return false;
+  for (const k of ak) {
+    const av = a[k];
+    const bv = b[k];
+    if (av === bv) continue;
+    if (!av || !bv) return false;
+    if (
+      av.item_number !== bv.item_number ||
+      av.score !== bv.score ||
+      av.at !== bv.at
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function areDebateRoundEqual(

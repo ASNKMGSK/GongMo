@@ -53,19 +53,20 @@ EXCLUDED_ITEMS: frozenset[int] = frozenset({15, 16})
 
 
 def _default_xlsx_path() -> str:
-    """env QA_GT_XLSX_PATH > Desktop _fixed.xlsx > Desktop legacy 순서로 탐색."""
+    """GT xlsx 경로 — `_gt_loader.resolve_gt_xlsx_path` 단일 헬퍼 사용 (S4 fix).
+
+    이전엔 Windows-only Desktop fallback 만 있어 EC2 Linux 에서 layer4 GT 비교가
+    무용했음. _gt_loader 가 OS 별 후보 통합 처리.
+    """
+    from ._gt_loader import resolve_gt_xlsx_path
+    resolved = resolve_gt_xlsx_path()
+    if resolved:
+        return resolved
+    # not-found fallback (호출자가 Path.exists() 로 다시 검사)
     env = os.environ.get("QA_GT_XLSX_PATH")
-    if env and Path(env).exists():
+    if env:
         return env
-    desktop = Path(r"C:\Users\META M\Desktop")
-    for fname in (
-        "QA정답-STT_기반_통합_상담평가표_v3재평가_fixed.xlsx",
-        "QA정답-STT_기반_통합_상담평가표_v3재평가.xlsx",
-    ):
-        p = desktop / fname
-        if p.exists():
-            return str(p)
-    return env or str(desktop / "QA정답-STT_기반_통합_상담평가표_v3재평가_fixed.xlsx")
+    return str(Path(r"C:\Users\META M\Desktop") / "QA정답-STT_기반_통합_상담평가표_v3재평가_fixed.xlsx")
 
 
 def _load_gt_items(xlsx_path: str, sample_id: str) -> tuple[list[dict], str | None, str | None]:
@@ -90,26 +91,10 @@ def _load_gt_items(xlsx_path: str, sample_id: str) -> tuple[list[dict], str | No
         return [], None, f"xlsx 로드 실패: {e}"
 
     try:
-        # /v2/gt-scores 엔드포인트와 동일한 lenient 매칭 사용 — strict suffix 만으로는
-        # JSON id="668451-A" (테스트 변형 suffix) 같은 케이스에서 시트 `..._668451` 에
-        # 매칭 실패. 1) suffix → 2) contains → 3) digits 추출 정수비교 순.
-        import re as _re
-
-        target_suffix = f"_{sample_id}"
-        matched = [s for s in wb.sheetnames if s.endswith(target_suffix)]
-        if not matched:
-            matched = [s for s in wb.sheetnames if sample_id in s]
-        if not matched:
-            sid_digits = _re.sub(r"\D", "", sample_id) or sample_id
-            try:
-                sid_int = int(sid_digits) if sid_digits else None
-            except (ValueError, TypeError):
-                sid_int = None
-            if sid_int is not None:
-                for s in wb.sheetnames:
-                    nums = _re.findall(r"\d+", s)
-                    if any(int(n) == sid_int for n in nums if n):
-                        matched.append(s)
+        # ★ 2026-04-30 S4 fix: lenient 매칭을 v2.layer4._gt_loader 단일 헬퍼로 통합.
+        # 이전엔 server_v2 `/v2/gt-scores` 와 이 함수에 동일 알고리즘 인라인 → drift 위험.
+        from ._gt_loader import match_sheet
+        matched, _method = match_sheet(wb.sheetnames, sample_id)
         if not matched:
             return [], None, f"sample_id={sample_id} 시트 없음"
         ws = wb[matched[0]]
@@ -119,12 +104,18 @@ def _load_gt_items(xlsx_path: str, sample_id: str) -> tuple[list[dict], str | No
         cur_idx = 0
         current_category: str | None = None
 
-        for r in range(6, 50):
-            cat_cell = ws.cell(row=r, column=1).value
-            item_name = ws.cell(row=r, column=2).value
-            max_score = ws.cell(row=r, column=4).value
-            score = ws.cell(row=r, column=5).value
-            note = ws.cell(row=r, column=6).value
+        # ★ 2026-05-08 perf: 셀 단위 ws.cell(r,c) 호출은 openpyxl read-only 에서
+        # 매 호출마다 XML 처음부터 재스트리밍 → 44행 × 6컬 = 264회 호출에 ~150ms+.
+        # iter_rows(values_only=True) 1회 호출은 동일 범위를 sub-millisecond 처리.
+        # ★ 2026-05-07: column 7 = 사람 검수자가 참조한 STT 원문 발췌 (col index 6).
+        rows_iter = ws.iter_rows(min_row=6, max_row=49, min_col=1, max_col=7, values_only=True)
+        for row_vals in rows_iter:
+            cat_cell = row_vals[0] if len(row_vals) > 0 else None
+            item_name = row_vals[1] if len(row_vals) > 1 else None
+            max_score = row_vals[3] if len(row_vals) > 3 else None
+            score = row_vals[4] if len(row_vals) > 4 else None
+            note = row_vals[5] if len(row_vals) > 5 else None
+            stt_excerpt = row_vals[6] if len(row_vals) > 6 else None
 
             if cat_cell and isinstance(cat_cell, str) and "총점" in cat_cell:
                 break
@@ -142,6 +133,11 @@ def _load_gt_items(xlsx_path: str, sample_id: str) -> tuple[list[dict], str | No
                 "max_score": int(max_score) if isinstance(max_score, (int, float)) else None,
                 "score": int(score) if isinstance(score, (int, float)) else None,
                 "note": str(note).strip() if isinstance(note, str) else None,
+                # 검수자가 참조한 실제 STT 발화 — 프론트가 "T 구간" 의 T 가 무엇인지 볼 수 있게.
+                "gt_evidence_excerpt": (
+                    str(stt_excerpt).strip() if isinstance(stt_excerpt, str)
+                    else (str(stt_excerpt) if stt_excerpt is not None else None)
+                ),
             })
             cur_idx += 1
 

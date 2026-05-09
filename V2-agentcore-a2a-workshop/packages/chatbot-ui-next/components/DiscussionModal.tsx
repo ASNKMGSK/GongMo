@@ -253,7 +253,13 @@ function DiscussionModalImpl({
                 : nodeItems.length > 0
                   ? `평가 항목 ${nodeItems.map((n) => `#${n}`).join(", ")}`
                   : "평가 항목"}
-              {" · 3명 페르소나 합의"}
+              {/* ★ 2026-04-30: 합의 여부에 따라 동적 라벨 — 이전엔 항상 "합의" 로 잘못 표시.
+                  done + converged → "합의" / done + 미수렴 → "미합의 → 판사 결정" / 나머지 → "토론". */}
+              {phase === "done" && state.final
+                ? state.final.converged
+                  ? " · 3명 페르소나 합의"
+                  : " · 3명 페르소나 미합의 → 판사 결정"
+                : " · 3명 페르소나 토론"}
               {maxScore ? ` · 만점 ${maxScore}점` : ""}
             </div>
           </div>

@@ -62,6 +62,10 @@ const ReviewQueuePanel = dynamic(
   () => import("./tabs/ReviewQueuePanel").then((m) => m.ReviewQueuePanel),
   { ssr: false, loading: () => <TabLoading label="검토 큐" /> },
 );
+const DriftDashboardPanel = dynamic(
+  () => import("./tabs/DriftDashboardPanel").then((m) => m.DriftDashboardPanel),
+  { ssr: false, loading: () => <TabLoading label="Drift 모니터링" /> },
+);
 
 /* ─────────────────────────────────────────────────────────────
    MainTabs — 탭 바 + 활성 패널
@@ -216,6 +220,7 @@ export function MainTabs() {
     { key: "matrix", node: <MatrixPanel /> },
     { key: "rag-admin", node: <RagAdminPanel /> },
     { key: "review-queue", node: <ReviewQueuePanel /> },
+    { key: "drift", node: <DriftDashboardPanel /> },
   ];
 
   return (

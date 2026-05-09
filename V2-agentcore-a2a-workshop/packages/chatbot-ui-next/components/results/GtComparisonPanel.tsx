@@ -134,9 +134,23 @@ function GtComparisonPanel({ gc }: Props) {
                   </td>
                   <td
                     className="num tabular-nums"
-                    style={{ textAlign: "right", fontWeight: 600 }}
+                    style={{
+                      textAlign: "right",
+                      fontWeight: row.gt_score != null ? 600 : 400,
+                      color:
+                        row.gt_score != null
+                          ? undefined
+                          : "var(--ink-muted)",
+                      fontStyle: row.gt_score != null ? undefined : "italic",
+                      fontSize: row.gt_score != null ? undefined : 11,
+                    }}
+                    title={
+                      row.gt_score == null
+                        ? "이 항목의 사람 QA 점수가 없습니다"
+                        : undefined
+                    }
                   >
-                    {row.gt_score ?? "-"}
+                    {row.gt_score ?? "GT값 없음"}
                   </td>
                   <td
                     className="num tabular-nums"
